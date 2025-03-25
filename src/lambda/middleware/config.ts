@@ -1,9 +1,9 @@
 import { DynamoDBClient, GetItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
-import { am_in_lambda } from './utils'
+import { am_in_lambda } from '../utils'
 import middy from '@middy/core'
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda'
-
+import { ContextWithConfig } from './context'
 
 export type ConfigType = {
   APPLE_CLIENT_ID: string,
@@ -39,7 +39,6 @@ export type ConfigType = {
 
 let configData: ConfigType
 
-export type ContextWithConfig = Context & { config: ConfigType }
 
 export const configMiddleware = (): middy.MiddlewareObj<APIGatewayProxyEvent, APIGatewayProxyResult, Error, ContextWithConfig> => {
 

@@ -4,6 +4,8 @@ import axios from 'axios'
 export const envQueryOptions = queryOptions({
     queryKey: ['env'],
     queryFn: () => fetchEnv(),
+    staleTime: 0,
+    refetchOnWindowFocus: true
   })
 
 

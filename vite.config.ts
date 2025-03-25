@@ -5,10 +5,12 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   root: 'src/front',
-  plugins: [TanStackRouterVite({
-    routesDirectory: 'src/front/routes',
-  }), react({})],
+  plugins: [react({})],
+ //plugins: [TanStackRouterVite({
+  //  routesDirectory: 'src/front/routes',
+  //}), react({})],
   server: {
+    hmr: false,
     port: 3000,
     proxy: {
       '/api': {
