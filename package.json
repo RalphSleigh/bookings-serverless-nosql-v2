@@ -37,13 +37,10 @@
     "@tanstack/react-router": "^1.109.2",
     "@tanstack/router-devtools": "^1.109.2",
     "axios": "^1.7.9",
-<<<<<<< HEAD
     "cookie": "^1.0.2",
     "electrodb": "^3.4.1",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.2.0",
-=======
->>>>>>> 125a5e82906a257ccdb3796ff8d14693dfe4e18d
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   }
