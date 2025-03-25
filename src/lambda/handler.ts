@@ -13,6 +13,7 @@ const routes = [
       method: "GET" as Method,
       path: '/api/env',
       handler: getEnv
+<<<<<<< HEAD
     },{
       method: "GET" as Method,
       path: '/api/auth/redirect',
@@ -21,6 +22,8 @@ const routes = [
       method: "GET" as Method,
       path: '/api/auth/callback',
       handler: authCallback
+=======
+>>>>>>> 125a5e82906a257ccdb3796ff8d14693dfe4e18d
     }
   ]
   
@@ -29,5 +32,8 @@ export const handler = middy()
 .use(httpHeaderNormalizer())
 .use(httpJsonBodyParser({disableContentTypeError: true}))
 .use(configMiddleware())
+<<<<<<< HEAD
 .use(userMiddleware())
+=======
+>>>>>>> 125a5e82906a257ccdb3796ff8d14693dfe4e18d
 .handler(httpRouterHandler(routes))
