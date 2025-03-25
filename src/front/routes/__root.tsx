@@ -12,7 +12,6 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
 }>()({
   component: RootComponent,
-<<<<<<< HEAD
   loader: ({ context: { queryClient } }) => {
     return queryClient.ensureQueryData(envQueryOptions)
   },
@@ -26,16 +25,6 @@ function RootComponent() {
         <Outlet />
         <ReactQueryDevtools buttonPosition="bottom-right" />
         <TanStackRouterDevtools position="bottom-right" />
-=======
-})
-
-function RootComponent() {
-  return (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="bottom-right" />
-      <TanStackRouterDevtools position="bottom-right" />
->>>>>>> 125a5e82906a257ccdb3796ff8d14693dfe4e18d
     </>
   )
 }
