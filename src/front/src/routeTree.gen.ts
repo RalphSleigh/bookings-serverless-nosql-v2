@@ -10,15 +10,42 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './../routes/__root'
-import { Route as IndexImport } from './../routes/index'
+import { Route as rootRoute } from './routes/__root'
+import { Route as UserImport } from './routes/_user'
+import { Route as IndexImport } from './routes/index'
+import { Route as UserUserImport } from './routes/_user/user'
+import { Route as UserTestLoggedInImport } from './routes/_user/testLoggedIn'
+import { Route as UserEventsNewImport } from './routes/_user/events/new'
 
 // Create/Update Routes
+
+const UserRoute = UserImport.update({
+  id: '/_user',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const UserUserRoute = UserUserImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => UserRoute,
+} as any)
+
+const UserTestLoggedInRoute = UserTestLoggedInImport.update({
+  id: '/testLoggedIn',
+  path: '/testLoggedIn',
+  getParentRoute: () => UserRoute,
+} as any)
+
+const UserEventsNewRoute = UserEventsNewImport.update({
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => UserRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -32,39 +59,101 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_user': {
+      id: '/_user'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof UserImport
+      parentRoute: typeof rootRoute
+    }
+    '/_user/testLoggedIn': {
+      id: '/_user/testLoggedIn'
+      path: '/testLoggedIn'
+      fullPath: '/testLoggedIn'
+      preLoaderRoute: typeof UserTestLoggedInImport
+      parentRoute: typeof UserImport
+    }
+    '/_user/user': {
+      id: '/_user/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserUserImport
+      parentRoute: typeof UserImport
+    }
+    '/_user/events/new': {
+      id: '/_user/events/new'
+      path: '/events/new'
+      fullPath: '/events/new'
+      preLoaderRoute: typeof UserEventsNewImport
+      parentRoute: typeof UserImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface UserRouteChildren {
+  UserTestLoggedInRoute: typeof UserTestLoggedInRoute
+  UserUserRoute: typeof UserUserRoute
+  UserEventsNewRoute: typeof UserEventsNewRoute
+}
+
+const UserRouteChildren: UserRouteChildren = {
+  UserTestLoggedInRoute: UserTestLoggedInRoute,
+  UserUserRoute: UserUserRoute,
+  UserEventsNewRoute: UserEventsNewRoute,
+}
+
+const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof UserRouteWithChildren
+  '/testLoggedIn': typeof UserTestLoggedInRoute
+  '/user': typeof UserUserRoute
+  '/events/new': typeof UserEventsNewRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof UserRouteWithChildren
+  '/testLoggedIn': typeof UserTestLoggedInRoute
+  '/user': typeof UserUserRoute
+  '/events/new': typeof UserEventsNewRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_user': typeof UserRouteWithChildren
+  '/_user/testLoggedIn': typeof UserTestLoggedInRoute
+  '/_user/user': typeof UserUserRoute
+  '/_user/events/new': typeof UserEventsNewRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '' | '/testLoggedIn' | '/user' | '/events/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '' | '/testLoggedIn' | '/user' | '/events/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/_user'
+    | '/_user/testLoggedIn'
+    | '/_user/user'
+    | '/_user/events/new'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  UserRoute: typeof UserRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  UserRoute: UserRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +166,32 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/_user"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/_user": {
+      "filePath": "_user.tsx",
+      "children": [
+        "/_user/testLoggedIn",
+        "/_user/user",
+        "/_user/events/new"
+      ]
+    },
+    "/_user/testLoggedIn": {
+      "filePath": "_user/testLoggedIn.tsx",
+      "parent": "/_user"
+    },
+    "/_user/user": {
+      "filePath": "_user/user.tsx",
+      "parent": "/_user"
+    },
+    "/_user/events/new": {
+      "filePath": "_user/events/new.tsx",
+      "parent": "/_user"
     }
   }
 }
