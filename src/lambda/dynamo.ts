@@ -33,6 +33,9 @@ export const DBUser = new Entity(
       email: {
         type: 'string',
       },
+      avatar: {
+        type: 'string',
+      },
       isWoodcraft: {
         type: 'boolean',
         required: true,

@@ -1,31 +1,34 @@
-import { AbilityBuilder, createMongoAbility, MongoAbility } from '@casl/ability';
+import { Ability, AbilityBuilder, createMongoAbility, MongoAbility } from '@casl/ability'
 
-import { DBRole } from '../lambda/dynamo';
-import { ContextUser } from '../lambda/middleware/context';
-import { TRole } from './schemas/role';
+import { DBRole } from '../lambda/dynamo'
+import { ContextUser } from '../lambda/middleware/context'
+import { TRole } from './schemas/role'
 
-type Action = 'manage' | 'create' | 'edit';
-type Subject = 'all' | 'event';
+export type Action = 'manage' | 'get' | 'create' | 'edit'
+export type Subject = 'all' | 'events' | 'event' | 'currentUser' | 'env'
 
 export const getPermissionsFromUser = (user: ContextUser) => {
-  const { can, cannot, build } = new AbilityBuilder<MongoAbility<[Action, Subject]>>(createMongoAbility);
+  const { can, cannot, build } = new AbilityBuilder<MongoAbility<[Action, Subject]>>(createMongoAbility)
 
-  cannot('manage', 'all');
+  cannot('manage', 'all')
+  can('get', 'currentUser')
+  can('get', 'env')
+  can('get', 'events')
+
 
   if (!user) {
-    return build();
+    return build()
   }
 
   for (const role of user.roles) {
-    permissionsFunctions[role.role](can);
+    permissionsFunctions[role.role](can)
   }
 
-  return build();
-};
-
+  return build()
+}
 
 const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<MongoAbility<[Action, Subject]>>['can']) => void> = {
   admin: (can) => {
-    can('manage', 'all');
+    can('manage', 'all')
   },
-};
+}

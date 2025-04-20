@@ -1,38 +1,24 @@
-import middy from '@middy/core';
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import middy from '@middy/core'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { ContextWithUser } from '../../middleware/context';
-import { DBEvent, DBRole } from '../../dynamo';
-import { getPermissionsFromUser } from '../../../shared/permissions';
-import { HandlerWrapper } from '../../utils';
-import { EventSchema, EventSchemaWhenCreating, TEventSchemaWhenCreating } from '../../../shared/schemas/event';
+import { getPermissionsFromUser } from '../../../shared/permissions'
+import { EventSchema, EventSchemaWhenCreating, TEventSchemaWhenCreating } from '../../../shared/schemas/event'
+import { DBEvent, DBRole } from '../../dynamo'
+import { ContextWithUser } from '../../middleware/context'
+import { HandlerWrapper } from '../../utils'
 
 export type TCreateEventData = {
   event: TEventSchemaWhenCreating
 }
 
-export const createEvent = HandlerWrapper<TCreateEventData>(
-  async (event, context) => {
-    const user = context.user;
-    const permission = getPermissionsFromUser(user);
+export const createEvent = HandlerWrapper<TCreateEventData>(['create', 'event'], async (event, context) => {
+  const validatedEvent = EventSchemaWhenCreating.parse(event.body.event)
 
-    if (!permission.can('manage', 'all')) {
-        return {
-            statusCode: 401,
-            body: 'Unauthorized',
-        }
-    }
+  console.log(validatedEvent)
 
-    const validatedEvent = EventSchemaWhenCreating.parse(event.body.event);
+  const createdEvent = await DBEvent.create(validatedEvent).go()
 
-    console.log(validatedEvent)
+  console.log(createdEvent)
 
-    const createdEvent = await DBEvent.create(validatedEvent).go()
-
-    console.log(createdEvent)
-
-    return {ok:"ok"}
-
-
-  },
-);
+  return { ok: 'ok' }
+})

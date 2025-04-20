@@ -95,6 +95,7 @@ export const authCallback = middy(
         sub: profile.sub!,
         email: email,
         name: displayName,
+        avatar: profile.picture,
         isWoodcraft: isWoodcraft,
         isGroupAccount: isisWoodcraftGroupUser,
       }).go();

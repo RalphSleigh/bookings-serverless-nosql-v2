@@ -1,10 +1,10 @@
-import { Button, Fab, Grid, Link, List, ListItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { format, isSameMonth, parseISO } from 'date-fns'
 import Markdown from 'react-markdown'
 
 import { TEvent } from '../../../shared/schemas/event.js'
 import { Can } from '../permissionContext'
-import { MUILink, toLocalDate } from '../utils.js'
+import { CustomLink, toLocalDate } from '../utils.js'
+import { Container, Paper, Title, Text } from '@mantine/core'
 
 export function EventList({ events }: { events: TEvent[] }) {
   //const bookingsQuery = useUsersBookings()
@@ -21,15 +21,11 @@ export function EventList({ events }: { events: TEvent[] }) {
 
   return (
     <>
-      <Grid container justifyContent="center">
-        <Grid size={{ xs: 12, lg: 10, xl: 8 }}>
-          <Grid container spacing={2} p={2}>
+      <Container>
             {cards}
             {/* {manageCards.length > 0 ? <Typography sx={{ mt: 2, ml: 2 }} variant="h5">Past Events</Typography> : null}
                     {manageCards} */}
-          </Grid>
-        </Grid>
-      </Grid>
+      </Container>
     </>
   )
 }
@@ -41,26 +37,24 @@ function EventCard({ event }: { event: TEvent }) {
   const startDataFormat = isSameMonth(startDate, endDate) ? 'do' : 'do MMMM'
 
   return (
-    <Grid size={12}>
-      <Paper sx={{ p: 2 }} elevation={4}>
+      <Paper shadow="md" radius="md" withBorder mt={16} p="md">
         {/* <BookingButton event={event} booking={booking} /> */}
-        <Typography variant="h5">{event.name}</Typography>
-        <Typography sx={{ mt: 1 }} variant="body1">
+        <Title order={1} size="h2">{event.name}</Title>
+        <Title order={2} size="h4">
           {format(startDate, startDataFormat)} - {format(endDate, 'do MMMM yyyy')}
-        </Typography>
+        </Title>
         {event.description ? <Markdown>{event.description}</Markdown> : null}
         {/* {booking && !booking.deleted ? <YourBooking event={event} booking={booking}></YourBooking> : null} */}
-        <Typography align="right">
+        <Text ta="right">
           <Can I="edit" a="event">
-            <MUILink to={`/event/${event.id}/edit`}>Edit</MUILink>
+            <CustomLink to={`/event/$eventId/edit`} params={{eventId: event.eventId}}>Edit</CustomLink>
           </Can>
           {' '}
           <Can I="manage" a="event">
-            <MUILink to={`/event/${event.id}/manage`}>Manage</MUILink>
+            <CustomLink to={`/event/${event.eventId}/manage`}>Manage</CustomLink>
           </Can>
-        </Typography>
+        </Text>
       </Paper>
-    </Grid>
   )
 }
 

@@ -10,12 +10,12 @@ export const testCreateRole = middy(
     const user = context.user;
     const permission = getPermissionsFromUser(user);
 
-    if (!permission.can('manage', 'all')) {
+/*     if (!permission.can('manage', 'all')) {
         return {
             statusCode: 401,
             body: 'Unauthorized',
         }
-    }
+    } */
 
     if(user) {
 

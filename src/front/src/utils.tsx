@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Link, SelectChangeEvent } from '@mui/material';
+import { Anchor, AnchorProps } from '@mantine/core';
 import { createLink, LinkComponent } from '@tanstack/react-router';
 import { parseISO } from 'date-fns';
 import React, { Dispatch, SetStateAction } from 'react';
@@ -14,19 +14,25 @@ export function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispa
   return [value, setValue];
 }
 
-export const MUILink = createLink(Link);
 
-interface MUIButtonLinkProps extends ButtonProps<'a'> {
-  // Add any additional props you want to pass to the Button
+interface MantineAnchorProps extends Omit<AnchorProps, 'href'> {
+  // Add any additional props you want to pass to the anchor
 }
 
-const MUIButtonLinkComponent = React.forwardRef<HTMLAnchorElement, MUIButtonLinkProps>((props, ref) => <Button ref={ref} component="a" {...props} />);
+const MantineLinkComponent = React.forwardRef<
+  HTMLAnchorElement,
+  MantineAnchorProps
+>((props, ref) => {
+  return <Anchor ref={ref} {...props} />
+})
 
-const CreatedButtonLinkComponent = createLink(MUIButtonLinkComponent);
+const CreatedLinkComponent = createLink(MantineLinkComponent)
 
-export const MUIButtonLink: LinkComponent<typeof MUIButtonLinkComponent> = (props) => {
-  return <CreatedButtonLinkComponent preload={'intent'} {...props} />;
-};
+export const CustomLink: LinkComponent<typeof MantineLinkComponent> = (
+  props,
+) => {
+  return <CreatedLinkComponent preload="intent" {...props} />
+}
 
 export function getSubUpdate<
   T extends Record<string, any>,

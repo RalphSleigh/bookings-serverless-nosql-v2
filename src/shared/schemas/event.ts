@@ -17,7 +17,7 @@ const ealingFee = z.object({
     unaccompanied: z.number(),
     accompaniedDiscount: z.number(),
     unaccompaniedDiscount: z.number(),
-    paymentInstructions: z.string(),
+    paymentInstructions: z.string().nonempty(),
   }),
 });
 

@@ -5,7 +5,6 @@ import { FeeTypes } from '.';
 import { AttendanceTypes } from '../attendance/attendance';
 import { TEalingFees, TEvent, TFees } from '../schemas/event';
 import { FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData } from './feeStructure';
-import { Grid, InputAdornment, TextField, Typography } from '@mui/material';
 import { getMemoObjectUpdateFunctions, getSubUpdate } from '../../front/src/utils';
 
 export class EalingFees implements FeeStructure<TEalingFees> {

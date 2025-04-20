@@ -5,6 +5,7 @@ export const UserSchema = z.object({
   sub: z.string(),
   name: z.string(),
   email: z.string(),
+  avatar: z.string(),
   isWoodcraft: z.boolean(),
   isGroupAccount: z.boolean(),
 });

@@ -19,12 +19,14 @@ export const userMiddleware = (): middy.MiddlewareObj<APIGatewayProxyEvent, APIG
 
         if (!cookie_string) {
           request.context.user = undefined
+          request.context.permissions = getPermissionsFromUser(undefined)
           return
       }
         const jwt_string = cookie.parse(cookie_string)?.jwt
 
         if (!jwt_string || jwt_string === "") {
             request.context.user = undefined
+            request.context.permissions = getPermissionsFromUser(undefined)
             return
         }
 
@@ -34,6 +36,7 @@ export const userMiddleware = (): middy.MiddlewareObj<APIGatewayProxyEvent, APIG
 
         if(userResult.data.user.length === 0) {
           request.context.user = undefined
+          request.context.permissions = getPermissionsFromUser(undefined)
           return
         }
         

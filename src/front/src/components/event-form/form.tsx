@@ -1,7 +1,3 @@
-import { Close } from '@mui/icons-material';
-import { Box, Button, FormControl, FormControlLabel, FormGroup, IconButton, InputLabel, MenuItem, Paper, Select, Switch, TextField, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import { DateTimePicker } from '@mui/x-date-pickers';
 import { parseISO } from 'date-fns';
 import React, { Dispatch, SetStateAction, useCallback, useContext, useState } from 'react';
 import { PartialDeep } from 'type-fest';
@@ -10,35 +6,47 @@ import { AttendanceOptions } from '../../../../shared/attendance/attendance.js';
 import { ConsentsOptions } from '../../../../shared/consents/consents.js';
 import { getFeeTypesForEvent, maybeGetFeeType } from '../../../../shared/fees/fees.js';
 import { KPOptions } from '../../../../shared/kp/kp.js';
-import { EventSchemaWhenCreating, TCustomQuestion, TEventSchemaWhenCreating } from '../../../../shared/schemas/event.js';
+import { EventSchema, EventSchemaWhenCreating, TCustomQuestion, TEventSchemaWhenCreating } from '../../../../shared/schemas/event.js';
 import { getArrayUpdate, getMemoArrayUpdateFunctions, getMemoObjectUpdateFunctions, getSubUpdate } from '../../utils.js';
 import { UtcDatePicker } from '../utcDatePicker.js';
 import { UseMutationResult } from '@tanstack/react-query';
+import { Container, Paper, TextInput, Title } from '@mantine/core';
+import { useForm, SubmitHandler, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { DateInput } from '@mantine/dates';
 
 type PartialEventType = PartialDeep<TEventSchemaWhenCreating>;
 
 export function EventForm({ inputData, mode, mutation }: { inputData: PartialEventType; mode: 'create' | 'edit', mutation: UseMutationResult<any, any, any, any> }) {
   const [data, setData] = useState(inputData);
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm({resolver: zodResolver(EventSchemaWhenCreating)})
+
   //const { events } = useEvents().data
 
-  const { updateField, updateDate, updateSwitch } = getMemoObjectUpdateFunctions(setData);
+/*   const { updateField, updateDate, updateSwitch } = getMemoObjectUpdateFunctions(setData);
 
   const updateKP = getMemoObjectUpdateFunctions(getSubUpdate(setData, 'kp'));
   const updateConsents = getMemoObjectUpdateFunctions(getSubUpdate(setData, 'consents'));
   const updateAttendance = getMemoObjectUpdateFunctions(getSubUpdate(setData, 'attendance'));
   const updateFeeFunction = getSubUpdate(setData, 'fee')
   const updateFee = getMemoObjectUpdateFunctions(updateFeeFunction);
-  const updateCustomQuestions = getArrayUpdate(setData, 'customQuestions');
+  const updateCustomQuestions = getArrayUpdate(setData, 'customQuestions'); */
 
-  const valid = EventSchemaWhenCreating.safeParse(data);
+  const valid = mode == "create" ? EventSchemaWhenCreating.safeParse(data) : EventSchema.safeParse(data)
 
   const create = (e: React.MouseEvent<HTMLElement>) => {
         mutation.mutate(data)
         e.preventDefault()
   }
 
-  const kpOptions = KPOptions.map((k) => (
+/*   const kpOptions = KPOptions.map((k) => (
     <MenuItem key={k} value={k}>
       {k}
     </MenuItem>
@@ -54,16 +62,12 @@ export function EventForm({ inputData, mode, mutation }: { inputData: PartialEve
     <MenuItem key={k} value={k}>
       {k}
     </MenuItem>
-  ));
+  )); */
 
   // const Attendance = maybeGetAttendance(data)
   // const AttendanceConfig = Attendance?.ConfigurationElement ?? (() => <></>)
 
-  const feeOptions = getFeeTypesForEvent(data).map((k) => (
-    <MenuItem key={k.typeName} value={k.typeName}>
-      {k.name}
-    </MenuItem>
-  ));
+  const feeOptions = getFeeTypesForEvent(data).map(k => ({value: k.typeName, label: k.name}));
 
   const feeConfig = React.useMemo(() => maybeGetFeeType(data), [data.fee?.feeStructure]);
 
@@ -86,35 +90,34 @@ export function EventForm({ inputData, mode, mutation }: { inputData: PartialEve
   };
  */
   return (
-    <Grid container spacing={0}>
-      <Grid size={12} p={2}>
-        <Paper elevation={3}>
-          <Box p={2}>
+    <Container>
+        <Paper>
             <form>
-              <Grid container spacing={0}>
-                <Typography variant="h4">{mode == 'create' ? 'New Event' : `Editing - ${data.name}`}</Typography>
-                <Grid size={12}>
+                <Title order={1} size={4}>{mode == 'create' ? 'New Event' : `Editing - ${data.name}`}</Title>
                   {/* <FormControl fullWidth sx={{ mt: 2 }}>
                     <InputLabel id="event-select-label">Copy From</InputLabel>
                     <Select label="Copy From" onChange={copyFromEvent} labelId="event-select-label">
-                      <MenuItem key="default" value="default">
+                      <MenuItem key="default" value="default">]
                         Please select
                       </MenuItem>
                       {eventsToCopyFrom}
                     </Select>
                   </FormControl> */}
-                  <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={data.name || ''} onChange={updateField('name')} />
-                  <TextField fullWidth sx={{ mt: 2 }} multiline minRows={3} id="outlined-required" label="Description" value={data.description || ''} onChange={updateField('description')} />
-                  <FormGroup>
-                    <UtcDatePicker sx={{ mt: 2 }} label="Start Date" value={data.startDate} onChange={updateDate('startDate')} />
-                  </FormGroup>
-                  <FormGroup>
-                    <UtcDatePicker sx={{ mt: 2 }} label="End Date" value={data.endDate} onChange={updateDate('endDate')} />
-                  </FormGroup>
-                  <FormGroup>
-                    <DateTimePicker sx={{ mt: 2 }} label="Booking Deadline" timezone="UTC" value={parseISO(data.bookingDeadline || '')} onChange={updateDate('bookingDeadline')} />
-                  </FormGroup>
-                  <TextField
+                  <TextInput {...register('name')} />
+                  <TextInput {...register('description')} />
+                  <Controller
+        name="startDate"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => {
+          const {onChange, value, ...rest} = field
+
+          return <DateInput value={parseISO(value)} onChange={e => onChange(e)} {...rest} />}}
+      />
+                    <DateInput {...register('startDate')} />
+                    <DateInput {...register('endDate')} />
+                    <DateInput {...register('bookingDeadline')} />
+                  <TextInput
                     fullWidth
                     sx={{ mt: 2 }}
                     required
@@ -124,19 +127,11 @@ export function EventForm({ inputData, mode, mutation }: { inputData: PartialEve
                     value={data.emailSubjectTag || ''}
                     onChange={updateField('emailSubjectTag')}
                   />
-                  <TextField fullWidth sx={{ mt: 2 }} required type="email" id="outlined-required" label="Reply-to" value={data.replyTo || ''} onChange={updateField('replyTo')} />
-                  <FormGroup>
+                  <TextInput fullWidth sx={{ mt: 2 }} required type="email" id="outlined-required" label="Reply-to" value={data.replyTo || ''} onChange={updateField('replyTo')} />
                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.bigCampMode || false} onChange={updateSwitch('bigCampMode')} />} label="Big Camp Mode" />
-                  </FormGroup>
-                  <FormGroup>
                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.applicationsRequired || false} onChange={updateSwitch('applicationsRequired')} />} label="Applications required?" />
-                  </FormGroup>
-                  <FormGroup>
                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.allParticipantEmails || false} onChange={updateSwitch('allParticipantEmails')} />} label="All participant emails" />
-                  </FormGroup>
-                  <FormGroup>
                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.howDidYouHear || false} onChange={updateSwitch('howDidYouHear')} />} label="How did you hear question" />
-                  </FormGroup>
                   <FormControl fullWidth sx={{ mt: 2 }}>
                     <InputLabel id="kp-select-label">KP Structure</InputLabel>
                     <Select value={data.kp?.kpStructure || 'default'} label="KP  Structure" onChange={updateKP.updateField('kpStructure')} labelId="kp-select-label">
@@ -196,19 +191,13 @@ export function EventForm({ inputData, mode, mutation }: { inputData: PartialEve
                   { feeConfig ? <feeConfig.ConfigurationElement data={data.fee as never} update={updateFeeFunction} /> : null }
                   {/* <FeeConfig attendanceData={data.attendanceData} data={data.feeData ?? {}} update={updateSubField('feeData')} /> */}
                   <CustomQuestionsForm data={data.customQuestions} update={updateCustomQuestions} />
-                </Grid>
-                <Grid container spacing={0}>
                   <Button disabled={!valid.success || mutation.isPending} sx={{ mt: 2 }} variant="contained" onClick={create}>
                     {mode == 'create' ? 'Create' : 'Edit'}
                   </Button>
                   {JSON.stringify(valid)}
-                </Grid>
-              </Grid>
             </form>
-          </Box>
         </Paper>
-      </Grid>
-    </Grid>
+      </Container>
   );
 }
 

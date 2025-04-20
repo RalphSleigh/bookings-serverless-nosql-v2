@@ -1,4 +1,3 @@
-import { Alert, Snackbar } from "@mui/material"
 import React, { createContext, useState } from "react";
 
 export type SnackbarDataType = {
@@ -28,7 +27,8 @@ export function SnackBarProvider({ children }: {children: React.ReactNode }) {
 
 const CustomSnackbar: React.FC<{ data: SnackbarDataType, [key: string]: any }> = (props) => {
     const { data, onClose, ...rest } = props
-    return (<Snackbar onClose={onClose} {...rest}>
+    return null
+    return ({/* <Snackbar onClose={onClose} {...rest}>
         <Alert
             onClose={onClose}
             severity={data.severity}
@@ -37,5 +37,5 @@ const CustomSnackbar: React.FC<{ data: SnackbarDataType, [key: string]: any }> =
         >
             {data.message}
         </Alert>
-    </Snackbar>)
+    </Snackbar> */})
 }

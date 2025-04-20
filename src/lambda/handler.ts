@@ -14,6 +14,7 @@ import { userMiddleware } from './middleware/user';
 import { testCreateRole } from './endpoints/test/addAdminRole';
 import { createEvent } from './endpoints/event/createEvent';
 import { getEvents } from './endpoints/event/getEvents';
+import { editEvent } from './endpoints/event/editEvent';
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
     method: 'POST' as Method,
     path: '/api/event/create',
     handler: createEvent
+  },
+  {
+    method: 'POST' as Method,
+    path: '/api/event/{eventId}/edit',
+    handler: editEvent
   }
 ];
 

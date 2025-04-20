@@ -1,4 +1,3 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import * as React from 'react';
 import { EventForm } from '../../../components/event-form/form';

@@ -2,21 +2,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useContext } from 'react';
 
-import { TEventSchemaWhenCreating } from '../../../shared/schemas/event';
+import { TEvent,  } from '../../../shared/schemas/event';
 import { SnackBarContext } from '../toasts';
 import { useNavigate } from '@tanstack/react-router';
-import { TCreateEventData } from '../../../lambda/endpoints/event/createEvent';
+import { TEditEventData } from '../../../lambda/endpoints/event/editEvent';
 
-export const createEventMuation = () => {
+export const editEventMuation = () => {
   const snackBar = useContext(SnackBarContext);
   const navigate = useNavigate();
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (event: TEventSchemaWhenCreating) => {
-      return await axios.post<TCreateEventData>(`/api/event/create`, { event: event });
+    mutationFn: async (event: TEvent) => {
+      return await axios.post<TEditEventData>(`/api/event/${event.eventId}/edit`, { event: event });
     },
-    onSuccess: (data: AxiosResponse, context) => {
+    onSuccess: (data: AxiosResponse) => {
         queryClient.invalidateQueries({queryKey: ['events']})
         navigate({to: '/'});
     },

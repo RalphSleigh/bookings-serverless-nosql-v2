@@ -1,5 +1,4 @@
-import { CssBaseline } from '@mui/material'
-import { createTheme, ThemeProvider, useColorScheme, useTheme } from '@mui/material/styles'
+import { AppShell } from '@mantine/core'
 import type { QueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRoute, createRootRouteWithContext, Link, Outlet, useRouteContext, useRouter, useSearch } from '@tanstack/react-router'
@@ -16,9 +15,11 @@ import { getEventsQueryOptions } from '../queries/getEvents'
 import { userQueryOptions } from '../queries/user'
 import { SnackBarProvider } from '../toasts'
 
+import classes from '../css/mainArea.module.css'
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   auth: ReturnType<typeof useAuth>
+  permission: ReturnType<typeof getPermissionsFromUser>
 }>()({
   component: RootComponent,
   loader: ({ context: { queryClient } }) => {
@@ -32,7 +33,7 @@ export const Route = createRootRouteWithContext<{
 })
 
 function RootComponent(): React.JSX.Element {
-  const search = useSearch({ from: '__root__' })
+  const search = Route.useSearch()
   const { auth } = useRouteContext({ from: '__root__' })
   const router = useRouter()
 
@@ -45,8 +46,13 @@ function RootComponent(): React.JSX.Element {
   return (
     <>
       <SnackBarProvider>
+        <AppShell header={{ height: 48 }}>
         <AppToolbar />
-        <Outlet />
+        <AppShell.Main className={classes.root}>
+          <Outlet/>
+          </AppShell.Main>
+
+        </AppShell>
         <ReactQueryDevtools buttonPosition="bottom-right" />
         <TanStackRouterDevtools position="bottom-right" />
       </SnackBarProvider>

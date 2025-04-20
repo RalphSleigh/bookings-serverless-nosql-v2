@@ -16,6 +16,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as UserUserImport } from './routes/_user/user'
 import { Route as UserTestLoggedInImport } from './routes/_user/testLoggedIn'
 import { Route as UserEventsNewImport } from './routes/_user/events/new'
+import { Route as UserEventEventIdEditImport } from './routes/_user/event/$eventId/edit'
 
 // Create/Update Routes
 
@@ -45,6 +46,12 @@ const UserTestLoggedInRoute = UserTestLoggedInImport.update({
 const UserEventsNewRoute = UserEventsNewImport.update({
   id: '/events/new',
   path: '/events/new',
+  getParentRoute: () => UserRoute,
+} as any)
+
+const UserEventEventIdEditRoute = UserEventEventIdEditImport.update({
+  id: '/event/$eventId/edit',
+  path: '/event/$eventId/edit',
   getParentRoute: () => UserRoute,
 } as any)
 
@@ -87,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserEventsNewImport
       parentRoute: typeof UserImport
     }
+    '/_user/event/$eventId/edit': {
+      id: '/_user/event/$eventId/edit'
+      path: '/event/$eventId/edit'
+      fullPath: '/event/$eventId/edit'
+      preLoaderRoute: typeof UserEventEventIdEditImport
+      parentRoute: typeof UserImport
+    }
   }
 }
 
@@ -96,12 +110,14 @@ interface UserRouteChildren {
   UserTestLoggedInRoute: typeof UserTestLoggedInRoute
   UserUserRoute: typeof UserUserRoute
   UserEventsNewRoute: typeof UserEventsNewRoute
+  UserEventEventIdEditRoute: typeof UserEventEventIdEditRoute
 }
 
 const UserRouteChildren: UserRouteChildren = {
   UserTestLoggedInRoute: UserTestLoggedInRoute,
   UserUserRoute: UserUserRoute,
   UserEventsNewRoute: UserEventsNewRoute,
+  UserEventEventIdEditRoute: UserEventEventIdEditRoute,
 }
 
 const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
@@ -112,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/testLoggedIn': typeof UserTestLoggedInRoute
   '/user': typeof UserUserRoute
   '/events/new': typeof UserEventsNewRoute
+  '/event/$eventId/edit': typeof UserEventEventIdEditRoute
 }
 
 export interface FileRoutesByTo {
@@ -120,6 +137,7 @@ export interface FileRoutesByTo {
   '/testLoggedIn': typeof UserTestLoggedInRoute
   '/user': typeof UserUserRoute
   '/events/new': typeof UserEventsNewRoute
+  '/event/$eventId/edit': typeof UserEventEventIdEditRoute
 }
 
 export interface FileRoutesById {
@@ -129,13 +147,26 @@ export interface FileRoutesById {
   '/_user/testLoggedIn': typeof UserTestLoggedInRoute
   '/_user/user': typeof UserUserRoute
   '/_user/events/new': typeof UserEventsNewRoute
+  '/_user/event/$eventId/edit': typeof UserEventEventIdEditRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/testLoggedIn' | '/user' | '/events/new'
+  fullPaths:
+    | '/'
+    | ''
+    | '/testLoggedIn'
+    | '/user'
+    | '/events/new'
+    | '/event/$eventId/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/testLoggedIn' | '/user' | '/events/new'
+  to:
+    | '/'
+    | ''
+    | '/testLoggedIn'
+    | '/user'
+    | '/events/new'
+    | '/event/$eventId/edit'
   id:
     | '__root__'
     | '/'
@@ -143,6 +174,7 @@ export interface FileRouteTypes {
     | '/_user/testLoggedIn'
     | '/_user/user'
     | '/_user/events/new'
+    | '/_user/event/$eventId/edit'
   fileRoutesById: FileRoutesById
 }
 
@@ -178,7 +210,8 @@ export const routeTree = rootRoute
       "children": [
         "/_user/testLoggedIn",
         "/_user/user",
-        "/_user/events/new"
+        "/_user/events/new",
+        "/_user/event/$eventId/edit"
       ]
     },
     "/_user/testLoggedIn": {
@@ -191,6 +224,10 @@ export const routeTree = rootRoute
     },
     "/_user/events/new": {
       "filePath": "_user/events/new.tsx",
+      "parent": "/_user"
+    },
+    "/_user/event/$eventId/edit": {
+      "filePath": "_user/event/$eventId/edit.tsx",
       "parent": "/_user"
     }
   }
