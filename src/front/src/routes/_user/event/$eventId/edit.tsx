@@ -31,5 +31,6 @@ function EditEventComponent() {
     })
     return <Navigate to="/" />
   }
+
   return <EventForm mode="edit" inputData={event} mutation={editEventMuation()} />
 }

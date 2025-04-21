@@ -1,82 +1,36 @@
-import { parseISO } from 'date-fns';
-import React, { Dispatch, SetStateAction, useCallback, useContext, useState } from 'react';
-import { PartialDeep } from 'type-fest';
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ActionIcon, Button, Container, Flex, Grid, keys, Paper, Select, Switch, Text, TextInput, Title } from '@mantine/core'
+import { DateInput } from '@mantine/dates'
+import { IconAlertCircle, IconAlertTriangle, IconTrash } from '@tabler/icons-react'
+import { UseMutationResult } from '@tanstack/react-query'
+import { parseISO } from 'date-fns'
+import React, { Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { Controller, DefaultValues, FieldValues, FormProvider, SubmitHandler, useFieldArray, UseFieldArrayRemove, useForm, useFormContext } from 'react-hook-form'
+import { PartialDeep } from 'type-fest'
+import { NIL } from 'uuid'
 
-import { AttendanceOptions } from '../../../../shared/attendance/attendance.js';
-import { ConsentsOptions } from '../../../../shared/consents/consents.js';
-import { getFeeTypesForEvent, maybeGetFeeType } from '../../../../shared/fees/fees.js';
-import { KPOptions } from '../../../../shared/kp/kp.js';
-import { EventSchema, EventSchemaWhenCreating, TCustomQuestion, TEventSchemaWhenCreating } from '../../../../shared/schemas/event.js';
-import { getArrayUpdate, getMemoArrayUpdateFunctions, getMemoObjectUpdateFunctions, getSubUpdate } from '../../utils.js';
-import { UtcDatePicker } from '../utcDatePicker.js';
-import { UseMutationResult } from '@tanstack/react-query';
-import { Container, Paper, TextInput, Title } from '@mantine/core';
-import { useForm, SubmitHandler, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { DateInput } from '@mantine/dates';
+import { AttendanceOptions } from '../../../../shared/attendance/attendance.js'
+import { ConsentsOptions } from '../../../../shared/consents/consents.js'
+import { getFeeTypesForEvent, maybeGetFeeType } from '../../../../shared/fees/fees.js'
+import { KPOptions } from '../../../../shared/kp/kp.js'
+import { EventSchema, EventSchemaWhenCreating, TCustomQuestion, TEvent, TEventWhenCreating } from '../../../../shared/schemas/event.js'
+import { CustomDatePicker, CustomDateTimePicker } from '../customDatePicker.js'
+import { CustomSelect } from '../customSelect.js'
+import { NumberValue } from '@aws-sdk/util-dynamodb/dist-types/NumberValue.js'
+import { useDebounce } from '@react-hook/debounce'
+import { z } from 'zod'
 
-type PartialEventType = PartialDeep<TEventSchemaWhenCreating>;
+type PartialEventType = PartialDeep<TEventWhenCreating, {recurseIntoArrays: true}>
 
-export function EventForm({ inputData, mode, mutation }: { inputData: PartialEventType; mode: 'create' | 'edit', mutation: UseMutationResult<any, any, any, any> }) {
-  const [data, setData] = useState(inputData);
+export function EventForm({ inputData, mode, mutation }: { inputData: DefaultValues<TEventWhenCreating>, mode: 'create' | 'edit', mutation: UseMutationResult<any, any, any, any> }) {
+  const formMethods = useForm<z.input<typeof EventSchemaWhenCreating>>({ resolver: zodResolver(EventSchemaWhenCreating), mode: 'onBlur', defaultValues: inputData })
+  const { register, watch, control, formState, handleSubmit, getValues  } = formMethods
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    control,
-    formState: { errors },
-  } = useForm({resolver: zodResolver(EventSchemaWhenCreating)})
+  const onSubmit: SubmitHandler<PartialEventType> = (data) => mutation.mutate(data)
 
-  //const { events } = useEvents().data
-
-/*   const { updateField, updateDate, updateSwitch } = getMemoObjectUpdateFunctions(setData);
-
-  const updateKP = getMemoObjectUpdateFunctions(getSubUpdate(setData, 'kp'));
-  const updateConsents = getMemoObjectUpdateFunctions(getSubUpdate(setData, 'consents'));
-  const updateAttendance = getMemoObjectUpdateFunctions(getSubUpdate(setData, 'attendance'));
-  const updateFeeFunction = getSubUpdate(setData, 'fee')
-  const updateFee = getMemoObjectUpdateFunctions(updateFeeFunction);
-  const updateCustomQuestions = getArrayUpdate(setData, 'customQuestions'); */
-
-  const valid = mode == "create" ? EventSchemaWhenCreating.safeParse(data) : EventSchema.safeParse(data)
-
-  const create = (e: React.MouseEvent<HTMLElement>) => {
-        mutation.mutate(data)
-        e.preventDefault()
-  }
-
-/*   const kpOptions = KPOptions.map((k) => (
-    <MenuItem key={k} value={k}>
-      {k}
-    </MenuItem>
-  ));
-
-  const consentOptions = ConsentsOptions.map((k) => (
-    <MenuItem key={k} value={k}>
-      {k}
-    </MenuItem>
-  ));
-
-  const attendanceOptions = AttendanceOptions.map((k) => (
-    <MenuItem key={k} value={k}>
-      {k}
-    </MenuItem>
-  )); */
-
-  // const Attendance = maybeGetAttendance(data)
-  // const AttendanceConfig = Attendance?.ConfigurationElement ?? (() => <></>)
-
-  const feeOptions = getFeeTypesForEvent(data).map(k => ({value: k.typeName, label: k.name}));
-
-  const feeConfig = React.useMemo(() => maybeGetFeeType(data), [data.fee?.feeStructure]);
-
-  /*     const feeOptions = Object.entries(fees).filter(([key, value]) => value.enabledForAttendance(Attendance)).map(([key, value]) => <MenuItem key={key} value={key}>
-        {value.feeName}
-    </MenuItem>) */
-
-  /*     const Fees = maybeGetFee(data)
-    const FeeConfig = Fees?.ConfigurationElement ?? (() => <></>) */
+  const feeOptions = getFeeTypesForEvent(watch('attendance.attendanceStructure')).map((k) => ({ value: k.typeName, label: k.name }))
+  const feeStructure = watch('fee.feeStructure')
+  const feeConfig = React.useMemo(() => maybeGetFeeType(feeStructure), [feeStructure])
 
   /*     const eventsToCopyFrom  = events.map(e => <MenuItem key={e.id} value={e.id}>
         {e.name}
@@ -89,12 +43,19 @@ export function EventForm({ inputData, mode, mutation }: { inputData: PartialEve
     setData({ ...event });
   };
  */
+
+  const { isValid, errors } = formState
   return (
-    <Container>
-        <Paper>
-            <form>
-                <Title order={1} size={4}>{mode == 'create' ? 'New Event' : `Editing - ${data.name}`}</Title>
-                  {/* <FormControl fullWidth sx={{ mt: 2 }}>
+    <FormProvider {...formMethods}>
+      <Container>
+        <Paper shadow="md" radius="md" withBorder mt={16} p="md">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Title order={1} size="h2">
+              {mode == 'create' ? 'New Event' : `Editing - ${inputData.name}`}
+            </Title>
+            <Text>{/* JSON.stringify(currentData, null, ' ') */}</Text>
+            {/* <Text>{JSON.stringify(errors, null, " ")}</Text> */}
+            {/* <FormControl fullWidth sx={{ mt: 2 }}>
                     <InputLabel id="event-select-label">Copy From</InputLabel>
                     <Select label="Copy From" onChange={copyFromEvent} labelId="event-select-label">
                       <MenuItem key="default" value="default">]
@@ -102,156 +63,120 @@ export function EventForm({ inputData, mode, mutation }: { inputData: PartialEve
                       </MenuItem>
                       {eventsToCopyFrom}
                     </Select>
+                    
                   </FormControl> */}
-                  <TextInput {...register('name')} />
-                  <TextInput {...register('description')} />
-                  <Controller
-        name="startDate"
-        control={control}
-        rules={{ required: true }}
-        render={({ field }) => {
-          const {onChange, value, ...rest} = field
-
-          return <DateInput value={parseISO(value)} onChange={e => onChange(e)} {...rest} />}}
-      />
-                    <DateInput {...register('startDate')} />
-                    <DateInput {...register('endDate')} />
-                    <DateInput {...register('bookingDeadline')} />
-                  <TextInput
-                    fullWidth
-                    sx={{ mt: 2 }}
-                    required
-                    type="email"
-                    id="outlined-required"
-                    label="Email subject tag"
-                    value={data.emailSubjectTag || ''}
-                    onChange={updateField('emailSubjectTag')}
-                  />
-                  <TextInput fullWidth sx={{ mt: 2 }} required type="email" id="outlined-required" label="Reply-to" value={data.replyTo || ''} onChange={updateField('replyTo')} />
-                    <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.bigCampMode || false} onChange={updateSwitch('bigCampMode')} />} label="Big Camp Mode" />
-                    <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.applicationsRequired || false} onChange={updateSwitch('applicationsRequired')} />} label="Applications required?" />
-                    <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.allParticipantEmails || false} onChange={updateSwitch('allParticipantEmails')} />} label="All participant emails" />
-                    <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.howDidYouHear || false} onChange={updateSwitch('howDidYouHear')} />} label="How did you hear question" />
-                  <FormControl fullWidth sx={{ mt: 2 }}>
-                    <InputLabel id="kp-select-label">KP Structure</InputLabel>
-                    <Select value={data.kp?.kpStructure || 'default'} label="KP  Structure" onChange={updateKP.updateField('kpStructure')} labelId="kp-select-label">
-                      {data.kp?.kpStructure ? null : (
-                        <MenuItem key="default" value="default">
-                          Please select
-                        </MenuItem>
-                      )}
-                      {kpOptions}
-                    </Select>
-                  </FormControl>
-                  <FormControl fullWidth sx={{ mt: 2 }}>
-                    <InputLabel id="consent-select-label">Consent Structure</InputLabel>
-                    <Select value={data.consents?.consentsStructure || 'default'} label="Consent Structure" onChange={updateConsents.updateField('consentsStructure')} labelId="consent-select-label">
-                      {data.consents?.consentsStructure ? null : (
-                        <MenuItem key="default" value="default">
-                          Please select
-                        </MenuItem>
-                      )}
-                      {consentOptions}
-                    </Select>
-                  </FormControl>
-                  <FormControl fullWidth sx={{ mt: 2 }}>
-                    <InputLabel id="attendance-select-label">Attendance Structure</InputLabel>
-                    <Select
-                      value={data.attendance?.attendanceStructure || 'default'}
-                      label="Attendance Structure"
-                      onChange={updateAttendance.updateField('attendanceStructure')}
-                      labelId="attendance-select-label"
-                    >
-                      {data.attendance?.attendanceStructure ? null : (
-                        <MenuItem key="default" value="default">
-                          Please select
-                        </MenuItem>
-                      )}
-                      {attendanceOptions}
-                    </Select>
-                  </FormControl>
-                  {/* <AttendanceConfig data={data.attendanceData} update={updateSubField('attendanceData')} /> */}
-                  <FormControl fullWidth sx={{ mt: 2 }}>
-                    <InputLabel id="fee-select-label">Fee Structure</InputLabel>
-                    <Select
-                      disabled={!data.attendance?.attendanceStructure}
-                      value={data.fee?.feeStructure || 'default'}
-                      label="Fee Structure"
-                      onChange={updateFee.updateField('feeStructure')}
-                      labelId="fee-select-label"
-                    >
-                      {data.fee?.feeStructure ? null : (
-                        <MenuItem key="default" value="default">
-                          Please select
-                        </MenuItem>
-                      )}
-                      {feeOptions}
-                    </Select>
-                  </FormControl>
-                  { feeConfig ? <feeConfig.ConfigurationElement data={data.fee as never} update={updateFeeFunction} /> : null }
-                  {/* <FeeConfig attendanceData={data.attendanceData} data={data.feeData ?? {}} update={updateSubField('feeData')} /> */}
-                  <CustomQuestionsForm data={data.customQuestions} update={updateCustomQuestions} />
-                  <Button disabled={!valid.success || mutation.isPending} sx={{ mt: 2 }} variant="contained" onClick={create}>
-                    {mode == 'create' ? 'Create' : 'Edit'}
-                  </Button>
-                  {JSON.stringify(valid)}
-            </form>
+            <TextInput label="Name" {...register('name')} mt={16} error={errors.name ? errors.name.message : null} />
+            <TextInput label="Description" {...register('description')} mt={16} />
+            <CustomDatePicker name="startDate" control={control} label="Start Date" mt={16} />
+            <CustomDatePicker name="endDate" control={control} label="End Date" mt={16} />
+            <CustomDateTimePicker name="bookingDeadline" control={control} label="Booking Deadline" mt={16} />
+            <TextInput label="Email Subject Tag" {...register('emailSubjectTag')} mt={16} />
+            <TextInput label="Reply-to" {...register('replyTo')} mt={16} />
+            <Switch label="Big Camp Mode" {...register('bigCampMode')} mt={16} />
+            <Switch label="Applications required?" {...register('applicationsRequired')} mt={16} />
+            <Switch label="All participant emails" {...register('allParticipantEmails')} mt={16} />
+            <Switch label="How did you hear question" {...register('howDidYouHear')} mt={16} />
+            <CustomSelect data={KPOptions} label="KP Structure" name="kp.kpStructure" control={control} mt={16} />
+            <CustomSelect data={ConsentsOptions} label="Consent Structure" name="consents.consentsStructure" control={control} mt={16} />
+            <CustomSelect data={AttendanceOptions} label="Attendance Structure" name="attendance.attendanceStructure" control={control} mt={16} />
+            <CustomSelect data={feeOptions} label="Fee Structure" name="fee.feeStructure" control={control} mt={16} disabled={!watch('attendance.attendanceStructure')} />
+            {feeConfig ? <feeConfig.ConfigurationElement /> : null}
+            <CustomQuestionsForm />
+            <ValidationErrors />
+            <Button variant="contained" type='submit' mt={16} disabled={!isValid} loading={mutation.isPending}>Create</Button>
+          </form>
         </Paper>
       </Container>
-  );
+    </FormProvider>
+  )
 }
 
-function CustomQuestionsForm({ data = [], update }: { data: PartialEventType['customQuestions']; update: Dispatch<SetStateAction<TEventSchemaWhenCreating['customQuestions']>> }) {
-  const { updateItem, deleteItem} = getMemoArrayUpdateFunctions(update)
-  
+function ValidationErrors() {
 
-  const deleteQuestion = useCallback(
-    (i: number) => (e: { preventDefault: () => void; }) => {
-      deleteItem(i);
-      e.preventDefault();
-    },
-    [],
-  );
+  const { watch, getValues } = useFormContext<TEventWhenCreating>()
+  const [formstate, setFormstate] = useDebounce<PartialEventType>(() => watch(), 1000)
 
-  const questions = [...data, {}].map((q, i) => {
-    return <QuestionItem i={i} key={i} question={q} updateItem={updateItem(i)} deleteQuestion={deleteQuestion(i)} />;
-  });
+  useEffect(() => {
+    const { unsubscribe } = watch((value) => {
+      console.log(value)
+      setFormstate(value)
+    })
+    return () => unsubscribe()
+  }, [watch])
 
+  const validation = useMemo(() => {
+    const valid = EventSchemaWhenCreating.safeParse(formstate)
+    return valid
+  }
+  , [formstate])
+
+  if (validation.success) return null
   return (
-    <>
-      <Typography sx={{ mt: 2 }} variant="h5">
-        Custom Questions
-      </Typography>
-      {questions}
-{/*       <FormControl sx={{ mt: 2 }}>
-        <Button variant="contained" onClick={addEmptyObjectToArray}>
-          Add Question
-        </Button>
-      </FormControl> */}
-    </>
-  );
-}
-
-const QuestionItem = ({ i, question, updateItem, deleteQuestion }: { i: number; question: Partial<TCustomQuestion>; updateItem: Dispatch<SetStateAction<TCustomQuestion>>; deleteQuestion: any }) => {
-  const { updateField } = getMemoObjectUpdateFunctions(updateItem);
-
-  return (
-    <Paper elevation={6} sx={{ mt: 2 }}>
-      <Box key={i} p={2}>
-        <FormControl sx={{ mt: 2 }}>
-          <InputLabel id={`question-select-label-${i}`}>Type</InputLabel>
-          <Select value={question.questionType || 'default'} label="Question type" onChange={updateField('questionType')} labelId={`question-select-label-${i}`}>
-            <MenuItem value="default">Please select</MenuItem>
-            <MenuItem value="yesnochoice">Yes/No</MenuItem>
-            <MenuItem value="text">Text</MenuItem>
-            <MenuItem value="longtext">Long Text</MenuItem>
-          </Select>
-        </FormControl>
-        <IconButton color="error" onClick={deleteQuestion}>
-          <Close />
-        </IconButton>
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Label" value={question.questionLabel || ''} onChange={updateField('questionLabel')} />
-      </Box>
+    <Paper shadow="md" radius="md" withBorder mt={16} p="lg" c="yellow.9" bg="yellow.0" bd="1 solid yellow.3">
+      <Flex gap="xs" align="center" mb={8}>
+       <IconAlertTriangle size={32} stroke={1.5} color="orange" />
+      <Title order={2} size="h4">Validation Errors</Title>
+      </Flex>
+      {validation.error.issues.map((issue) => (
+        <Text key={issue.path.join('.')}>
+          {issue.path.join('.')} - {issue.message}
+        </Text>
+      ))}
     </Paper>
-  );
-};
+  )
+}
+
+function CustomQuestionsForm() {
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    name: 'customQuestions', // unique name for your Field Array
+  })
+
+  const questions = fields.map((f, i) => {
+    return <QuestionItem index={i} key={f.id} remove={remove} />
+  })
+
+  return (
+    <Grid>
+      <Grid.Col>
+      <Title order={2} size="h5">
+        Custom Questions
+      </Title>
+      {questions}
+      <Button variant="contained" onClick={() => append({})} mt={16}>
+        Add Question
+      </Button>
+      </Grid.Col>
+    </Grid>
+  )
+}
+
+const QuestionItem = ({ index, remove }: { index: number; remove: UseFieldArrayRemove }) => {
+  const { register, control } = useFormContext<Pick<PartialEventType, 'customQuestions'>>()
+
+  return (
+    <Paper shadow="md" radius="md" withBorder mt={16} p="md">
+      <Grid>
+        <Grid.Col span={3}>
+          <CustomSelect
+            control={control}
+            name={`customQuestions.${index}.questionType`}
+            label="Question Type"
+            data={[
+              { value: 'yesnochoice', label: 'Yes/No' },
+              { value: 'text', label: 'Text' },
+              { value: 'longtext', label: 'Long Text' },
+            ]}
+          />
+        </Grid.Col>
+        <Grid.Col span={8}>
+          <TextInput label="Question Label" {...register(`customQuestions.${index}.questionLabel` as const)} error={null} />
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <ActionIcon variant="default" size="input-sm" onClick={() => remove(index)} mt={24}>
+            <IconTrash size={16} stroke={1.5} color="red" />
+          </ActionIcon>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  )
+}

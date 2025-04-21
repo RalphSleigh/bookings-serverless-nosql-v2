@@ -1,0 +1,26 @@
+
+                  {/* <AttendanceConfig data={data.attendanceData} update={updateSubField('attendanceData')} /> */}
+                  <FormControl fullWidth sx={{ mt: 2 }}>
+                    <InputLabel id="fee-select-label">Fee Structure</InputLabel>
+                    <Select
+                      disabled={!data.attendance?.attendanceStructure}
+                      value={data.fee?.feeStructure || 'default'}
+                      label="Fee Structure"
+                      onChange={updateFee.updateField('feeStructure')}
+                      labelId="fee-select-label"
+                    >
+                      {data.fee?.feeStructure ? null : (
+                        <MenuItem key="default" value="default">
+                          Please select
+                        </MenuItem>
+                      )}
+                      {feeOptions}
+                    </Select>
+                  </FormControl>
+                  { feeConfig ? <feeConfig.ConfigurationElement data={data.fee as never} update={updateFeeFunction} /> : null }
+                  {/* <FeeConfig attendanceData={data.attendanceData} data={data.feeData ?? {}} update={updateSubField('feeData')} /> */}
+                  <CustomQuestionsForm data={data.customQuestions} update={updateCustomQuestions} />
+                  <Button disabled={!valid.success || mutation.isPending} sx={{ mt: 2 }} variant="contained" onClick={create}>
+                    {mode == 'create' ? 'Create' : 'Edit'}
+                  </Button>
+                  {JSON.stringify(valid)}

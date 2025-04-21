@@ -2,13 +2,13 @@ import middy from '@middy/core'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { getPermissionsFromUser } from '../../../shared/permissions'
-import { EventSchema, EventSchemaWhenCreating, TEventSchemaWhenCreating } from '../../../shared/schemas/event'
+import { EventSchema, EventSchemaWhenCreating, TEventWhenCreating } from '../../../shared/schemas/event'
 import { DBEvent, DBRole } from '../../dynamo'
 import { ContextWithUser } from '../../middleware/context'
 import { HandlerWrapper } from '../../utils'
 
 export type TCreateEventData = {
-  event: TEventSchemaWhenCreating
+  event: TEventWhenCreating
 }
 
 export const createEvent = HandlerWrapper<TCreateEventData>(['create', 'event'], async (event, context) => {
