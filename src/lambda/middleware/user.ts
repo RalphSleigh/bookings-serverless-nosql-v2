@@ -32,7 +32,7 @@ export const userMiddleware = (): middy.MiddlewareObj<APIGatewayProxyEvent, APIG
 
         const token = jwt.verify(jwt_string, config.JWT_SECRET) as { sub: string, id: string }
 
-        const userResult = await DB.collections.userWithRoles({id: token.id}).go()
+        const userResult = await DB.collections.userWithRoles({userId: token.id}).go()
 
         if(userResult.data.user.length === 0) {
           request.context.user = undefined

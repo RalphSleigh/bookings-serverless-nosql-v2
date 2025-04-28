@@ -13,7 +13,6 @@ import { AppToolbar } from '../components/appbar'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
 import { userQueryOptions } from '../queries/user'
-import { SnackBarProvider } from '../toasts'
 
 import classes from '../css/mainArea.module.css'
 export const Route = createRootRouteWithContext<{
@@ -45,17 +44,14 @@ function RootComponent(): React.JSX.Element {
 
   return (
     <>
-      <SnackBarProvider>
         <AppShell header={{ height: 48 }}>
         <AppToolbar />
         <AppShell.Main className={classes.root}>
           <Outlet/>
           </AppShell.Main>
-
         </AppShell>
         <ReactQueryDevtools buttonPosition="bottom-right" />
         <TanStackRouterDevtools position="bottom-right" />
-      </SnackBarProvider>
     </>
   )
 }

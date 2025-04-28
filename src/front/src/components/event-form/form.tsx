@@ -19,6 +19,7 @@ import { CustomSelect } from '../customSelect.js'
 import { NumberValue } from '@aws-sdk/util-dynamodb/dist-types/NumberValue.js'
 import { useDebounce } from '@react-hook/debounce'
 import { z } from 'zod'
+import { CustomSwitch } from '../customSwitch.js'
 
 type PartialEventType = PartialDeep<TEventWhenCreating, {recurseIntoArrays: true}>
 
@@ -72,10 +73,10 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
             <CustomDateTimePicker name="bookingDeadline" control={control} label="Booking Deadline" mt={16} />
             <TextInput label="Email Subject Tag" {...register('emailSubjectTag')} mt={16} />
             <TextInput label="Reply-to" {...register('replyTo')} mt={16} />
-            <Switch label="Big Camp Mode" {...register('bigCampMode')} mt={16} />
-            <Switch label="Applications required?" {...register('applicationsRequired')} mt={16} />
-            <Switch label="All participant emails" {...register('allParticipantEmails')} mt={16} />
-            <Switch label="How did you hear question" {...register('howDidYouHear')} mt={16} />
+            <CustomSwitch label="Big Camp Mode" name='bigCampMode' control={control} mt={16} />
+            <CustomSwitch label="Applications required?" name='applicationsRequired' control={control} mt={16} />
+            <CustomSwitch label="All participant emails" name='allParticipantEmails' control={control} mt={16} />
+            <CustomSwitch label="How did you hear question" name='howDidYouHear'  control={control} mt={16} />
             <CustomSelect data={KPOptions} label="KP Structure" name="kp.kpStructure" control={control} mt={16} />
             <CustomSelect data={ConsentsOptions} label="Consent Structure" name="consents.consentsStructure" control={control} mt={16} />
             <CustomSelect data={AttendanceOptions} label="Attendance Structure" name="attendance.attendanceStructure" control={control} mt={16} />
@@ -83,7 +84,7 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
             {feeConfig ? <feeConfig.ConfigurationElement /> : null}
             <CustomQuestionsForm />
             <ValidationErrors />
-            <Button variant="contained" type='submit' mt={16} disabled={!isValid} loading={mutation.isPending}>Create</Button>
+            <Button variant="contained" type='submit' mt={16} disabled={!isValid} loading={mutation.isPending}>{mode == 'create' ? 'Create' : 'Edit'}</Button>
           </form>
         </Paper>
       </Container>

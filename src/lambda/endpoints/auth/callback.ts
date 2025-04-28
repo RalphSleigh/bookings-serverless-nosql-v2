@@ -106,7 +106,7 @@ export const authCallback = middy(
 
     console.log(user);
 
-    const jwt_token = jwt.sign({ sub: user.sub, id: user.userId }, config.JWT_SECRET, {
+    const jwt_token = jwt.sign({ id: user.userId }, config.JWT_SECRET, {
       expiresIn: 1000 * 60 * 60 * config.COOKIE_EXPIRY,
     });
     const cookie_string = cookie.serialize('jwt', jwt_token, {

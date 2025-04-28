@@ -17,6 +17,7 @@ import { Route as UserUserImport } from './routes/_user/user'
 import { Route as UserTestLoggedInImport } from './routes/_user/testLoggedIn'
 import { Route as UserEventsNewImport } from './routes/_user/events/new'
 import { Route as UserEventEventIdEditImport } from './routes/_user/event/$eventId/edit'
+import { Route as UserEventEventIdBookImport } from './routes/_user/event/$eventId/book'
 
 // Create/Update Routes
 
@@ -52,6 +53,12 @@ const UserEventsNewRoute = UserEventsNewImport.update({
 const UserEventEventIdEditRoute = UserEventEventIdEditImport.update({
   id: '/event/$eventId/edit',
   path: '/event/$eventId/edit',
+  getParentRoute: () => UserRoute,
+} as any)
+
+const UserEventEventIdBookRoute = UserEventEventIdBookImport.update({
+  id: '/event/$eventId/book',
+  path: '/event/$eventId/book',
   getParentRoute: () => UserRoute,
 } as any)
 
@@ -94,6 +101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserEventsNewImport
       parentRoute: typeof UserImport
     }
+    '/_user/event/$eventId/book': {
+      id: '/_user/event/$eventId/book'
+      path: '/event/$eventId/book'
+      fullPath: '/event/$eventId/book'
+      preLoaderRoute: typeof UserEventEventIdBookImport
+      parentRoute: typeof UserImport
+    }
     '/_user/event/$eventId/edit': {
       id: '/_user/event/$eventId/edit'
       path: '/event/$eventId/edit'
@@ -110,6 +124,7 @@ interface UserRouteChildren {
   UserTestLoggedInRoute: typeof UserTestLoggedInRoute
   UserUserRoute: typeof UserUserRoute
   UserEventsNewRoute: typeof UserEventsNewRoute
+  UserEventEventIdBookRoute: typeof UserEventEventIdBookRoute
   UserEventEventIdEditRoute: typeof UserEventEventIdEditRoute
 }
 
@@ -117,6 +132,7 @@ const UserRouteChildren: UserRouteChildren = {
   UserTestLoggedInRoute: UserTestLoggedInRoute,
   UserUserRoute: UserUserRoute,
   UserEventsNewRoute: UserEventsNewRoute,
+  UserEventEventIdBookRoute: UserEventEventIdBookRoute,
   UserEventEventIdEditRoute: UserEventEventIdEditRoute,
 }
 
@@ -128,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/testLoggedIn': typeof UserTestLoggedInRoute
   '/user': typeof UserUserRoute
   '/events/new': typeof UserEventsNewRoute
+  '/event/$eventId/book': typeof UserEventEventIdBookRoute
   '/event/$eventId/edit': typeof UserEventEventIdEditRoute
 }
 
@@ -137,6 +154,7 @@ export interface FileRoutesByTo {
   '/testLoggedIn': typeof UserTestLoggedInRoute
   '/user': typeof UserUserRoute
   '/events/new': typeof UserEventsNewRoute
+  '/event/$eventId/book': typeof UserEventEventIdBookRoute
   '/event/$eventId/edit': typeof UserEventEventIdEditRoute
 }
 
@@ -147,6 +165,7 @@ export interface FileRoutesById {
   '/_user/testLoggedIn': typeof UserTestLoggedInRoute
   '/_user/user': typeof UserUserRoute
   '/_user/events/new': typeof UserEventsNewRoute
+  '/_user/event/$eventId/book': typeof UserEventEventIdBookRoute
   '/_user/event/$eventId/edit': typeof UserEventEventIdEditRoute
 }
 
@@ -158,6 +177,7 @@ export interface FileRouteTypes {
     | '/testLoggedIn'
     | '/user'
     | '/events/new'
+    | '/event/$eventId/book'
     | '/event/$eventId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -166,6 +186,7 @@ export interface FileRouteTypes {
     | '/testLoggedIn'
     | '/user'
     | '/events/new'
+    | '/event/$eventId/book'
     | '/event/$eventId/edit'
   id:
     | '__root__'
@@ -174,6 +195,7 @@ export interface FileRouteTypes {
     | '/_user/testLoggedIn'
     | '/_user/user'
     | '/_user/events/new'
+    | '/_user/event/$eventId/book'
     | '/_user/event/$eventId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -211,6 +233,7 @@ export const routeTree = rootRoute
         "/_user/testLoggedIn",
         "/_user/user",
         "/_user/events/new",
+        "/_user/event/$eventId/book",
         "/_user/event/$eventId/edit"
       ]
     },
@@ -224,6 +247,10 @@ export const routeTree = rootRoute
     },
     "/_user/events/new": {
       "filePath": "_user/events/new.tsx",
+      "parent": "/_user"
+    },
+    "/_user/event/$eventId/book": {
+      "filePath": "_user/event/$eventId/book.tsx",
       "parent": "/_user"
     },
     "/_user/event/$eventId/edit": {

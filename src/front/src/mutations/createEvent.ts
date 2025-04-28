@@ -1,37 +1,43 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import { useContext } from 'react';
+import { notifications } from '@mantine/notifications'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import { useContext } from 'react'
 
-import { TEventWhenCreating } from '../../../shared/schemas/event';
-import { SnackBarContext } from '../toasts';
-import { useNavigate } from '@tanstack/react-router';
-import { TCreateEventData } from '../../../lambda/endpoints/event/createEvent';
+import { TCreateEventData } from '../../../lambda/endpoints/event/createEvent'
+import { TEventWhenCreating } from '../../../shared/schemas/event'
 
 export const createEventMuation = () => {
-  const snackBar = useContext(SnackBarContext);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (event: TEventWhenCreating) => {
-      return await axios.post<TCreateEventData>(`/api/event/create`, { event: event });
+      return await axios.post<TCreateEventData>(`/api/event/create`, { event: event })
     },
     onSuccess: (data: AxiosResponse, context) => {
-        queryClient.invalidateQueries({queryKey: ['events']})
-        navigate({to: '/'});
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      navigate({ to: '/' })
+      notifications.show({
+        title: 'Event Created',
+        message: `Event created`,
+        color: 'green',
+      })
     },
     onError: (error) => {
-      if(error instanceof AxiosError) {
-      snackBar({
-        message: `Error: ${error.response?.data?.message || 'Unknown error'}`,
-        severity: 'error',
-      });
-    } else {
-        snackBar({
-            message: `Error: ${error.message || 'Unknown error'}`,
-            severity: 'error',
-        });
-    }
+      if (error instanceof AxiosError) {
+        notifications.show({
+          title: 'Error',
+          message: `Error: ${error.response?.data?.message || 'Unknown error'}`,
+          color: 'red',
+        })
+      } else {
+        notifications.show({
+          title: 'Error',
+          message: `Error: ${error.message || 'Unknown error'}`,
+          color: 'red',
+        })
+      }
     },
-  });
-};
+  })
+}

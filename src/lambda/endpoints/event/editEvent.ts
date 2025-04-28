@@ -12,7 +12,7 @@ export type TEditEventData = {
 }
 
 export const editEvent = HandlerWrapper<TEditEventData>(['create', 'event'], async (event, context) => {
-  if(event.body.event.eventId === event.pathParameters?.eventId) {
+  if(event.body.event.eventId !== event.pathParameters?.eventId) {
     throw new Error('Event ID in path and body do not match')
   }
   const validatedEvent = EventSchema.parse(event.body.event)

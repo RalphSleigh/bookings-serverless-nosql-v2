@@ -4,7 +4,6 @@ import type { ContextUser, ContextWithUser } from '../../middleware/context'
 import { HandlerWrapper } from '../../utils'
 
 export const getUser = HandlerWrapper(['get', 'currentUser'], async (event, context) => {
-  await new Promise((resolve) => setTimeout(resolve, 3000))
   return { loggedIn: context.user !== undefined, user: context.user }
 })
 

@@ -40,24 +40,24 @@ export const AppToolbar = () => {
         {env.env === 'dev' ? (
           <>
             <ActionIcon
-            variant="default"
+              variant="default"
               size="input-sm"
               onClick={() => {
                 throw 'BOOM (event handler)'
               }}
               c="orange"
             >
-              <IconBug/>
+              <IconBug />
             </ActionIcon>
             <ActionIcon
-            variant="default"
+              variant="default"
               size="input-sm"
               onClick={() => {
                 setError(true)
               }}
-               c="orange"
+              c="orange"
             >
-              <IconBug/>
+              <IconBug />
             </ActionIcon>
             <Title order={6} c="orange" pr={16}>
               TEST MODE
@@ -79,10 +79,16 @@ const UserStatus = () => {
           <Text>{user.name?.replaceAll(' ', '\xa0') ?? ''}</Text>
         </CustomLink>
         <CustomLink to="/user" style={{ textDecoration: 'none' }}>
-          <Avatar name={user?.name ?? undefined} src={user.avatar} size={32}/>
+          <Avatar
+            imageProps={{
+              referrerPolicy: 'no-referrer',
+            }}
+            name={user?.name ?? undefined}
+            src={user.avatar}
+            size={32}
+          />
         </CustomLink>
-        <ActionIcon component={'a'} href="/api/user/logout" variant="default"
-              size="input-sm">
+        <ActionIcon component={'a'} href="/api/user/logout" variant="default" size="input-sm">
           <IconLogout />
         </ActionIcon>
       </>

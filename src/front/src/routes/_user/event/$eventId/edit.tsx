@@ -4,8 +4,8 @@ import { useContext } from 'react'
 
 import { EventForm } from '../../../../components/event-form/form'
 import { getEventsQueryOptions } from '../../../../queries/getEvents'
-import { SnackBarContext } from '../../../../toasts'
 import { editEventMuation } from '../../../../mutations/editEvent'
+import { notifications } from '@mantine/notifications'
 
 export const Route = createFileRoute('/_user/event/$eventId/edit')({
   beforeLoad: async ({ location, context }) => {
@@ -20,14 +20,14 @@ export const Route = createFileRoute('/_user/event/$eventId/edit')({
 function EditEventComponent() {
   const { eventId } = Route.useParams()
   const { data } = useSuspenseQuery(getEventsQueryOptions)
-  const snackbar = useContext(SnackBarContext)
 
   const event = data.events.find((event) => event.eventId === eventId)
 
   if (!event) {
-    snackbar({
+    notifications.show({
+      title: 'Error',
       message: `Event ${eventId} not found`,
-      severity: 'error',
+      color: 'red',
     })
     return <Navigate to="/" />
   }

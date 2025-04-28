@@ -8,7 +8,7 @@ import { am_in_lambda } from './utils';
 const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' };
 const client = new DynamoDBClient(dynamodbClientOptions);
 
-const table = 'Booking';
+const table = 'Bookings';
 
 export const DBUser = new Entity(
   {
@@ -48,28 +48,24 @@ export const DBUser = new Entity(
     indexes: {
       bySub: {
         pk: {
-          // highlight-next-line
           field: 'pk',
           composite: [],
         },
         sk: {
-          // highlight-next-line
           field: 'sk',
           composite: ['sub'],
         },
       },
       byUserId: {
         collection: 'userWithRoles',
-        index: 'ls1',
+        index: 'gsi1pk-gsi1sk-index',
         pk: {
-          // highlight-next-line
-          field: 'pk',
-          composite: [],
+          field: 'gsi1pk',
+          composite: ['userId'],
         },
         sk: {
-          // highlight-next-line
-          field: 'ls1',
-          composite: ['userId'],
+          field: 'gsi1sk',
+          composite: [],
         },
       },
     },
@@ -109,15 +105,15 @@ export const DBRole = new Entity(
         },
       },
       byUserId: {
-        index: 'ls1',
+        index: 'gsi1pk-gsi1sk-index',
         collection: 'userWithRoles',
         pk: {
-          field: 'pk',
-          composite: [],
+          field: 'gsi1pk',
+          composite: ['userId'],
         },
         sk: {
-          field: 'ls1',
-          composite: ['userId'],
+          field: 'gsi1sk',
+          composite: [],
         },
       },
     },

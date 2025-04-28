@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client'
 
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
 
 import { createTheme, MantineProvider, virtualColor } from '@mantine/core'
 import { QueryClient, QueryClientProvider, useSuspenseQuery } from '@tanstack/react-query'
@@ -14,6 +15,7 @@ import { SuspenseWrapper } from './components/suspense'
 import { AbilityContext } from './permissionContext'
 import { routeTree } from './routeTree.gen'
 import { DatesProvider } from '@mantine/dates';
+import { Notifications } from '@mantine/notifications';
 
 const queryClient = new QueryClient()
 
@@ -28,6 +30,7 @@ const router = createRouter({
   context: { queryClient, auth: undefined!, permission: undefined! },
   routeTree,
   defaultPreload: 'intent',
+  defaultPendingComponent : SuspenseWrapper,
 })
 
 /* const theme = createTheme({
@@ -60,9 +63,8 @@ if (!rootElement.innerHTML) {
     <MantineProvider>
       <DatesProvider settings={{ timezone: 'UTC' }}>
       <QueryClientProvider client={queryClient}>
-        <SuspenseWrapper>
+      <Notifications />
           <App />
-        </SuspenseWrapper>
       </QueryClientProvider>
       </DatesProvider>
     </MantineProvider>,

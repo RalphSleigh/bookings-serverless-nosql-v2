@@ -2,6 +2,8 @@ import { Anchor, AnchorProps } from '@mantine/core';
 import { createLink, LinkComponent } from '@tanstack/react-router';
 import { parseISO } from 'date-fns';
 import React, { Dispatch, SetStateAction } from 'react';
+import * as _ from 'lodash';
+
 
 export function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [value, setValue] = React.useState<T>(() => {
@@ -131,4 +133,13 @@ export function toLocalDate(date: string): Date | null {
   if (!localDate) return null
 
   return new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60000)
+}
+
+export const errorProps = (errors: any) => (path: string) => {
+  const error = _.get(errors, path) 
+  if (error) {
+    return { error: error.message }
+  } else {
+    return {}
+  }
 }
