@@ -45,7 +45,7 @@ resource "aws_lambda_function" "api_lambda" {
     aws_iam_role_policy_attachment.lambda_policy_attachment,
   ]
 
-  runtime = "nodejs20.x"
+  runtime = "nodejs22.x"
 }
 
 resource "aws_lambda_permission" "api_gateway_lambda_permission" {

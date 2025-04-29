@@ -17,7 +17,7 @@ esbuild
         format: 'esm',
         platform: 'node',
         //sourcemap: 'inline',
-        target: ['node20'],
+        target: ['node22'],
         //external: ['aws-sdk','lodash', 'aws-lambda','@aws-sdk/*','bcryptjs'],
         /* metafile: true,
         banner: {
