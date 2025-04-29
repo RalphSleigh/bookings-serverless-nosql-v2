@@ -27,7 +27,7 @@ resource "aws_api_gateway_rest_api" "gateway" {
             }
           }
           x-amazon-apigateway-integration = {
-            uri         = aws_lambda_function.lambda["function_api_handler"].invoke_arn
+            uri         = aws_lambda_function.api_lambda.invoke_arn
             httpMethod  = "POST"
             type        = "aws_proxy"
           }
