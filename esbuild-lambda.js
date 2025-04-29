@@ -19,7 +19,7 @@ esbuild
         //sourcemap: 'inline',
         target: ['node22'],
         //external: ['aws-sdk','lodash', 'aws-lambda','@aws-sdk/*','bcryptjs'],
-        /* metafile: true,
+        //metafile: true,
         banner: {
             js: `
             import path from 'path';
@@ -29,7 +29,7 @@ esbuild
             const __filename = fileURLToPath(import.meta.url);
             const __dirname = path.dirname(__filename);
             `,
-          }, */
+          },
     })
 
 
