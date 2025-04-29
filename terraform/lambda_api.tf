@@ -43,6 +43,7 @@ resource "aws_lambda_function" "api_lambda" {
 
   depends_on = [
     aws_iam_role_policy_attachment.lambda_policy_attachment,
+    aws_s3_object.lambda_code
   ]
 
   runtime = "nodejs22.x"
