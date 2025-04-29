@@ -18,7 +18,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 resource "aws_lambda_function" "api_lambda" {
   function_name = "function_api_handler"
   role          = aws_iam_role.iam_for_lambda.arn
-  handler       = "handler.lambdaHandler"
+  handler       = "handler.handler"
 
   s3_bucket = aws_s3_bucket.lambda_code.id
   s3_key    = data.archive_file.lambda_zip.output_md5
