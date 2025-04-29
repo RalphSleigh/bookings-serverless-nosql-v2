@@ -1,0 +1,63 @@
+name: Build and Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
+        
+permissions:
+  id-token: write
+  contents: read
+
+concurrency: 
+  group: ${{ inputs.environment }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ inputs.environment }} - Build and Deploy
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      NODE_ENV: production
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-role
+          role-session-name: terraform-session
+          aws-region: eu-west-2
+
+      - name: install base
+        run: |
+          npm ci --include=dev
+
+      - name: build lambdas
+        run: |
+          node esbuild-lambda.js 
+
+      - name: build front
+        run: |
+          npm run build
+
+      - name: terraform init
+        working-directory: terraform
+        run: |
+          terraform init -backend-config "bucket=bookings-nosql-2-terraform-state-${{ github.ref_name }}"
+
+      - name: terraform apply
+        working-directory: terraform
+        run: |
+          terraform apply -auto-approve

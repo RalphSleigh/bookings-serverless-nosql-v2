@@ -2,13 +2,18 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
+
 // https://vitejs.dev/config/
+
+
 export default defineConfig({
   root: 'src/front',
   //plugins: [react({})],
   plugins: [
     TanStackRouterVite({
       routesDirectory: 'src/front/src/routes',
+      target: 'react',
+      autoCodeSplitting: true,
     }),
     react({}),
   ],
@@ -28,7 +33,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: './dist',
+    outDir: '../../dist',
     emptyOutDir: true
   },
 })

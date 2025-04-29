@@ -7,8 +7,7 @@ import { PartialDeep } from 'type-fest'
 import { z } from 'zod'
 
 import { BookingSchema, BookingSchemaForType, TBookingForType } from '../../../../shared/schemas/booking'
-import { PersonSchemaForType } from '../../../../shared/schemas/person'
-import { set } from 'lodash'
+
 
 type ValidationErrorsProps = {
   schema: ReturnType<typeof BookingSchema>
