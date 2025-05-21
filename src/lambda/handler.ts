@@ -1,20 +1,21 @@
-import middy from '@middy/core';
-import httpHeaderNormalizer from '@middy/http-header-normalizer';
-import httpJsonBodyParser from '@middy/http-json-body-parser';
-import httpRouterHandler, { type Method } from '@middy/http-router';
+import middy from '@middy/core'
+import httpHeaderNormalizer from '@middy/http-header-normalizer'
+import httpJsonBodyParser from '@middy/http-json-body-parser'
+import httpRouterHandler, { type Method } from '@middy/http-router'
+import inputOutputLogger from '@middy/input-output-logger'
 
-import { authCallback } from './endpoints/auth/callback';
-import { logout } from './endpoints/auth/logout';
-import { authRedirect } from './endpoints/auth/redirect';
-import { getEnv } from './endpoints/env';
-import { testLoggedIn } from './endpoints/test/testLoggedIn';
-import { getUser } from './endpoints/user/getUser';
-import { configMiddleware } from './middleware/config';
-import { userMiddleware } from './middleware/user';
-import { testCreateRole } from './endpoints/test/addAdminRole';
-import { createEvent } from './endpoints/event/createEvent';
-import { getEvents } from './endpoints/event/getEvents';
-import { editEvent } from './endpoints/event/editEvent';
+import { authCallback } from './endpoints/auth/callback'
+import { logout } from './endpoints/auth/logout'
+import { authRedirect } from './endpoints/auth/redirect'
+import { getEnv } from './endpoints/env'
+import { createEvent } from './endpoints/event/createEvent'
+import { editEvent } from './endpoints/event/editEvent'
+import { getEvents } from './endpoints/event/getEvents'
+import { testCreateRole } from './endpoints/test/addAdminRole'
+import { testLoggedIn } from './endpoints/test/testLoggedIn'
+import { getUser } from './endpoints/user/getUser'
+import { configMiddleware } from './middleware/config'
+import { userMiddleware } from './middleware/user'
 
 const routes = [
   {
@@ -55,24 +56,24 @@ const routes = [
   {
     method: 'GET' as Method,
     path: '/api/events',
-    handler: getEvents
+    handler: getEvents,
   },
   {
     method: 'POST' as Method,
     path: '/api/event/create',
-    handler: createEvent
+    handler: createEvent,
   },
   {
     method: 'POST' as Method,
     path: '/api/event/{eventId}/edit',
-    handler: editEvent
-  }
-];
+    handler: editEvent,
+  },
+]
 
 export const handler = middy()
-  //.use(inputOutputLogger())
+  .use(inputOutputLogger())
   .use(httpHeaderNormalizer())
   .use(httpJsonBodyParser({ disableContentTypeError: true }))
   .use(configMiddleware())
   .use(userMiddleware())
-  .handler(httpRouterHandler(routes));
+  .handler(httpRouterHandler(routes))
