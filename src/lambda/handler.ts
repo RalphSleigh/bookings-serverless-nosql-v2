@@ -20,52 +20,52 @@ import { userMiddleware } from './middleware/user'
 const routes = [
   {
     method: 'GET' as Method,
-    path: '/api/env',
+    path: '/env',
     handler: getEnv,
   },
   {
     method: 'GET' as Method,
-    path: '/api/auth/redirect',
+    path: '/auth/redirect',
     handler: authRedirect,
   },
   {
     method: 'GET' as Method,
-    path: '/api/auth/callback',
+    path: '/auth/callback',
     handler: authCallback,
   },
   {
     method: 'GET' as Method,
-    path: '/api/user/current',
+    path: '/user/current',
     handler: getUser,
   },
   {
     method: 'GET' as Method,
-    path: '/api/user/logout',
+    path: '/user/logout',
     handler: logout,
   },
   {
     method: 'GET' as Method,
-    path: '/api/test/loggedIn',
+    path: '/test/loggedIn',
     handler: testLoggedIn,
   },
   {
     method: 'GET' as Method,
-    path: '/api/test/createRole',
+    path: '/test/createRole',
     handler: testCreateRole,
   },
   {
     method: 'GET' as Method,
-    path: '/api/events',
+    path: '/events',
     handler: getEvents,
   },
   {
     method: 'POST' as Method,
-    path: '/api/event/create',
+    path: '/event/create',
     handler: createEvent,
   },
   {
     method: 'POST' as Method,
-    path: '/api/event/{eventId}/edit',
+    path: '/event/{eventId}/edit',
     handler: editEvent,
   },
 ]
