@@ -1,8 +1,8 @@
 resource "aws_dynamodb_table" "bookings_table" {
-  name           = "Bookings"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "pk"
-  range_key      = "sk"
+  name         = "Bookings"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "pk"
+  range_key    = "sk"
 
   attribute {
     name = "pk"
@@ -19,10 +19,11 @@ resource "aws_dynamodb_table" "bookings_table" {
     type = "S"
   }
 
-  local_secondary_index {
-    name            = "ls1"
+  global_secondary_index {
+    name            = "gsi1pk-gsi1sk-index"
+    hash_key        = "gsi1pk"
+    range_key       = "gsi1sk"
     projection_type = "ALL"
-    range_key       = "userIdVersion"
   }
 }
 /* 

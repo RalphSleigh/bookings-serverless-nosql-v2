@@ -16,6 +16,7 @@ import { testLoggedIn } from './endpoints/test/testLoggedIn'
 import { getUser } from './endpoints/user/getUser'
 import { configMiddleware } from './middleware/config'
 import { userMiddleware } from './middleware/user'
+import { loggerMiddleware } from './middleware/logger'
 
 const routes = [
   {
@@ -71,9 +72,9 @@ const routes = [
 ]
 
 export const handler = middy()
-  .use(inputOutputLogger())
   .use(httpHeaderNormalizer())
   .use(httpJsonBodyParser({ disableContentTypeError: true }))
+  .use(loggerMiddleware())
   .use(configMiddleware())
   .use(userMiddleware())
   .handler(httpRouterHandler(routes))
