@@ -68,8 +68,8 @@ export const updateBooking = HandlerWrapper(
         await DBPersonHistory.create(personHistoryItem).go()
       }
 
-      for (const existingPersonId of existingPeopleIds) {
-        if (!newPeopleIds.has(existingPersonId)) {
+      for (const person of existingBooking.people) {
+        if (!newPeopleIds.has(person.personId)) {
           const { personId, userId, eventId, createdAt, updatedAt, ...personUpdateData } = person
           const newPerson = await DBPerson.patch(person)
             .set({ ...personUpdateData, cancelled: true })
