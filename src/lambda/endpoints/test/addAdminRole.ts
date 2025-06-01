@@ -1,38 +1,25 @@
-import middy from '@middy/core';
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { RequestHandler } from 'express'
 
-import { ContextWithUser } from '../../middleware/context';
-import { DBRole } from '../../dynamo';
-import { getPermissionsFromUser } from '../../../shared/permissions';
+import { getPermissionsFromUser } from '../../../shared/permissions'
+import { DBRole } from '../../dynamo'
 
-export const testCreateRole = middy(
-  async (event: APIGatewayProxyEvent, context: ContextWithUser) => {
-    const user = context.user;
-    const permission = getPermissionsFromUser(user);
+export const testCreateRole: RequestHandler = async (req, res) => {
+  const user = res.locals.user
+  const permission = getPermissionsFromUser(user)
 
-/*     if (!permission.can('manage', 'all')) {
+  /*     if (!permission.can('manage', 'all')) {
         return {
             statusCode: 401,
             body: 'Unauthorized',
         }
     } */
 
-    if(user) {
+  if (user) {
+    const role = await DBRole.create({ userId: user.userId, role: 'admin' }).go()
 
-        const role = await DBRole.create({userId: user.userId, role: 'admin'}).go()
-
-        return {
-            statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({role})
-        } as APIGatewayProxyResult; 
-    } else {  
-        return {
-            statusCode: 401,
-            body: 'Unauthorized',
-        }
-    }
-  },
-);
+    res.json(role)
+  } else {
+    res.status(401).json({ error: 'Unauthorized' })
+  }
+}

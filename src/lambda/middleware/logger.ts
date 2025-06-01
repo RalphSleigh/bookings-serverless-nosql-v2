@@ -1,13 +1,11 @@
-import middy from '@middy/core'
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda'
+import { RequestHandler } from "express"
 
-export const loggerMiddleware = (): middy.MiddlewareObj<APIGatewayProxyEvent, APIGatewayProxyResult, Error, Context> => {
-  const before: middy.MiddlewareFn<APIGatewayProxyEvent, APIGatewayProxyResult, Error, Context> = async (request): Promise<void> => {
-    //@ts-expect-error
-    const {options, ...rest } = request.event
-    console.log('Request:', JSON.stringify(rest))
-  }
-  return {
-    before,
+export const loggerMiddleware: RequestHandler = async (req, res, next) => {
+  try {
+    console.log(req.path, req.method, req.body, req.query, req.params)
+    next()
+  } catch (error) {
+    console.log(error)
+    throw error
   }
 }

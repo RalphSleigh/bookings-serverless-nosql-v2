@@ -8,8 +8,9 @@ import { Container, Paper, Title, Text, Button } from '@mantine/core'
 import { useRouteContext } from '@tanstack/react-router'
 import { CustomButtonLink } from './customLinkButton.js'
 import { subject } from '@casl/ability'
+import { TBooking } from '../../../shared/schemas/booking.js'
 
-export function EventList({ events }: { events: TEvent[] }) {
+export function EventList({ events, bookings }: { events: TEvent[], bookings: TBooking[] }) {
   //const bookingsQuery = useUsersBookings()
   //const bookings = bookingsQuery.data.bookings
   //const user = useContext(UserContext)
@@ -19,7 +20,7 @@ export function EventList({ events }: { events: TEvent[] }) {
 
   const cards = futureEvents
     .sort((a, b) => (a.startDate < b.startDate ? -1 : a.startDate > b.startDate ? 1 : 0))
-    .map((e) => <EventCard event={e} key={e.eventId} /* booking={bookings.find((b) => b.eventId === e.id) }*/ />)
+    .map((e) => <EventCard event={e} key={e.eventId} booking={bookings.find((b) => b.eventId === e.eventId) } />)
   //const manageCards = pastEventsCanManage.sort((a, b) => (a.startDate < b.startDate) ? -1 : ((a.startDate > b.startDate) ? 1 : 0)).map(e => <EventCard event={e} key={e.id} booking={bookings.find(b => b.eventId === e.id)} />)
 
   return (
@@ -33,7 +34,7 @@ export function EventList({ events }: { events: TEvent[] }) {
   )
 }
 
-function EventCard({ event }: { event: TEvent }) {
+function EventCard({ event, booking }: { event: TEvent, booking?: TBooking  }) {
   const startDate = toLocalDate(event.startDate)!
   const endDate = toLocalDate(event.endDate)!
 
@@ -41,7 +42,7 @@ function EventCard({ event }: { event: TEvent }) {
 
   return (
       <Paper shadow="md" radius="md" withBorder mt={16} p="md">
-        <BookingButton event={event} /* booking={booking} */ />
+        <BookingButton event={event} booking={booking} />
         <Title order={1} size="h2">{event.name}</Title>
         <Title order={2} size="h4">
           {format(startDate, startDataFormat)} - {format(endDate, 'do MMMM yyyy')}
@@ -61,16 +62,20 @@ function EventCard({ event }: { event: TEvent }) {
   )
 }
 
-function BookingButton({ event, booking }: { event: TEvent, booking?: any }) {
+function BookingButton({ event, booking }: { event: TEvent, booking?: TBooking }) {
     const { auth, permission } = useRouteContext({ from: '__root__' })
     const user = auth.loggedIn ? auth.user : undefined
     if (!user) return <Button component="a" style={{float:'right'}} href="/api/auth/redirect">
             Login to Book
           </Button>
 
+    if(booking && permission.can('update', subject('eventBooking', {event, booking}))) return <CustomButtonLink to={`/event/$eventId/own/update`} params={{eventId: event.eventId}} style={{float:'right'}}>
+            Update Booking
+          </CustomButtonLink>
+
     if (!event.bigCampMode && Date.now() > parseISO(event.bookingDeadline).getTime()) return <Button style={{float:'right'}} disabled>Deadline Passed</Button>
 
-    if (permission.can('book', subject('event', event))) return <CustomButtonLink style={{float:'right'}} to={`/event/${event.eventId}/book`}>Book
+    if (permission.can('book', subject('event', event))) return <CustomButtonLink style={{float:'right'}} to={`/event/$eventId/own/book`} params={{eventId: event.eventId}}>Book
     </CustomButtonLink>
 
     return <Button variant="contained" style={{float:'right'}}>Dunno</Button>

@@ -15,8 +15,12 @@ export function CustomDatePicker<T extends FieldValues>(props: CustomDateInputPr
   })
   const valueAsDate = value != undefined ? parseISO(value) : undefined
   //const formValue = valueAsDate ? new Date(valueAsDate.getTime() + valueAsDate.getTimezoneOffset() * 60000) : undefined
+
+  const { error } = fieldState
+
   return (
     <DateInput popoverProps={{zIndex: 1000}}
+    error={error?.message}
     valueFormat="DD/MM/YYYY"
     type="default"
       value={valueAsDate}
@@ -26,6 +30,7 @@ export function CustomDatePicker<T extends FieldValues>(props: CustomDateInputPr
         }
       }}
       {...inputProps}
+      {...field}
     />
   )
 }

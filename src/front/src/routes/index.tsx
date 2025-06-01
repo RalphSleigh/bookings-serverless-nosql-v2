@@ -7,6 +7,7 @@ import * as React from 'react'
 import { EventList } from '../components/eventList'
 import { Can } from '../permissionContext'
 import { getEventsQueryOptions } from '../queries/getEvents'
+import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
 
 //import { useSuspenseIfUser } from '../queries/useSuspenseWrapper'
 
@@ -16,9 +17,10 @@ export const Route = createFileRoute('/')({
 
 function HomeComponent() {
   const eventsQuery = useSuspenseQuery(getEventsQueryOptions)
+  const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
   return (
     <>
-      <EventList events={eventsQuery.data.events} />
+      <EventList events={eventsQuery.data.events} bookings={bookingsQuery.data.bookings}/>
       <Flex justify="flex-end" p={16}>
       <Can I="create" a="event">
         <Link to="/events/new">

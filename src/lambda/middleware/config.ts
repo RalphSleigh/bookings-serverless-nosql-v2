@@ -1,9 +1,7 @@
-import { DynamoDBClient, GetItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb'
+import { DynamoDBClient, GetItemCommand } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { am_in_lambda } from '../utils'
-import middy from '@middy/core'
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda'
-import { ContextWithConfig } from './context'
+import { RequestHandler } from 'express'
 
 export type ConfigType = {
   AUTH0_CLIENT_SECRET: string,
@@ -20,7 +18,36 @@ export type ConfigType = {
 
 let configData: ConfigType
 
+export const configMiddleware: RequestHandler = async (req, res, next) => {
+  try {
+        if(!configData) {
+        const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' }
+        const client = new DynamoDBClient(dynamodbClientOptions)
 
+        const input = {
+            "Key": {
+              "pk": {
+                "S": "CONFIG"
+              },
+              "key": {
+                "S": "CURRENT"
+              }
+            },
+            "TableName": "Config"
+          };
+
+        const command = new GetItemCommand(input)
+        const data = await client.send(command)
+        configData = unmarshall(data.Item!) as ConfigType
+        }
+        res.locals.config = configData as ConfigType
+        next()
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+  }
+/* 
 export const configMiddleware = (): middy.MiddlewareObj<APIGatewayProxyEvent, APIGatewayProxyResult, Error, ContextWithConfig> => {
 
   const before: middy.MiddlewareFn<APIGatewayProxyEvent, APIGatewayProxyResult, Error, ContextWithConfig> = async (
@@ -58,4 +85,4 @@ export const configMiddleware = (): middy.MiddlewareObj<APIGatewayProxyEvent, AP
   return {
     before
   }
-}
+} */

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod/v4";
 
 const basicKP = z.object({ kpStructure: z.literal('basic') })
 
@@ -43,9 +43,9 @@ export const EventSchema = z
       eventId: z.string().nonempty(),
       name: z.string().nonempty(),
       description: z.string().nonempty(),
-      startDate: z.string().datetime(),
-      endDate: z.string().datetime(),
-      bookingDeadline: z.string().datetime(),
+      startDate: z.iso.datetime(),
+      endDate: z.iso.datetime(),
+      bookingDeadline: z.iso.datetime(),
       fee: feeOptions,
       kp: kpOptions,
       consents: consentsOptions,

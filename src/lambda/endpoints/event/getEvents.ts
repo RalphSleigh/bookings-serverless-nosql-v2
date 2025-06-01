@@ -3,8 +3,13 @@ import { DBEvent } from '../../dynamo'
 import { HandlerWrapper } from '../../utils'
 
 export type getEventsResponseType = { events: TEvent[] }
-export const getEvents = HandlerWrapper<any, getEventsResponseType>(['get', 'events'], async (event, context) => {
-  const events = await DBEvent.query.natural({}).go()
-  if (events.data) return { events: events.data.map((event) => EventSchema.parse(event)) }
-  throw new Error('Events query failed')
+export const getEvents = HandlerWrapper(res => ['get', 'events'], async (req, res) => {
+  try {
+    const events = await DBEvent.query.natural({}).go()
+    if (events.data) res.json({ events: events.data.map((event) => EventSchema.parse(event)) })
+  } catch (error) {
+    console.log('Events query failed')
+    console.log(error)
+    throw error
+  }
 })

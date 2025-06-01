@@ -1,14 +1,38 @@
-import middy from '@middy/core';
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { RequestHandler, Response } from 'express'
+import { ZodError } from "zod/v4";
 
-import type { ContextWithUser } from './middleware/context';
-import { ZodError } from 'zod';
-import { Action, Subject } from '../shared/permissions';
+import { Action, Subject } from '../shared/permissions'
+import { sub } from 'date-fns'
 
 export function am_in_lambda(): boolean {
-  return process.env.LOCAL_SERVER !== 'true';
+  return process.env.LOCAL_SERVER !== 'true'
 }
 
+type PermissionFn = (res: Response) => [action: Action, subject: Subject]
+
+export type THandlerWrapper = (permissionFn: PermissionFn, fn: RequestHandler) => RequestHandler
+
+export const HandlerWrapper: THandlerWrapper =
+  (permissionFn, fn) =>
+  async (req, res, next) => {
+    const permission = res.locals.permissions
+
+    if (!permission.can(...permissionFn(res))) {
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
+
+    try {
+      await fn(req, res, next)
+    } catch (error: any) {
+      console.error('Error in handler:', error)
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Validation Error, this shouldn't happen" })
+      }
+      return res.status(500).json({ error: error.message })
+    }
+  }
+
+/* 
 export type HandlerFunction<TPost, TResult> = (event: Omit<APIGatewayProxyEvent, 'body'> & { body: TPost }, context: ContextWithUser) => Promise<TResult>;
 export type HandlerWrapperType = <TPost = any, TResult = any>(permission: [Action, Subject], fn: HandlerFunction<TPost, TResult>) => middy.MiddyfiedHandler<Omit<APIGatewayProxyEvent, 'body'> & { body: TPost }, APIGatewayProxyResult, Error, ContextWithUser>;
 
@@ -44,4 +68,4 @@ export const HandlerWrapper: HandlerWrapperType = <TPost, TResult>([action, subj
       } as APIGatewayProxyResult;
     }
   });
-};
+}; */

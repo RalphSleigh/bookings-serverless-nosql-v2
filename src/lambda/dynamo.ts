@@ -1,14 +1,16 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { Entity, Service, type EntityItem } from 'electrodb';
-import { v4 as uuidv4 } from 'uuid';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { Attributes, Entity, Service, type EntityItem } from 'electrodb'
+import { v4 as uuidv4 } from 'uuid'
 
-import { EventSchema } from '../shared/schemas/event';
-import { am_in_lambda } from './utils';
+import { KPBasicOptions } from '../shared/kp/kp'
+import { EventSchema } from '../shared/schemas/event'
+import { am_in_lambda } from './utils'
+import { ca } from 'zod/v4/locales'
 
-const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' };
-const client = new DynamoDBClient(dynamodbClientOptions);
+const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' }
+const client = new DynamoDBClient(dynamodbClientOptions)
 
-const table = 'Bookings';
+const table = 'Bookings'
 
 export const DBUser = new Entity(
   {
@@ -71,7 +73,7 @@ export const DBUser = new Entity(
     },
   },
   { client, table },
-);
+)
 
 export const DBRole = new Entity(
   {
@@ -119,8 +121,7 @@ export const DBRole = new Entity(
     },
   },
   { client, table },
-);
-
+)
 
 export const DBEvent = new Entity(
   {
@@ -156,7 +157,7 @@ export const DBEvent = new Entity(
         required: true,
       },
       fee: {
-        type:'map',
+        type: 'map',
         properties: {
           feeStructure: {
             type: ['free', 'ealing'] as const,
@@ -271,9 +272,356 @@ export const DBEvent = new Entity(
     },
   },
   { client, table },
-);
+)
+
+const BookingAttributes = {
+  userId: {
+    type: 'string',
+    required: true,
+  },
+  eventId: {
+    type: 'string',
+    required: true,
+  },
+  cancelled: {
+    type: 'boolean',
+    required: true,
+    default: false,
+  },
+  basic: {
+    type: 'map',
+    properties: {
+      name: { type: 'string', required: true },
+      email: { type: 'string', required: true },
+      telephone: { type: 'string', required: true },
+      organisation: { type: 'string' },
+      district: { type: 'string' },
+      type: {
+        type: ['individual', 'group'] as const,
+      },
+    },
+  },
+  extraContacts: {
+    type: 'list',
+    items: {
+      type: 'map',
+      properties: {
+        name: { type: 'string', required: true },
+        email: { type: 'string', required: true },
+      },
+    },
+  },
+} as const
+
+export const DBBooking = new Entity(
+  {
+    model: {
+      entity: 'booking',
+      version: '1',
+      service: 'bookings',
+    },
+    attributes: {
+      ...BookingAttributes,
+      createdAt: {
+        type: 'number',
+        readOnly: true,
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+      updatedAt: {
+        type: 'number',
+        watch: '*',
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+    },
+    indexes: {
+      natural: {
+        collection: 'booking',
+        pk: {
+          field: 'pk',
+          composite: [],
+        },
+        sk: {
+          field: 'sk',
+          composite: ['eventId', 'userId'],
+        },
+      },
+      byUserId: {
+        collection: 'bookingByUserId',
+        index: 'gsi1pk-gsi1sk-index',
+        pk: {
+          field: 'gsi1pk',
+          composite: [],
+        },
+        sk: {
+          field: 'gsi1sk',
+          composite: ['userId', 'eventId'],
+        },
+      },
+    },
+  },
+  { client, table },
+)
+
+export const DBBookingHistory = new Entity(
+  {
+    model: {
+      entity: 'bookingHistory',
+      version: '1',
+      service: 'bookings',
+    },
+    attributes: {
+      userId: {
+        type: 'string',
+        required: true,
+      },
+      eventId: {
+        type: 'string',
+        required: true,
+      },
+      versions: {
+        required: true,
+        type: 'list',
+        items: {
+          type: 'map',
+          properties: {
+            ...BookingAttributes,
+            createdAt: {
+              type: 'number',
+              readOnly: true,
+              required: true,
+            },
+            updatedAt: {
+              type: 'number',
+              readOnly: true,
+              required: true,
+            },
+          },
+        },
+      },
+      createdAt: {
+        type: 'number',
+        readOnly: true,
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+      updatedAt: {
+        type: 'number',
+        watch: '*',
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+    },
+    indexes: {
+      natural: {
+        collection: 'bookingHistory',
+        pk: {
+          field: 'pk',
+          composite: [],
+        },
+        sk: {
+          field: 'sk',
+          composite: ['eventId', 'userId'],
+        },
+      },
+      byUserId: {
+        index: 'gsi1pk-gsi1sk-index',
+        pk: {
+          field: 'gsi1pk',
+          composite: [],
+        },
+        sk: {
+          field: 'gsi1sk',
+          composite: ['userId', 'eventId'],
+        },
+      },
+    },
+  },
+  { client, table },
+)
+
+const PersonAttributes = {
+  personId: {
+    type: 'string',
+    required: true,
+    default: () => uuidv4(),
+  },
+  userId: {
+    type: 'string',
+    required: true,
+  },
+  eventId: {
+    type: 'string',
+    required: true,
+  },
+  cancelled: {
+    type: 'boolean',
+    required: true,
+    default: false,
+  },
+  basic: {
+    type: 'map',
+    properties: {
+      name: { type: 'string', required: true },
+      dob: { type: 'string', required: true },
+      email: { type: 'string' },
+    },
+  },
+  kp: {
+    type: 'map',
+    properties: {
+      diet: { type: KPBasicOptions, required: true },
+      allergies: { type: 'string' },
+    },
+  },
+} as const
+
+export const DBPerson = new Entity(
+  {
+    model: {
+      entity: 'person',
+      version: '1',
+      service: 'bookings',
+    },
+    attributes: {
+      ...PersonAttributes,
+      createdAt: {
+        type: 'number',
+        readOnly: true,
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+      updatedAt: {
+        type: 'number',
+        watch: '*',
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+    },
+    indexes: {
+      natural: {
+        collection: 'booking',
+        pk: {
+          field: 'pk',
+          composite: [],
+        },
+        sk: {
+          field: 'sk',
+          composite: ['eventId', 'userId', 'personId'],
+        },
+      },
+      byUserId: {
+        collection: 'bookingByUserId',
+        index: 'gsi1pk-gsi1sk-index',
+        pk: {
+          field: 'gsi1pk',
+          composite: [],
+        },
+        sk: {
+          field: 'gsi1sk',
+          composite: ['userId', 'eventId', 'personId'],
+        },
+      },
+    },
+  },
+  { client, table },
+)
+
+export const DBPersonHistory = new Entity(
+  {
+    model: {
+      entity: 'personHistory',
+      version: '1',
+      service: 'bookings',
+    },
+    attributes: {
+      personId: {
+        type: 'string',
+        required: true,
+      },
+      userId: {
+        type: 'string',
+        required: true,
+      },
+      eventId: {
+        type: 'string',
+        required: true,
+      },
+      versions: {
+        required: true,
+        type: 'list',
+        items: {
+          type: 'map',
+          properties: {
+            ...PersonAttributes,
+            createdAt: {
+              type: 'number',
+              readOnly: true,
+              required: true,
+            },
+            updatedAt: {
+              type: 'number',
+              readOnly: true,
+              required: true,
+            },
+          },
+        },
+      },
+      createdAt: {
+        type: 'number',
+        readOnly: true,
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+      updatedAt: {
+        type: 'number',
+        watch: '*',
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+    },
+    indexes: {
+      natural: {
+        collection: 'bookingHistory',
+        pk: {
+          field: 'pk',
+          composite: [],
+        },
+        sk: {
+          field: 'sk',
+          composite: ['eventId', 'userId', 'personId'],
+        },
+      },
+      byUserId: {
+        index: 'gsi1pk-gsi1sk-index',
+        pk: {
+          field: 'gsi1pk',
+          composite: [],
+        },
+        sk: {
+          field: 'gsi1sk',
+          composite: ['userId', 'eventId', 'personId'],
+        },
+      },
+    },
+  },
+  { client, table },
+)
 
 export const DB = new Service({
   user: DBUser,
   role: DBRole,
-});
+  booking: DBBooking,
+  bookingHistory: DBBookingHistory,
+  person: DBPerson,
+  personHistory: DBPersonHistory,
+})

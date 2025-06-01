@@ -1,5 +1,5 @@
 import { eachMonthOfInterval } from 'date-fns'
-import { z, ZodType } from 'zod'
+import { z, ZodType } from "zod/v4";
 
 import { TEvent } from './event'
 import { PersonSchema, PersonSchemaForType } from './person'
@@ -43,9 +43,13 @@ export const BookingSchema = (event: TEvent) =>
     z
       .object({
         userId: z.string().nonempty(),
+        eventId: z.string().nonempty(),
+        cancelled: z.boolean().default(false),
         basic: event.bigCampMode ? basicBig : basicSmall,
         extraContacts: z.array(extraContact).optional(),
-        people: z.array(PersonSchema(event)),
+        people: z.array(PersonSchema(event)).min(1),
+        createdAt: z.number().optional(),
+        updatedAt: z.number().optional(),
       })
       .strict()
   
@@ -54,9 +58,13 @@ export const BookingSchema = (event: TEvent) =>
 export const BookingSchemaForType = z
   .object({
     userId: z.string().nonempty(),
+    eventId: z.string().nonempty(),
+    cancelled: z.boolean().default(false),
     basic: basicSmall.or(basicBig),
     extraContacts: z.array(extraContact).optional(),
-    people: z.array(PersonSchemaForType)
+    people: z.array(PersonSchemaForType).min(1),
+    createdAt: z.number().optional(),
+    updatedAt: z.number().optional(),
   })
   .strict()
 

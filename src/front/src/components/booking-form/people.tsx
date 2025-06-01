@@ -1,28 +1,40 @@
 import { ActionIcon, Button, Flex, Grid, Paper, TextInput, Title } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
 import React, { useState } from 'react'
-import { useFieldArray, UseFieldArrayRemove, useFormContext } from 'react-hook-form'
-import { z } from 'zod'
+import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext } from 'react-hook-form'
+import { v4 as uuidv4 } from 'uuid'
+import { z } from "zod/v4";
 
 import { KPBasicOptions } from '../../../../shared/kp/kp.js'
 import { BookingSchema, BookingSchemaForType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
-import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
+import { PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
+import { errorProps } from '../../utils.js'
 import { CustomDatePicker } from '../customDatePicker.js'
 import { CustomSelect } from '../customSelect.js'
+import { useRouteContext } from '@tanstack/react-router'
+import { app } from '../../../../lambda/app.js'
 
 type PeopleFormProps = {
-  event: TEvent
+  event: TEvent,
 }
 
 export const PeopleForm: React.FC<PeopleFormProps> = ({ event }) => {
+const { user } = useRouteContext({ from: '/_user' })
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray<z.infer<typeof BookingSchemaForType>>({
     name: 'people', // unique name for your Field Array
   })
 
+  const { watch } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+
   const people = fields.map((f, i) => {
     return <PersonForm event={event} index={i} key={f.id} remove={remove} />
   })
+
+  const appendFn = () => {
+    const newPerson = { personId: uuidv4(), eventId: event.eventId, userId: user.userId, cancelled: false}
+    append(newPerson as TPerson)
+  }
 
   return (
     <>
@@ -30,7 +42,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event }) => {
         People
       </Title>
       {people}
-      <Button onClick={() => append({} as z.input<typeof PersonSchemaForType>)} mt={16} variant="outline">
+      <Button onClick={appendFn} mt={16} variant="outline">
         Add person
       </Button>
     </>
@@ -38,18 +50,29 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event }) => {
 }
 
 const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; remove: UseFieldArrayRemove }) => {
-  const { register, control } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+
+  const { errors } = formState
+  const e = errorProps(errors)
 
   const removeFn = (index: number) => {
-    if(confirm(`Are you sure you want to remove this person?`)) {
-        remove(index)
-        }
+    if (confirm(`Are you sure you want to remove this person?`)) {
+      remove(index)
+    }
   }
 
   const emailAndDiet = event.allParticipantEmails ? (
     <>
       <Grid.Col span={8}>
-        <TextInput required autoComplete={`section-person-${index} email`} id={`person-email-${index}`} data-form-type="other" label="Email" {...register(`people.${index}.basic.email` as const)} />
+        <TextInput
+          required
+          autoComplete={`section-person-${index} email`}
+          id={`person-email-${index}`}
+          data-form-type="other"
+          label="Email"
+          {...register(`people.${index}.basic.email` as const)}
+          {...e(`people.${index}.basic.email`)}
+        />
       </Grid.Col>
       <Grid.Col span={4}>
         <CustomSelect required label="Dietary requirements" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} control={control} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
@@ -67,18 +90,25 @@ const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; re
     <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8}>
       <Grid p={6} gutter={8}>
         <Grid.Col span={8}>
-          <TextInput required autoComplete={`section-person-${index} name`} id={`person-name-${index}`} data-form-type="other" label="Name" {...register(`people.${index}.basic.name` as const)} />
+          <TextInput
+            required
+            autoComplete={`section-person-${index} name`}
+            id={`person-name-${index}`}
+            data-form-type="other"
+            label="Name"
+            {...register(`people.${index}.basic.name` as const)}
+            {...e(`people.${index}.basic.name`)}
+          />
         </Grid.Col>
         <Grid.Col span={4}>
           <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} control={control} required />
         </Grid.Col>
         {emailAndDiet}
         <Grid.Col span={12}>
-            <Flex
-              justify="flex-end">
-          <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>
-            <IconX size={16} stroke={1.5} color="red" />
-          </ActionIcon>
+          <Flex justify="flex-end">
+            <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>
+              <IconX size={16} stroke={1.5} color="red" />
+            </ActionIcon>
           </Flex>
         </Grid.Col>
       </Grid>

@@ -8,17 +8,15 @@ import { PartialDeep } from "type-fest"
 import { ActionIcon, Box, Button, Flex, Grid, LoadingOverlay, Overlay, Paper, Text, TextInput, Title } from '@mantine/core'
 import { IconPlus, IconTrash } from '@tabler/icons-react'
 import { useFieldArray, UseFieldArrayAppend, UseFieldArrayRemove, useFormContext } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from "zod/v4";
 
 import { BookingSchemaForType } from '../../../../shared/schemas/booking'
+import { errorProps } from '../../utils'
 
-/* let key = 1
-
-*/
 export function ExtraContactsForm() {
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray<z.infer<typeof BookingSchemaForType>>({
     name: 'extraContacts', // unique name for your Field Array
-  })
+  }) 
 
   const contacts = fields.map((f, i) => {
     return <ContactItem index={i} key={f.id} remove={remove} />
@@ -39,7 +37,10 @@ export function ExtraContactsForm() {
 }
 
 const ContactItem = ({ index, remove }: { index: number; remove: UseFieldArrayRemove }) => {
-  const { register, control } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+
+  const { errors } = formState
+  const e = errorProps(errors)
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} pl={16} pr={16}>
@@ -51,6 +52,7 @@ const ContactItem = ({ index, remove }: { index: number; remove: UseFieldArrayRe
             data-form-type="other"
             label="Name"
             {...register(`extraContacts.${index}.name` as const)}
+            {...e(`extraContacts.${index}.name`)}
           />
         </Grid.Col>
         <Grid.Col span={6}>
@@ -62,6 +64,7 @@ const ContactItem = ({ index, remove }: { index: number; remove: UseFieldArrayRe
               data-form-type="other"
               label="Email"
               {...register(`extraContacts.${index}.email` as const)}
+               {...e(`extraContacts.${index}.email`)}
             />
             <ActionIcon variant="default" size="input-sm" onClick={() => remove(index)} mt={24}>
               <IconTrash size={16} stroke={1.5} color="red" />

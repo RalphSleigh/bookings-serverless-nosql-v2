@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { ActionIcon, Button, Container, Flex, Grid, keys, Paper, Select, Switch, Text, TextInput, Title } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 import { IconAlertCircle, IconAlertTriangle, IconTrash } from '@tabler/icons-react'
@@ -18,13 +18,13 @@ import { CustomDatePicker, CustomDateTimePicker } from '../customDatePicker.js'
 import { CustomSelect } from '../customSelect.js'
 import { NumberValue } from '@aws-sdk/util-dynamodb/dist-types/NumberValue.js'
 import { useDebounce } from '@react-hook/debounce'
-import { z } from 'zod'
+import { z } from "zod/v4";
 import { CustomSwitch } from '../customSwitch.js'
 
 type PartialEventType = PartialDeep<TEventWhenCreating, {recurseIntoArrays: true}>
 
 export function EventForm({ inputData, mode, mutation }: { inputData: DefaultValues<TEventWhenCreating>, mode: 'create' | 'edit', mutation: UseMutationResult<any, any, any, any> }) {
-  const formMethods = useForm<z.input<typeof EventSchemaWhenCreating>>({ resolver: zodResolver(EventSchemaWhenCreating), mode: 'onBlur', defaultValues: inputData })
+  const formMethods = useForm<z.input<typeof EventSchemaWhenCreating>>({ resolver: standardSchemaResolver(EventSchemaWhenCreating), mode: 'onBlur', defaultValues: inputData })
   const { register, watch, control, formState, handleSubmit, getValues  } = formMethods
 
   const onSubmit: SubmitHandler<PartialEventType> = (data) => mutation.mutate(data)

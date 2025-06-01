@@ -5,16 +5,14 @@ import { createRootRoute, createRootRouteWithContext, Link, Outlet, useRouteCont
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import * as React from 'react'
 
-import { UserResponseType } from '../../../lambda/endpoints/user/getUser'
-import { ContextUser } from '../../../lambda/middleware/context'
 import { getPermissionsFromUser } from '../../../shared/permissions'
 import { useAuth } from '../auth'
 import { AppToolbar } from '../components/appbar'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
-import { userQueryOptions } from '../queries/user'
 
 import classes from '../css/mainArea.module.css'
+import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   auth: ReturnType<typeof useAuth>
@@ -22,7 +20,7 @@ export const Route = createRootRouteWithContext<{
 }>()({
   component: RootComponent,
   loader: ({ context: { queryClient } }) => {
-    return Promise.all([queryClient.ensureQueryData(envQueryOptions), queryClient.ensureQueryData(getEventsQueryOptions)])
+    return Promise.all([queryClient.ensureQueryData(envQueryOptions), queryClient.ensureQueryData(getEventsQueryOptions), queryClient.ensureQueryData(getUserBookingsQueryOptions)])
   },
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
     // validate and parse the search params into a typed state

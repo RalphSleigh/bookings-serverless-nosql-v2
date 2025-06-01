@@ -4,7 +4,7 @@ import { IconAlertTriangle } from '@tabler/icons-react'
 import React, { useEffect, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
-import { z } from 'zod'
+import { z } from "zod/v4";
 
 import { BookingSchema, BookingSchemaForType, TBookingForType } from '../../../../shared/schemas/booking'
 
@@ -15,7 +15,7 @@ type ValidationErrorsProps = {
 
 type PartialBookingType = PartialDeep<TBookingForType, { recurseIntoArrays: true }>
 
-const mapValidationError = (data: PartialBookingType) => (issue: z.ZodIssue) => {
+const mapValidationError = (data: PartialBookingType) => (issue: z.core.$ZodIssue) => {
   if (issue.path[0] === 'basic') {
     if (issue.path[1] === 'type') return `Please select a booking type`
     if (issue.path[1] === 'organisation') return `Please enter your organisation name`

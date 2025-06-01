@@ -2,7 +2,7 @@ import { Alert, Box, Grid, Paper, Radio, RadioGroup, Text, TextInput, Title } fr
 import { IconInfoCircle } from '@tabler/icons-react'
 import React from 'react'
 import { useController, useFormContext } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from "zod/v4";
 
 import { BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
