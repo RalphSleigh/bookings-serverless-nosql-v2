@@ -43,7 +43,7 @@ export const configMiddleware: RequestHandler = async (req, res, next) => {
         res.locals.config = configData as ConfigType
         next()
     } catch (error) {
-        console.log(error)
+        res.locals.logger.logToPath(error)
         throw error
     }
   }

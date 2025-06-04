@@ -7,14 +7,23 @@ const seeLogStreams = new Set()
 
 const cloudWatchLogsClient = new CloudWatchLogsClient({ region: 'eu-west-2' })
 
-class AWSLogger {
+export interface Logger {
+  logToPath(message: any): void
+  logToSystem(message: any): void
+  flush(): Promise<void>
+}
+
+class AWSLogger implements Logger {
   private tasks: Promise<any>[] = []
   createTask: Promise<PutLogEventsCommandOutput> | undefined
   constructor(private req: Request) {
     this.req = req
   }
 
-  logToPath(message: string) {
+  logToPath(message: any) {
+    if(typeof message !== 'string') {
+      message = JSON.stringify(message)
+    }
     console.log(`[${this.req.path}][${this.req.method}] ${message}`)
     const logStreamName = `${this.req.method}-${this.req.path}`
     if (!seeLogStreams.has(logStreamName)) {
@@ -55,7 +64,10 @@ class AWSLogger {
     }
   }
 
-  logToSystem(message: string) {
+  logToSystem(message: any) {
+    if(typeof message !== 'string') {
+      message = JSON.stringify(message)
+    }
     console.log(`[system] ${message}`)
     const task = cloudWatchLogsClient.send(
       new PutLogEventsCommand({
@@ -73,7 +85,7 @@ class AWSLogger {
   }
 }
 
-class ConsoleLogger {
+class ConsoleLogger implements Logger {
   constructor(private req: Request) {
     this.req = req
   }
@@ -113,3 +125,15 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
     throw error
   }
 }
+
+export const requestLoggerMiddleware: RequestHandler = async (req, res, next) => {
+    if(res.locals.user) {
+        res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+    } else {
+        res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+    }
+    next()
+}
+
+
+

@@ -11,11 +11,11 @@ export const createEvent = HandlerWrapper(res => ['create', 'event'], async (req
   //export const createEvent = HandlerWrapper<TCreateEventData>(['create', 'event'], async (event, context) => {
   const validatedEvent = EventSchemaWhenCreating.parse(req.body.event)
 
-  console.log(validatedEvent)
+  res.locals.logger.logToPath(validatedEvent)
 
   const createdEvent = await DBEvent.create(validatedEvent).go()
 
-  console.log(createdEvent)
+  res.locals.logger.logToPath(createdEvent)
 
   res.json({ ok: 'ok' })
 })

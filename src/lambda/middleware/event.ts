@@ -24,7 +24,7 @@ export const eventMiddleware: RequestHandler = async (req, res, next) => {
     res.locals.event = EventSchema.parse(event.data)
     next()
   } catch (error) {
-    console.log(error)
+    res.locals.logger.logToPath(error)
     throw error
   }
 }

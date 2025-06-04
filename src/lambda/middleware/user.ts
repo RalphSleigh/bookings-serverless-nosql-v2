@@ -38,7 +38,7 @@ export const userMiddleware: RequestHandler = async (req, res, next) => {
       res.cookie('jwt', '', { maxAge: 60 * 60, httpOnly: true, sameSite: true, path: '/' })
       return next()
     } else {
-      console.log(error)
+      res.locals.logger.logToPath(error)
       throw error
     }
   }

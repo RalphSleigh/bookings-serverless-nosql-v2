@@ -45,8 +45,8 @@ export const authCallback: RequestHandler = async (req, res) => {
   const userResult = await DBUser.get({ sub: profile.sub! }).go()
   let user: TUser
 
-  console.log('PROFILE')
-  console.log(profile)
+  res.locals.logger.logToPath('PROFILE')
+  res.locals.logger.logToPath(profile)
 
   if (userResult.data === null) {
     const [source, sub] = profile.sub!.split('|')
@@ -78,7 +78,7 @@ export const authCallback: RequestHandler = async (req, res) => {
         displayName = user.data.name?.fullName
         email = user.data.primaryEmail
       } catch (e) {
-        console.log(e)
+        res.locals.logger.logToPath(e)
       }
     }
 
@@ -95,7 +95,7 @@ export const authCallback: RequestHandler = async (req, res) => {
     user = UserSchema.parse(userResult.data)
   }
 
-  console.log(user)
+  res.locals.logger.logToPath(user)
 
   const jwt_token = jwt.sign({ id: user.userId }, config.JWT_SECRET, {
     expiresIn: 1000 * 60 * 60 * config.COOKIE_EXPIRY,

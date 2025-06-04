@@ -26,7 +26,7 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
       next()
     }
   } catch (error) {
-    console.log(error)
+    res.locals.logger.logToPath(error)
     throw error
   }
 }

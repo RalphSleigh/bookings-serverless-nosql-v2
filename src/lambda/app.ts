@@ -15,7 +15,7 @@ import { testLoggedIn } from './endpoints/test/testLoggedIn'
 import { getUser } from './endpoints/user/getUser'
 import { configMiddleware } from './middleware/config'
 import { eventMiddleware } from './middleware/event'
-import { loggerMiddleware } from './middleware/logger'
+import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { userMiddleware } from './middleware/user'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { updateBooking } from './endpoints/booking/updateBooking'
@@ -26,9 +26,9 @@ export const app = express()
 router.use(loggerMiddleware)
 router.use(express.json())
 router.use(cookieParser())
-
 router.use(configMiddleware)
 router.use(userMiddleware)
+router.use(requestLoggerMiddleware)
 
 router.get('/env', getEnv)
 router.get('/auth/redirect', authRedirect)

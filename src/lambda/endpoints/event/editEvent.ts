@@ -12,11 +12,11 @@ export const editEvent = HandlerWrapper(res => ['create', 'event'], async (req, 
     throw new Error('Event ID in path and body do not match')
   }
   const validatedEvent = EventSchema.parse(req.body.event)
-  console.log(validatedEvent)
+  res.locals.logger.logToPath(validatedEvent)
 
   const updatedEvent = await DBEvent.put(validatedEvent).go()
 
-  console.log(updatedEvent)
+  res.locals.logger.logToPath(updatedEvent)
 
   res.json({ ok: 'ok' })
 })

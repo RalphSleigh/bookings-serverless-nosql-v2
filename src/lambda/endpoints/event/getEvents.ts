@@ -8,8 +8,8 @@ export const getEvents = HandlerWrapper(res => ['get', 'events'], async (req, re
     const events = await DBEvent.query.natural({}).go()
     if (events.data) res.json({ events: events.data.map((event) => EventSchema.parse(event)) })
   } catch (error) {
-    console.log('Events query failed')
-    console.log(error)
+    res.locals.logger.logToPath('Events query failed')
+    res.locals.logger.logToPath(error)
     throw error
   }
 })
