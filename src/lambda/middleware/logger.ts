@@ -22,7 +22,7 @@ class AWSLogger {
         try {
           await cloudWatchLogsClient.send(
             new CreateLogStreamCommand({
-              logGroupName: 'bookings_system_logs',
+              logGroupName: 'bookings_system_request_logs',
               logStreamName,
             }),
           )
