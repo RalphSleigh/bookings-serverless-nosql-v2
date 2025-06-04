@@ -9,6 +9,7 @@ const cloudWatchLogsClient = new CloudWatchLogsClient({ region: 'eu-west-2' })
 
 class AWSLogger {
   private tasks: Promise<any>[] = []
+  createTask: Promise<PutLogEventsCommandOutput> | undefined
   constructor(private req: Request) {
     this.req = req
   }
@@ -17,8 +18,7 @@ class AWSLogger {
     console.log(`[${this.req.path}][${this.req.method}] ${message}`)
     const logStreamName = `${this.req.method}-${this.req.path}`
     if (!seeLogStreams.has(logStreamName)) {
-      seeLogStreams.add(logStreamName)
-      const task = (async () => {
+      this.createTask = (async () => {
         try {
           await cloudWatchLogsClient.send(
             new CreateLogStreamCommand({
@@ -38,15 +38,19 @@ class AWSLogger {
           }),
         )
       })
-      this.tasks.push(task)
+      seeLogStreams.add(logStreamName)
+      this.tasks.push(this.createTask)
     } else {
-      const task = cloudWatchLogsClient.send(
-        new PutLogEventsCommand({
-          logGroupName: 'bookings_system_request_logs',
-          logStreamName,
-          logEvents: [{ message, timestamp: Date.now() }],
-        }),
-      )
+      const task = (async () => {
+        await this.createTask
+        await cloudWatchLogsClient.send(
+          new PutLogEventsCommand({
+            logGroupName: 'bookings_system_request_logs',
+            logStreamName,
+            logEvents: [{ message, timestamp: Date.now() }],
+          }),
+        )
+      })()
       this.tasks.push(task)
     }
   }
