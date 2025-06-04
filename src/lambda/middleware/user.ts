@@ -31,8 +31,15 @@ export const userMiddleware: RequestHandler = async (req, res, next) => {
     res.locals.user = { ...UserSchema.parse(userResult.data.user[0]), roles: userResult.data.role.map((r) => RoleSchema.parse(r)) }
     res.locals.permissions = getPermissionsFromUser(res.locals.user)
     next()
-  } catch (error) {
-    console.log(error)
-    throw error
+  } catch (error: any) {
+    if (error.name === 'JsonWebTokenError') {
+      res.locals.user = undefined
+      res.locals.permissions = getPermissionsFromUser(undefined)
+      res.cookie('jwt', '', { maxAge: 60 * 60, httpOnly: true, sameSite: true, path: '/' })
+      return next()
+    } else {
+      console.log(error)
+      throw error
+    }
   }
 }
