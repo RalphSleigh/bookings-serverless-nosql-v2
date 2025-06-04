@@ -1,7 +1,7 @@
-//import { CloudWatchLogsClient, PutLogEventsCommand, PutLogEventsCommandOutput, CreateLogStreamCommand  } from "@aws-sdk/client-cloudwatch-logs"
+import { CloudWatchLogsClient, PutLogEventsCommand, PutLogEventsCommandOutput, CreateLogStreamCommand  } from "@aws-sdk/client-cloudwatch-logs"
 import { RequestHandler, Request } from "express"
 import { am_in_lambda } from "../utils"
-/* 
+
 const seeLogStreams = new Set()
 
 const cloudWatchLogsClient = new CloudWatchLogsClient({ region: 'eu-west-2' })
@@ -54,7 +54,7 @@ class AWSLogger {
         await Promise.all(this.tasks)
     }
 }
- */
+
 class ConsoleLogger {
     constructor(private req: Request) {
         this.req = req
@@ -76,8 +76,7 @@ class ConsoleLogger {
 export const loggerMiddleware: RequestHandler = async (req, res, next) => {
   try {
     if(am_in_lambda()) {
-        res.locals.logger = new ConsoleLogger(req)
-        //res.locals.logger = new AWSLogger(req)
+        res.locals.logger = new AWSLogger(req)
         res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
         res.on('finish', async () => {
             res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
