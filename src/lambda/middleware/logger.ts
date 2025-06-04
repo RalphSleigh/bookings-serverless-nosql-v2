@@ -14,7 +14,7 @@ class AWSLogger {
 
     logToPath(message: string) {
         console.log(`[${this.req.path}][${this.req.method}] ${message}`)
-        const logStreamName = `${this.req.path}-${this.req.method}`
+        const logStreamName = `${this.req.method}-${this.req.path}`
         if (!seeLogStreams.has(logStreamName)) {
             seeLogStreams.add(logStreamName)
             const task = cloudWatchLogsClient.send(new CreateLogStreamCommand({
@@ -22,7 +22,7 @@ class AWSLogger {
                 logStreamName
             })).then(() => {
                 return cloudWatchLogsClient.send(new PutLogEventsCommand({
-                    logGroupName: 'bookings_system_logs',
+                    logGroupName: 'bookings_system_request_logs',
                     logStreamName,
                     logEvents: [{ message, timestamp: Date.now() }]
                 }))
@@ -30,7 +30,7 @@ class AWSLogger {
             this.tasks.push(task)
         } else {
             const task = cloudWatchLogsClient.send(new PutLogEventsCommand({
-                logGroupName: 'bookings_system_logs',
+                logGroupName: 'bookings_system_request_logs',
                 logStreamName,
                 logEvents: [{ message, timestamp: Date.now() }]
             }))

@@ -18,7 +18,7 @@ esbuild
         platform: 'node',
         //sourcemap: 'inline',
         target: ['node22'],
-        external: ['aws-sdk','aws-lambda','@aws-sdk/*'],
+        external: ['aws-sdk','aws-lambda','@aws-sdk/*', 'punycode'],
         //metafile: true,
         banner: {
             js: `
