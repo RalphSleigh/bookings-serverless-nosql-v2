@@ -25,7 +25,7 @@ class AWSLogger implements Logger {
       message = JSON.stringify(message)
     }
     console.log(`[${this.req.path}][${this.req.method}] ${message}`)
-    const logStreamName = `${this.req.method}-${this.req.path}`
+    const logStreamName = `${this.req.method}_${this.req.path}`
     if (!seeLogStreams.has(logStreamName)) {
       this.createTask = (async () => {
         try {
