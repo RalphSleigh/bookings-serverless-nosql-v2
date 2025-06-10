@@ -111,7 +111,9 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
       res.locals.logger = new AWSLogger(req)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
       res.on('finish', async () => {
+        console.log(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
+        console.log(`Flushing logger`)
         await res.locals.logger.flush()
       })
     } else {
