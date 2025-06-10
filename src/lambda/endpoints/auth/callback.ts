@@ -8,6 +8,9 @@ import { TUser, UserSchema } from '../../../shared/schemas/user'
 import { DBUser } from '../../dynamo'
 
 export const authCallback: RequestHandler = async (req, res) => {
+  const logToPath = res.locals.logger.logToPath
+  const logToSystem = res.locals.logger.logToSystem
+
   const config = res.locals.config
 
   const code = req.query.code as string | undefined
@@ -82,6 +85,7 @@ export const authCallback: RequestHandler = async (req, res) => {
       }
     }
 
+
     const createResult = await DBUser.create({
       sub: profile.sub!,
       email: email,
@@ -91,8 +95,10 @@ export const authCallback: RequestHandler = async (req, res) => {
       isGroupAccount: isisWoodcraftGroupUser,
     }).go()
     user = UserSchema.parse(createResult.data)
+    logToSystem(`New user created: ${JSON.stringify(user)}`)
   } else {
     user = UserSchema.parse(userResult.data)
+    logToSystem(`User found: ${JSON.stringify(user)}`)
   }
 
   res.locals.logger.logToPath(user)
