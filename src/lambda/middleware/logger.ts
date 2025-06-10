@@ -83,6 +83,10 @@ class AWSLogger implements Logger {
   }
 
   async flush() {
+    console.log(this)
+    console.log(`Flushing AWS logger tasks`)
+    console.log(`Tasks to flush: ${this.tasks.length}`)
+    console.log(`Tasks: ${this.tasks}`)
     await Promise.all(this.tasks)
   }
 }
