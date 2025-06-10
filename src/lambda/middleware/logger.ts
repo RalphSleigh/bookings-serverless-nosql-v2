@@ -48,6 +48,7 @@ class AWSLogger implements Logger {
         )
       })
       seeLogStreams.add(logStreamName)
+      console.log(`pushing task create stream`)
       this.tasks.push(this.createTask)
     } else {
       const task = (async () => {
@@ -60,6 +61,7 @@ class AWSLogger implements Logger {
           }),
         )
       })()
+      console.log(`pushing task didnt create stream`)
       this.tasks.push(task)
     }
   }
@@ -76,7 +78,7 @@ class AWSLogger implements Logger {
         logEvents: [{ message, timestamp: Date.now() }],
       }),
     )
-
+    console.log(`pushing task to system logs`)
     this.tasks.push(task)
   }
 
