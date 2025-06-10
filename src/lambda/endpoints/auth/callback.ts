@@ -8,8 +8,8 @@ import { TUser, UserSchema } from '../../../shared/schemas/user'
 import { DBUser } from '../../dynamo'
 
 export const authCallback: RequestHandler = async (req, res) => {
-  const logToPath = res.locals.logger.logToPath
-  const logToSystem = res.locals.logger.logToSystem
+  const logToPath = res.locals.logger.logToPath.bind(res.locals.logger)
+  const logToSystem = res.locals.logger.logToSystem.bind(res.locals.logger)
 
   const config = res.locals.config
 
