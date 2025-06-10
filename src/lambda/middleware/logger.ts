@@ -48,7 +48,6 @@ class AWSLogger implements Logger {
         )
       })
       seeLogStreams.add(logStreamName)
-      console.log(`pushing task create stream`)
       this.tasks.push(this.createTask)
     } else {
       const task = (async () => {
@@ -61,7 +60,6 @@ class AWSLogger implements Logger {
           }),
         )
       })()
-      console.log(`pushing task didnt create stream`)
       this.tasks.push(task)
     }
   }
@@ -78,15 +76,10 @@ class AWSLogger implements Logger {
         logEvents: [{ message, timestamp: Date.now() }],
       }),
     )
-    console.log(`pushing task to system logs`)
     this.tasks.push(task)
   }
 
   async flush() {
-    console.log(this)
-    console.log(`Flushing AWS logger tasks`)
-    console.log(`Tasks to flush: ${this.tasks.length}`)
-    console.log(`Tasks: ${this.tasks}`)
     await Promise.all(this.tasks)
   }
 }
@@ -115,9 +108,7 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
       res.locals.logger = new AWSLogger(req)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
       res.on('finish', async () => {
-        console.log(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
-        console.log(`Flushing logger`)
         await res.locals.logger.flush()
       })
     } else {
