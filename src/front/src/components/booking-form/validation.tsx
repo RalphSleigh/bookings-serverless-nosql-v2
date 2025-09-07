@@ -6,14 +6,12 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 import { z } from "zod/v4";
 
-import { BookingSchema, BookingSchemaForType, TBookingForType } from '../../../../shared/schemas/booking'
+import { BookingSchema, BookingSchemaForType, PartialBookingType, TBookingForType } from '../../../../shared/schemas/booking'
 
 
 type ValidationErrorsProps = {
   schema: ReturnType<typeof BookingSchema>
 }
-
-type PartialBookingType = PartialDeep<TBookingForType, { recurseIntoArrays: true }>
 
 const mapValidationError = (data: PartialBookingType) => (issue: z.core.$ZodIssue) => {
   if (issue.path[0] === 'basic') {

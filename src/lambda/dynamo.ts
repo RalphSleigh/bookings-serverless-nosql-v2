@@ -1,11 +1,11 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Attributes, Entity, Service, type EntityItem } from 'electrodb'
 import { v4 as uuidv4 } from 'uuid'
+import { ca } from 'zod/v4/locales'
 
 import { KPBasicOptions } from '../shared/kp/kp'
 import { EventSchema } from '../shared/schemas/event'
 import { am_in_lambda } from './utils'
-import { ca } from 'zod/v4/locales'
 
 const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' }
 const client = new DynamoDBClient(dynamodbClientOptions)
@@ -83,12 +83,17 @@ export const DBRole = new Entity(
       service: 'bookings',
     },
     attributes: {
+      roleId: {
+        type: 'string',
+        required: true,
+        default: () => uuidv4(),
+      },
       userId: {
         type: 'string',
         required: true,
       },
       role: {
-        type: ['admin'] as const,
+        type: ['admin', 'owner'] as const,
         required: true,
       },
       eventId: {
@@ -103,7 +108,7 @@ export const DBRole = new Entity(
         },
         sk: {
           field: 'sk',
-          composite: ['userId'],
+          composite: ['eventId', 'roleId'],
         },
       },
       byUserId: {
@@ -311,6 +316,19 @@ const BookingAttributes = {
       },
     },
   },
+  other: {
+    type: 'map',
+    properties: {
+      anythingElse: {
+        type: 'string',
+        required: false,
+      },
+      whatsApp: {
+        type: ['yes', 'no'] as const,
+        required: false,
+      },
+    },
+  },
 } as const
 
 export const DBBooking = new Entity(
@@ -476,7 +494,13 @@ const PersonAttributes = {
     type: 'map',
     properties: {
       diet: { type: KPBasicOptions, required: true },
-      allergies: { type: 'string' },
+      details: { type: 'string' },
+    },
+  },
+  health: {
+    type: 'map',
+    properties: {
+      medical: { type: 'string' },
     },
   },
 } as const

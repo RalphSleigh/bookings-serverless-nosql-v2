@@ -10,7 +10,7 @@ export type TCreateBookingData = {
 }
 
 export const updateBooking = HandlerWrapper(
-  (res) => ['update', subject('eventBooking', { event: res.locals.event, booking: res.locals.booking })],
+  (req, res) => ['update', subject('eventBooking', { event: res.locals.event, booking: res.locals.booking })],
   async (req, res) => {
     const user = res.locals.user
     const event = res.locals.event

@@ -5,7 +5,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 import jwksClient from 'jwks-rsa'
 
 import { TUser, UserSchema } from '../../../shared/schemas/user'
-import { DBUser } from '../../dynamo'
+import { DBRole, DBUser } from '../../dynamo'
 
 export const authCallback: RequestHandler = async (req, res) => {
   const logToPath = res.locals.logger.logToPath.bind(res.locals.logger)
@@ -85,7 +85,6 @@ export const authCallback: RequestHandler = async (req, res) => {
       }
     }
 
-
     const createResult = await DBUser.create({
       sub: profile.sub!,
       email: email,
@@ -94,7 +93,13 @@ export const authCallback: RequestHandler = async (req, res) => {
       isWoodcraft: isWoodcraft,
       isGroupAccount: isisWoodcraftGroupUser,
     }).go()
+
     user = UserSchema.parse(createResult.data)
+
+    if (config.ENV === 'dev' && user.isWoodcraft) {
+      await DBRole.create({ userId: user.userId, role: 'admin' }).go()
+    }
+
     logToSystem(`New user created: ${JSON.stringify(user)}`)
   } else {
     user = UserSchema.parse(userResult.data)

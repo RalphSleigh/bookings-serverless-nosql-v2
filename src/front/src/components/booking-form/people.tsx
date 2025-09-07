@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Flex, Grid, Paper, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Flex, Grid, Paper, Textarea, TextInput, Title } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext } from 'react-hook-form'
@@ -10,8 +10,8 @@ import { BookingSchema, BookingSchemaForType } from '../../../../shared/schemas/
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
 import { errorProps } from '../../utils.js'
-import { CustomDatePicker } from '../customDatePicker.js'
-import { CustomSelect } from '../customSelect.js'
+import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
+import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { useRouteContext } from '@tanstack/react-router'
 import { app } from '../../../../lambda/app.js'
 
@@ -50,7 +50,7 @@ const { user } = useRouteContext({ from: '/_user' })
 }
 
 const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; remove: UseFieldArrayRemove }) => {
-  const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { register, control, formState, watch } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
   const e = errorProps(errors)
@@ -60,6 +60,8 @@ const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; re
       remove(index)
     }
   }
+
+  const personId = watch(`people.${index}.personId`)
 
   const emailAndDiet = event.allParticipantEmails ? (
     <>
@@ -75,19 +77,19 @@ const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; re
         />
       </Grid.Col>
       <Grid.Col span={4}>
-        <CustomSelect required label="Dietary requirements" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} control={control} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
+        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} control={control} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
       </Grid.Col>
     </>
   ) : (
     <>
       <Grid.Col span={12}>
-        <CustomSelect required label="Dietary requirements" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} control={control} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
+        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} control={control} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
       </Grid.Col>
     </>
   )
 
   return (
-    <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8}>
+    <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={personId}>
       <Grid p={6} gutter={8}>
         <Grid.Col span={8}>
           <TextInput
@@ -104,6 +106,30 @@ const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; re
           <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} control={control} required />
         </Grid.Col>
         {emailAndDiet}
+        <Grid.Col span={12}>
+          <Textarea
+            autoComplete={`section-person-${index} diet-details`}
+            id={`person-details-${index}`}
+            data-form-type="other"
+            label="Additional dietary requirement or food related allergies"
+            {...register(`people.${index}.kp.details` as const)}
+            {...e(`people.${index}.kp.details`)}
+            autosize
+        minRows={2}
+          />
+        </Grid.Col>
+        <Grid.Col span={12}>
+            <Textarea
+              autoComplete={`section-person-${index} health-medical`}
+              id={`person-health-medical-${index}`}
+              data-form-type="other"
+              label="Details of relevant medical conditions, medication taken or addtional needs"
+              {...register(`people.${index}.health.medical` as const)}
+              {...e(`people.${index}.health.medical`)}
+              autosize
+              minRows={2}
+            />
+        </Grid.Col>
         <Grid.Col span={12}>
           <Flex justify="flex-end">
             <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>

@@ -16,7 +16,7 @@ export const testCreateRole: RequestHandler = async (req, res) => {
     } */
 
   if (user) {
-    const role = await DBRole.create({ userId: user.userId, role: 'admin' }).go()
+    const role = await DBRole.create({ userId: user.userId, role: 'admin', eventId: "*"}).go()
 
     res.json(role)
   } else {

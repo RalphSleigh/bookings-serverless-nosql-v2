@@ -3,7 +3,6 @@ import { ActionIcon, Button, Container, Flex, Grid, keys, Paper, Select, Switch,
 import { DateInput } from '@mantine/dates'
 import { IconAlertCircle, IconAlertTriangle, IconTrash } from '@tabler/icons-react'
 import { UseMutationResult } from '@tanstack/react-query'
-import { parseISO } from 'date-fns'
 import React, { Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { Controller, DefaultValues, FieldValues, FormProvider, SubmitHandler, useFieldArray, UseFieldArrayRemove, useForm, useFormContext } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
@@ -14,12 +13,12 @@ import { ConsentsOptions } from '../../../../shared/consents/consents.js'
 import { getFeeTypesForEvent, maybeGetFeeType } from '../../../../shared/fees/fees.js'
 import { KPOptions } from '../../../../shared/kp/kp.js'
 import { EventSchema, EventSchemaWhenCreating, TCustomQuestion, TEvent, TEventWhenCreating } from '../../../../shared/schemas/event.js'
-import { CustomDatePicker, CustomDateTimePicker } from '../customDatePicker.js'
-import { CustomSelect } from '../customSelect.js'
+import { CustomDatePicker, CustomDateTimePicker } from '../custom-inputs/customDatePicker.js'
+import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { NumberValue } from '@aws-sdk/util-dynamodb/dist-types/NumberValue.js'
 import { useDebounce } from '@react-hook/debounce'
 import { z } from "zod/v4";
-import { CustomSwitch } from '../customSwitch.js'
+import { CustomSwitch } from '../custom-inputs/customSwitch.js'
 
 type PartialEventType = PartialDeep<TEventWhenCreating, {recurseIntoArrays: true}>
 
@@ -99,7 +98,6 @@ function ValidationErrors() {
 
   useEffect(() => {
     const { unsubscribe } = watch((value) => {
-      console.log(value)
       setFormstate(value)
     })
     return () => unsubscribe()

@@ -10,7 +10,7 @@ export type TUserBookingsResponseType = {
 }
 
 export const getUserBookings = HandlerWrapper(
-  (res) => ['get', 'ownBookings'],
+  (req, res) => ['get', 'ownBookings'],
   async (req, res) => {
     const user = res.locals.user
     if (!user) {

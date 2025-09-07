@@ -6,7 +6,7 @@ export type TEditEventData = {
   event: TEvent
 }
 
-export const editEvent = HandlerWrapper(res => ['create', 'event'], async (req, res) => {
+export const editEvent = HandlerWrapper((req, res) => ['create', 'event'], async (req, res) => {
   //export const editEvent = HandlerWrapper<TEditEventData>(['create', 'event'], async (event, context) => {
   if (req.body.event.eventId !== res.locals.event.eventId) {
     throw new Error('Event ID in path and body do not match')

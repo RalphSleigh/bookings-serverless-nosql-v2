@@ -19,6 +19,11 @@ import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { userMiddleware } from './middleware/user'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { updateBooking } from './endpoints/booking/updateBooking'
+import { getEventBookings } from './endpoints/event/manage/getEventBookings'
+import { getEventRoles } from './endpoints/event/manage/getEventRoles'
+import { getUsers } from './endpoints/event/manage/getUsers'
+import { createRole } from './endpoints/event/manage/createRole'
+import { deleteRole } from './endpoints/event/manage/deleteRole'
 
 export const router = express.Router()
 export const app = express()
@@ -47,5 +52,11 @@ router.use('/event/:eventId/{*splat}', [eventMiddleware, ownBookingMiddleware])
 router.post('/event/:eventId/edit', editEvent)
 router.post('/event/:eventId/booking/create', createBooking)
 router.post('/event/:eventId/booking/update', updateBooking)
+
+router.get('/event/:eventId/manage/bookings', getEventBookings)
+router.get('/event/:eventId/manage/roles', getEventRoles)
+router.get('/event/:eventId/manage/users', getUsers)
+router.post('/event/:eventId/manage/role/create', createRole)
+router.delete('/event/:eventId/manage/role/:roleId', deleteRole)
 
 app.use('/', router)

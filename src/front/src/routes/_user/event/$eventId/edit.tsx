@@ -6,6 +6,7 @@ import { EventForm } from '../../../../components/event-form/form'
 import { getEventsQueryOptions } from '../../../../queries/getEvents'
 import { editEventMuation } from '../../../../mutations/editEvent'
 import { notifications } from '@mantine/notifications'
+import { useEvent } from '../../../../utils'
 
 export const Route = createFileRoute('/_user/event/$eventId/edit')({
   beforeLoad: async ({ location, context }) => {
@@ -18,15 +19,13 @@ export const Route = createFileRoute('/_user/event/$eventId/edit')({
 })
 
 function EditEventComponent() {
-  const { eventId } = Route.useParams()
-  const { data } = useSuspenseQuery(getEventsQueryOptions)
 
-  const event = data.events.find((event) => event.eventId === eventId)
+  const event = useEvent()
 
   if (!event) {
     notifications.show({
       title: 'Error',
-      message: `Event ${eventId} not found`,
+      message: `Event not found`,
       color: 'red',
     })
     return <Navigate to="/" />

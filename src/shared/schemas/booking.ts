@@ -1,8 +1,8 @@
-import { eachMonthOfInterval } from 'date-fns'
 import { z, ZodType } from "zod/v4";
 
 import { TEvent } from './event'
 import { PersonSchema, PersonSchemaForType } from './person'
+import { PartialDeep } from "type-fest";
 
 //Basic Information/Contact Details
 
@@ -37,6 +37,18 @@ const extraContact = z.object({
   email: z.string().email(),
 })
 
+// Other Stuff
+
+const otherBig = z.object({
+  anythingElse: z.string().optional(),
+})
+
+const otherSmall = z.object({
+  anythingElse: z.string().optional(),
+  whatsApp: z.enum(['yes', 'no']),
+
+})
+
 // Main Booking Schema, which is used for validation, depends on the event
 
 export const BookingSchema = (event: TEvent) =>
@@ -48,6 +60,7 @@ export const BookingSchema = (event: TEvent) =>
         basic: event.bigCampMode ? basicBig : basicSmall,
         extraContacts: z.array(extraContact).optional(),
         people: z.array(PersonSchema(event)).min(1),
+        other: event.bigCampMode ? otherBig : otherSmall,
         createdAt: z.number().optional(),
         updatedAt: z.number().optional(),
       })
@@ -63,6 +76,7 @@ export const BookingSchemaForType = z
     basic: basicSmall.or(basicBig),
     extraContacts: z.array(extraContact).optional(),
     people: z.array(PersonSchemaForType).min(1),
+    other: otherBig.or(otherSmall),
     createdAt: z.number().optional(),
     updatedAt: z.number().optional(),
   })
@@ -79,4 +93,4 @@ export const BookingSchemaForTypeBasicBig = BookingSchemaForType.extend({
 })
 
 export type TBooking = z.infer<typeof BookingSchemaForType>
-
+export type PartialBookingType = PartialDeep<TBookingForType, { recurseIntoArrays: true }>

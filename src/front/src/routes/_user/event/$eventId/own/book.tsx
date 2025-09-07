@@ -10,6 +10,7 @@ import { BookingForm } from '../../../../../components/booking-form/form'
 import { EventForm } from '../../../../../components/event-form/form'
 import { createBookingMuation } from '../../../../../mutations/createBooking'
 import { getEventsQueryOptions } from '../../../../../queries/getEvents'
+import { useEvent } from '../../../../../utils'
 
 export const Route = createFileRoute('/_user/event/$eventId/own/book')({
   // Can't check this as we need the event object to check permissions
@@ -23,18 +24,23 @@ export const Route = createFileRoute('/_user/event/$eventId/own/book')({
 })
 
 function BookEventComponent() {
-  const { eventId } = Route.useParams()
+  const event = useEvent()
   const { permission, user } = Route.useRouteContext()
-  const { data } = useSuspenseQuery(getEventsQueryOptions)
-  const event = data.events.find((event) => event.eventId === eventId)
 
   if (!event || !permission.can('book', subject('event', event))) {
     notifications.show({
       title: 'Error',
-      message: `Event ${eventId} not found, or you don't have permission to book it`,
+      message: `Event not found, or you don't have permission to book it`,
       color: 'red',
     })
     return <Navigate to="/" />
   }
-  return <BookingForm mode="create" event={event} inputData={{ userId: user.userId, eventId: event.eventId, cancelled: false, basic: {}, people: [{ personId: uuidv4(), eventId: event.eventId, userId: user.userId, cancelled: false }] }} mutation={createBookingMuation()} />
+  return (
+    <BookingForm
+      mode="create"
+      event={event}
+      inputData={{ userId: user.userId, eventId: event.eventId, cancelled: false, basic: {}, people: [{ personId: uuidv4(), eventId: event.eventId, userId: user.userId, cancelled: false }] }}
+      mutation={createBookingMuation()}
+    />
+  )
 }

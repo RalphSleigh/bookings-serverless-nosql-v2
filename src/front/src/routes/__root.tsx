@@ -8,11 +8,11 @@ import * as React from 'react'
 import { getPermissionsFromUser } from '../../../shared/permissions'
 import { useAuth } from '../auth'
 import { AppToolbar } from '../components/appbar'
+import classes from '../css/mainArea.module.css'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
-
-import classes from '../css/mainArea.module.css'
 import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   auth: ReturnType<typeof useAuth>
@@ -42,14 +42,14 @@ function RootComponent(): React.JSX.Element {
 
   return (
     <>
-        <AppShell header={{ height: 48 }}>
+      <AppShell header={{ height: 48 }}>
         <AppToolbar />
         <AppShell.Main className={classes.root}>
-          <Outlet/>
-          </AppShell.Main>
-        </AppShell>
-        <ReactQueryDevtools buttonPosition="bottom-right" />
-        <TanStackRouterDevtools position="bottom-right" />
+          <Outlet />
+        </AppShell.Main>
+      </AppShell>
+      <ReactQueryDevtools buttonPosition="bottom-right" />
+      <TanStackRouterDevtools position="bottom-right" />
     </>
   )
 }

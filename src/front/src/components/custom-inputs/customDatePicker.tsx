@@ -1,5 +1,5 @@
 import { DateInput, DateInputProps, DatePicker, DatePickerInput, DatePickerInputProps, DatesRangeValue, DateTimePicker, DateTimePickerProps, DateValue } from '@mantine/dates'
-import { DateValues, parseISO } from 'date-fns'
+import dayjs from 'dayjs'
 import { Controller, ControllerProps, FieldValues, useController, UseControllerProps } from 'react-hook-form'
 
 export type CustomDateInputProps<T extends FieldValues> = UseControllerProps<T> & Omit<DateInputProps, 'value' | 'defaultValue'>
@@ -13,28 +13,24 @@ export function CustomDatePicker<T extends FieldValues>(props: CustomDateInputPr
     name,
     control,
   })
-  const valueAsDate = value != undefined ? parseISO(value) : undefined
+  const valueAsDate = value != undefined ? dayjs(value).toDate() : undefined
   //const formValue = valueAsDate ? new Date(valueAsDate.getTime() + valueAsDate.getTimezoneOffset() * 60000) : undefined
 
   const { error } = fieldState
 
   return (
-    <DateInput popoverProps={{zIndex: 1000}}
-    error={error?.message}
-    valueFormat="DD/MM/YYYY"
-    type="default"
+    <DateInput
+      popoverProps={{ zIndex: 1000 }}
+      error={error?.message}
+      valueFormat="DD/MM/YYYY"
+      type="default"
       value={valueAsDate}
-      onChange={(value) => {
-        if (value instanceof Date) {
-          fieldOnChange(value.toISOString());
-        }
-      }}
+      onChange={(value) => fieldOnChange(value ? new Date(value).toISOString() : undefined)}
       {...inputProps}
       {...field}
     />
   )
 }
-
 
 export type CustomDateTimePickerProps<T extends FieldValues> = UseControllerProps<T> & Omit<DateTimePickerProps, 'value' | 'defaultValue'>
 
@@ -47,19 +43,13 @@ export function CustomDateTimePicker<T extends FieldValues>(props: CustomDateTim
     name,
     control,
   })
-  const valueAsDate = value != undefined ? parseISO(value) : undefined
+  const valueAsDate = value != undefined ? dayjs(value).toDate() : undefined
   //const formValue = valueAsDate ? new Date(valueAsDate.getTime() + valueAsDate.getTimezoneOffset() * 60000) : undefined
   return (
     <DateTimePicker
       value={valueAsDate}
-      onChange={(e) => {
-        if(e instanceof Date){
-        //const utcDate = new Date(e?.getTime() - e?.getTimezoneOffset() * 60000)
-        fieldOnChange(e.toISOString())
-        }
-      }}
+      onChange={(value) => fieldOnChange(value ? new Date(value).toISOString() : undefined)}
       {...inputProps}
     />
   )
 }
-

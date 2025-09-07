@@ -10,6 +10,7 @@ export const FeeOptions = EventSchema.shape.fee.options.map((option) => option.s
 
 const feeTypes = [FreeFees, EalingFees]
 
+
 type FeeTypes = InstanceType<typeof feeTypes[number]>
 
 export const getFeeTypesForEvent = (attendanceStructure: AttendanceTypes | undefined) => {
@@ -17,9 +18,14 @@ export const getFeeTypesForEvent = (attendanceStructure: AttendanceTypes | undef
     return feeTypes.map((feeType) => new feeType()).filter((fee) => fee.supportedAttendance.includes(attendanceStructure))
 }
 
-export const maybeGetFeeType = (feeStructure: FeeStructureValues | undefined): FeeTypes | undefined => {
+export const maybeGetFeeType = (feeStructure: FeeStructureValues | undefined): FeeStructure<any> | undefined => {
     if (!feeStructure) return undefined
     const feeType = feeTypes.find((fee) => new fee().typeName === feeStructure)
     if (!feeType) return undefined
     return new feeType()
+}
+
+export const getFeeType = (event: TEvent): FeeStructure<any> => {
+    const feeStructure = event.fee.feeStructure
+    return maybeGetFeeType(feeStructure) || new FreeFees()
 }

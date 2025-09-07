@@ -1,6 +1,6 @@
 import { Select,  type SelectProps } from "@mantine/core";
 import { FieldValues, useController, UseControllerProps } from "react-hook-form";
-import { errorProps } from "../utils";
+import { errorProps } from "../../utils";
 
 
 

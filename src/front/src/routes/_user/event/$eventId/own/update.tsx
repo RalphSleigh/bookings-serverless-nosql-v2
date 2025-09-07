@@ -9,6 +9,7 @@ import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookin
 import { getEventsQueryOptions } from '../../../../../queries/getEvents'
 import { BookingForm } from '../../../../../components/booking-form/form'
 import { updateBookingMuation } from '../../../../../mutations/updateBooking'
+import { useEvent } from '../../../../../utils'
 
 export const Route = createFileRoute('/_user/event/$eventId/own/update')({
   // Can't check this as we need the event object to check permissions
@@ -22,21 +23,19 @@ export const Route = createFileRoute('/_user/event/$eventId/own/update')({
 })
 
 function EditBookingComponent() {
-  const { eventId } = Route.useParams()
   const { permission, user } = Route.useRouteContext()
 
   const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
-  const eventsQuery = useSuspenseQuery(getEventsQueryOptions)
 
-  const event = eventsQuery.data.events.find((event) => event.eventId === eventId)
-  const booking = bookingsQuery.data.bookings.find((booking) => booking.eventId === eventId && booking.userId === user.userId)
+  const event = useEvent()
+  const booking = bookingsQuery.data.bookings.find((booking) => booking.eventId === event.eventId && booking.userId === user.userId)
 
 
 
   if (!event || !booking || !permission.can('update', subject('eventBooking', {event, booking}))) {
     notifications.show({
       title: 'Error',
-      message: `Event ${eventId} not found, or you don't have permission to book it`,
+      message: `Event  not found, or you don't have permission to book it`,
       color: 'red',
     })
     return <Navigate to="/" />

@@ -1,8 +1,11 @@
 import { Anchor, AnchorProps } from '@mantine/core'
-import { createLink, LinkComponent } from '@tanstack/react-router'
-import { parseISO } from 'date-fns'
+import { createLink, getRouteApi, LinkComponent, Route } from '@tanstack/react-router'
 import get from 'lodash/get'
 import React, { Dispatch, SetStateAction } from 'react'
+import { TEvent } from '../../shared/schemas/event'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getEventsQueryOptions } from './queries/getEvents'
+import dayjs from 'dayjs'
 
 export function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [value, setValue] = React.useState<T>(() => {
@@ -126,7 +129,7 @@ export function getMemoArrayUpdateFunctions<T extends Array<any>>(update: Dispat
 }
 
 export function toLocalDate(date: string): Date | null {
-  let localDate = parseISO(date)
+  let localDate = dayjs(date).toDate()
   if (!localDate) return null
 
   return new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60000)
@@ -140,3 +143,16 @@ export const errorProps = (errors: any) => (path: string) => {
     return {}
   }
 }
+
+const route = getRouteApi('/_user/event/$eventId')
+
+export const useEvent: () => TEvent = () => {
+    const { eventId } = route.useParams()
+    const { data } = useSuspenseQuery(getEventsQueryOptions)
+  
+    const event = data.events.find((event) => event.eventId === eventId)
+    if (!event) {
+      throw new Error(`Event with ID ${eventId} not found`)
+    }
+    return event
+  }

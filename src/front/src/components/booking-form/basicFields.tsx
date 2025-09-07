@@ -6,7 +6,7 @@ import { z } from "zod/v4";
 
 import { BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
-import { CustomSelect } from '../customSelect'
+import { CustomSelect } from '../custom-inputs/customSelect'
 import { organisations } from '../../../../shared/ifm'
 import { errorProps } from '../../utils'
 

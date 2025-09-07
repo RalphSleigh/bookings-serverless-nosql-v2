@@ -2,7 +2,8 @@ import { Dispatch, SetStateAction } from 'react';
 import { PartialDeep } from 'type-fest';
 
 import { AttendanceTypes } from '../attendance/attendance';
-import { TEvent, TFees } from '../schemas/event';
+import { TEvent, TEventWithFees, TFees } from '../schemas/event';
+import { PartialBookingType, TBookingForType } from '../schemas/booking';
 
 export type FeeStructureConfigData<T extends TFees> = Required<Pick<T, 'feeStructure'>> & PartialDeep<T>;
 export type FeeStructureCondfigurationElement<T extends TFees> = React.FC<{
@@ -10,9 +11,20 @@ export type FeeStructureCondfigurationElement<T extends TFees> = React.FC<{
   //update: Dispatch<SetStateAction<PartialDeep<T>>>;
 }>;
 
+export type BookingFormDisplayElement<T> = React.FC<{event: TEventWithFees<T>}>
+
+export type FeeLine = {
+  label: string;
+  amount: number;
+}
+
+export type GetFeeLineFunction<T extends TFees> = (event: TEventWithFees<T>, booking: PartialBookingType) => FeeLine[];
+
 export interface FeeStructure<T extends TFees = TFees> {
   typeName: T['feeStructure']
   name: string;
   supportedAttendance: AttendanceTypes[];
+  getFeeLines: GetFeeLineFunction<T>;
   ConfigurationElement: FeeStructureCondfigurationElement<T>;
+  BookingFormDisplayElement: BookingFormDisplayElement<T>;
 }

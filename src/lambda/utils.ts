@@ -1,23 +1,23 @@
-import { RequestHandler, Response } from 'express'
+import { RequestHandler, Request, Response } from 'express'
 import { ZodError } from "zod/v4";
-
-import { Action, Subject } from '../shared/permissions'
-import { sub } from 'date-fns'
+import { Abilities } from '../shared/permissions';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 export function am_in_lambda(): boolean {
   return process.env.LOCAL_SERVER !== 'true'
 }
 
-type PermissionFn = (res: Response) => [action: Action, subject: Subject]
+type PermissionFn<B, P> = (req: TypedRequest<B, P>, res: Response) => Abilities
+type TypedRequest<B, P> = Request<P, any, B>
 
-export type THandlerWrapper = (permissionFn: PermissionFn, fn: RequestHandler) => RequestHandler
+export type THandlerWrapper = <B = any, P extends ParamsDictionary = {}>(permissionFn: PermissionFn<B, P>, fn: RequestHandler) => RequestHandler<P, any, B>
 
 export const HandlerWrapper: THandlerWrapper =
   (permissionFn, fn) =>
   async (req, res, next) => {
     const permission = res.locals.permissions
 
-    if (!permission.can(...permissionFn(res))) {
+    if (!permission.can(...permissionFn(req, res))) {
       return res.status(401).json({ message: 'Unauthorized' })
     }
 

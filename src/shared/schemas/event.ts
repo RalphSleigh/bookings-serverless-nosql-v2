@@ -64,4 +64,5 @@ export const EventSchema = z
 export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true }).strict()
 
 export type TEvent = z.infer<typeof EventSchema>
+export type TEventWithFees<F> = TEvent & { fee: F }
 export type TEventWhenCreating = z.infer<typeof EventSchemaWhenCreating>
