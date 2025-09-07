@@ -21,3 +21,4 @@ docker/*
 dist-local/*
 
 **/.terraform/*
+*.gen.ts
