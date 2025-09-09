@@ -112,16 +112,18 @@ let auth_client: GoogleAuth | null = null
 
 export async function getAccessTokenFunction(config: ConfigType) {
   if (!auth_client) {
+
+    // Get temporary AWS credentials to authenticate to the Workload Identity Pool
+    // These credentials are automatically rotated by the AWS SDK
+    // We just need to make sure we have valid credentials when we create the Google Auth Client
+    // The credentials are stored in environment variables that the Google Auth Library will pick up automatically
+    // See: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+    // and https://cloud.google.com/docs/authentication/production#finding_credentials
     const command = new GetSessionTokenCommand({
       DurationSeconds: 3600,
     })
-
     const client = new STSClient({ region: 'us-west-2' })
-
     const result = await client.send(command)
-
-    console.log(result)
-
     process.env.AWS_ACCESS_KEY_ID = result.Credentials?.AccessKeyId
     process.env.AWS_SECRET_ACCESS_KEY = result.Credentials?.SecretAccessKey
     process.env.AWS_SESSION_TOKEN = result.Credentials?.SessionToken
