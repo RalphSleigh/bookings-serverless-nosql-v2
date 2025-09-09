@@ -42,7 +42,7 @@ jobs:
 
       - name: install base
         run: |
-          npm ci --include=dev
+          npm ci --include=dev --force
 
       - name: build lambdas
         run: |
