@@ -16,9 +16,15 @@ import { Route as IndexImport } from './routes/index'
 import { Route as UserUserImport } from './routes/_user/user'
 import { Route as UserTestLoggedInImport } from './routes/_user/testLoggedIn'
 import { Route as UserEventsNewImport } from './routes/_user/events/new'
+import { Route as UserEventEventIdImport } from './routes/_user/event/$eventId'
+import { Route as UserEventEventIdManageImport } from './routes/_user/event/$eventId/manage'
 import { Route as UserEventEventIdEditImport } from './routes/_user/event/$eventId/edit'
+import { Route as UserEventEventIdManageIndexImport } from './routes/_user/event/$eventId/manage/index'
 import { Route as UserEventEventIdOwnUpdateImport } from './routes/_user/event/$eventId/own/update'
 import { Route as UserEventEventIdOwnBookImport } from './routes/_user/event/$eventId/own/book'
+import { Route as UserEventEventIdManageRolesImport } from './routes/_user/event/$eventId/manage/roles'
+import { Route as UserEventEventIdManageCampersImport } from './routes/_user/event/$eventId/manage/campers'
+import { Route as UserEventEventIdManageBookingsImport } from './routes/_user/event/$eventId/manage/bookings'
 
 // Create/Update Routes
 
@@ -51,23 +57,63 @@ const UserEventsNewRoute = UserEventsNewImport.update({
   getParentRoute: () => UserRoute,
 } as any)
 
-const UserEventEventIdEditRoute = UserEventEventIdEditImport.update({
-  id: '/event/$eventId/edit',
-  path: '/event/$eventId/edit',
+const UserEventEventIdRoute = UserEventEventIdImport.update({
+  id: '/event/$eventId',
+  path: '/event/$eventId',
   getParentRoute: () => UserRoute,
 } as any)
 
+const UserEventEventIdManageRoute = UserEventEventIdManageImport.update({
+  id: '/manage',
+  path: '/manage',
+  getParentRoute: () => UserEventEventIdRoute,
+} as any)
+
+const UserEventEventIdEditRoute = UserEventEventIdEditImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => UserEventEventIdRoute,
+} as any)
+
+const UserEventEventIdManageIndexRoute =
+  UserEventEventIdManageIndexImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
+
 const UserEventEventIdOwnUpdateRoute = UserEventEventIdOwnUpdateImport.update({
-  id: '/event/$eventId/own/update',
-  path: '/event/$eventId/own/update',
-  getParentRoute: () => UserRoute,
+  id: '/own/update',
+  path: '/own/update',
+  getParentRoute: () => UserEventEventIdRoute,
 } as any)
 
 const UserEventEventIdOwnBookRoute = UserEventEventIdOwnBookImport.update({
-  id: '/event/$eventId/own/book',
-  path: '/event/$eventId/own/book',
-  getParentRoute: () => UserRoute,
+  id: '/own/book',
+  path: '/own/book',
+  getParentRoute: () => UserEventEventIdRoute,
 } as any)
+
+const UserEventEventIdManageRolesRoute =
+  UserEventEventIdManageRolesImport.update({
+    id: '/roles',
+    path: '/roles',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
+
+const UserEventEventIdManageCampersRoute =
+  UserEventEventIdManageCampersImport.update({
+    id: '/campers',
+    path: '/campers',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
+
+const UserEventEventIdManageBookingsRoute =
+  UserEventEventIdManageBookingsImport.update({
+    id: '/bookings',
+    path: '/bookings',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -101,6 +147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserUserImport
       parentRoute: typeof UserImport
     }
+    '/_user/event/$eventId': {
+      id: '/_user/event/$eventId'
+      path: '/event/$eventId'
+      fullPath: '/event/$eventId'
+      preLoaderRoute: typeof UserEventEventIdImport
+      parentRoute: typeof UserImport
+    }
     '/_user/events/new': {
       id: '/_user/events/new'
       path: '/events/new'
@@ -110,46 +163,114 @@ declare module '@tanstack/react-router' {
     }
     '/_user/event/$eventId/edit': {
       id: '/_user/event/$eventId/edit'
-      path: '/event/$eventId/edit'
+      path: '/edit'
       fullPath: '/event/$eventId/edit'
       preLoaderRoute: typeof UserEventEventIdEditImport
-      parentRoute: typeof UserImport
+      parentRoute: typeof UserEventEventIdImport
+    }
+    '/_user/event/$eventId/manage': {
+      id: '/_user/event/$eventId/manage'
+      path: '/manage'
+      fullPath: '/event/$eventId/manage'
+      preLoaderRoute: typeof UserEventEventIdManageImport
+      parentRoute: typeof UserEventEventIdImport
+    }
+    '/_user/event/$eventId/manage/bookings': {
+      id: '/_user/event/$eventId/manage/bookings'
+      path: '/bookings'
+      fullPath: '/event/$eventId/manage/bookings'
+      preLoaderRoute: typeof UserEventEventIdManageBookingsImport
+      parentRoute: typeof UserEventEventIdManageImport
+    }
+    '/_user/event/$eventId/manage/campers': {
+      id: '/_user/event/$eventId/manage/campers'
+      path: '/campers'
+      fullPath: '/event/$eventId/manage/campers'
+      preLoaderRoute: typeof UserEventEventIdManageCampersImport
+      parentRoute: typeof UserEventEventIdManageImport
+    }
+    '/_user/event/$eventId/manage/roles': {
+      id: '/_user/event/$eventId/manage/roles'
+      path: '/roles'
+      fullPath: '/event/$eventId/manage/roles'
+      preLoaderRoute: typeof UserEventEventIdManageRolesImport
+      parentRoute: typeof UserEventEventIdManageImport
     }
     '/_user/event/$eventId/own/book': {
       id: '/_user/event/$eventId/own/book'
-      path: '/event/$eventId/own/book'
+      path: '/own/book'
       fullPath: '/event/$eventId/own/book'
       preLoaderRoute: typeof UserEventEventIdOwnBookImport
-      parentRoute: typeof UserImport
+      parentRoute: typeof UserEventEventIdImport
     }
     '/_user/event/$eventId/own/update': {
       id: '/_user/event/$eventId/own/update'
-      path: '/event/$eventId/own/update'
+      path: '/own/update'
       fullPath: '/event/$eventId/own/update'
       preLoaderRoute: typeof UserEventEventIdOwnUpdateImport
-      parentRoute: typeof UserImport
+      parentRoute: typeof UserEventEventIdImport
+    }
+    '/_user/event/$eventId/manage/': {
+      id: '/_user/event/$eventId/manage/'
+      path: '/'
+      fullPath: '/event/$eventId/manage/'
+      preLoaderRoute: typeof UserEventEventIdManageIndexImport
+      parentRoute: typeof UserEventEventIdManageImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface UserEventEventIdManageRouteChildren {
+  UserEventEventIdManageBookingsRoute: typeof UserEventEventIdManageBookingsRoute
+  UserEventEventIdManageCampersRoute: typeof UserEventEventIdManageCampersRoute
+  UserEventEventIdManageRolesRoute: typeof UserEventEventIdManageRolesRoute
+  UserEventEventIdManageIndexRoute: typeof UserEventEventIdManageIndexRoute
+}
+
+const UserEventEventIdManageRouteChildren: UserEventEventIdManageRouteChildren =
+  {
+    UserEventEventIdManageBookingsRoute: UserEventEventIdManageBookingsRoute,
+    UserEventEventIdManageCampersRoute: UserEventEventIdManageCampersRoute,
+    UserEventEventIdManageRolesRoute: UserEventEventIdManageRolesRoute,
+    UserEventEventIdManageIndexRoute: UserEventEventIdManageIndexRoute,
+  }
+
+const UserEventEventIdManageRouteWithChildren =
+  UserEventEventIdManageRoute._addFileChildren(
+    UserEventEventIdManageRouteChildren,
+  )
+
+interface UserEventEventIdRouteChildren {
+  UserEventEventIdEditRoute: typeof UserEventEventIdEditRoute
+  UserEventEventIdManageRoute: typeof UserEventEventIdManageRouteWithChildren
+  UserEventEventIdOwnBookRoute: typeof UserEventEventIdOwnBookRoute
+  UserEventEventIdOwnUpdateRoute: typeof UserEventEventIdOwnUpdateRoute
+}
+
+const UserEventEventIdRouteChildren: UserEventEventIdRouteChildren = {
+  UserEventEventIdEditRoute: UserEventEventIdEditRoute,
+  UserEventEventIdManageRoute: UserEventEventIdManageRouteWithChildren,
+  UserEventEventIdOwnBookRoute: UserEventEventIdOwnBookRoute,
+  UserEventEventIdOwnUpdateRoute: UserEventEventIdOwnUpdateRoute,
+}
+
+const UserEventEventIdRouteWithChildren =
+  UserEventEventIdRoute._addFileChildren(UserEventEventIdRouteChildren)
+
 interface UserRouteChildren {
   UserTestLoggedInRoute: typeof UserTestLoggedInRoute
   UserUserRoute: typeof UserUserRoute
+  UserEventEventIdRoute: typeof UserEventEventIdRouteWithChildren
   UserEventsNewRoute: typeof UserEventsNewRoute
-  UserEventEventIdEditRoute: typeof UserEventEventIdEditRoute
-  UserEventEventIdOwnBookRoute: typeof UserEventEventIdOwnBookRoute
-  UserEventEventIdOwnUpdateRoute: typeof UserEventEventIdOwnUpdateRoute
 }
 
 const UserRouteChildren: UserRouteChildren = {
   UserTestLoggedInRoute: UserTestLoggedInRoute,
   UserUserRoute: UserUserRoute,
+  UserEventEventIdRoute: UserEventEventIdRouteWithChildren,
   UserEventsNewRoute: UserEventsNewRoute,
-  UserEventEventIdEditRoute: UserEventEventIdEditRoute,
-  UserEventEventIdOwnBookRoute: UserEventEventIdOwnBookRoute,
-  UserEventEventIdOwnUpdateRoute: UserEventEventIdOwnUpdateRoute,
 }
 
 const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
@@ -159,10 +280,16 @@ export interface FileRoutesByFullPath {
   '': typeof UserRouteWithChildren
   '/testLoggedIn': typeof UserTestLoggedInRoute
   '/user': typeof UserUserRoute
+  '/event/$eventId': typeof UserEventEventIdRouteWithChildren
   '/events/new': typeof UserEventsNewRoute
   '/event/$eventId/edit': typeof UserEventEventIdEditRoute
+  '/event/$eventId/manage': typeof UserEventEventIdManageRouteWithChildren
+  '/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
+  '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
+  '/event/$eventId/manage/': typeof UserEventEventIdManageIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -170,10 +297,15 @@ export interface FileRoutesByTo {
   '': typeof UserRouteWithChildren
   '/testLoggedIn': typeof UserTestLoggedInRoute
   '/user': typeof UserUserRoute
+  '/event/$eventId': typeof UserEventEventIdRouteWithChildren
   '/events/new': typeof UserEventsNewRoute
   '/event/$eventId/edit': typeof UserEventEventIdEditRoute
+  '/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
+  '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
+  '/event/$eventId/manage': typeof UserEventEventIdManageIndexRoute
 }
 
 export interface FileRoutesById {
@@ -182,10 +314,16 @@ export interface FileRoutesById {
   '/_user': typeof UserRouteWithChildren
   '/_user/testLoggedIn': typeof UserTestLoggedInRoute
   '/_user/user': typeof UserUserRoute
+  '/_user/event/$eventId': typeof UserEventEventIdRouteWithChildren
   '/_user/events/new': typeof UserEventsNewRoute
   '/_user/event/$eventId/edit': typeof UserEventEventIdEditRoute
+  '/_user/event/$eventId/manage': typeof UserEventEventIdManageRouteWithChildren
+  '/_user/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
+  '/_user/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/_user/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
   '/_user/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/_user/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
+  '/_user/event/$eventId/manage/': typeof UserEventEventIdManageIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -195,30 +333,47 @@ export interface FileRouteTypes {
     | ''
     | '/testLoggedIn'
     | '/user'
+    | '/event/$eventId'
     | '/events/new'
     | '/event/$eventId/edit'
+    | '/event/$eventId/manage'
+    | '/event/$eventId/manage/bookings'
+    | '/event/$eventId/manage/campers'
+    | '/event/$eventId/manage/roles'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
+    | '/event/$eventId/manage/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | ''
     | '/testLoggedIn'
     | '/user'
+    | '/event/$eventId'
     | '/events/new'
     | '/event/$eventId/edit'
+    | '/event/$eventId/manage/bookings'
+    | '/event/$eventId/manage/campers'
+    | '/event/$eventId/manage/roles'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
+    | '/event/$eventId/manage'
   id:
     | '__root__'
     | '/'
     | '/_user'
     | '/_user/testLoggedIn'
     | '/_user/user'
+    | '/_user/event/$eventId'
     | '/_user/events/new'
     | '/_user/event/$eventId/edit'
+    | '/_user/event/$eventId/manage'
+    | '/_user/event/$eventId/manage/bookings'
+    | '/_user/event/$eventId/manage/campers'
+    | '/_user/event/$eventId/manage/roles'
     | '/_user/event/$eventId/own/book'
     | '/_user/event/$eventId/own/update'
+    | '/_user/event/$eventId/manage/'
   fileRoutesById: FileRoutesById
 }
 
@@ -254,10 +409,8 @@ export const routeTree = rootRoute
       "children": [
         "/_user/testLoggedIn",
         "/_user/user",
-        "/_user/events/new",
-        "/_user/event/$eventId/edit",
-        "/_user/event/$eventId/own/book",
-        "/_user/event/$eventId/own/update"
+        "/_user/event/$eventId",
+        "/_user/events/new"
       ]
     },
     "/_user/testLoggedIn": {
@@ -268,21 +421,57 @@ export const routeTree = rootRoute
       "filePath": "_user/user.tsx",
       "parent": "/_user"
     },
+    "/_user/event/$eventId": {
+      "filePath": "_user/event/$eventId.tsx",
+      "parent": "/_user",
+      "children": [
+        "/_user/event/$eventId/edit",
+        "/_user/event/$eventId/manage",
+        "/_user/event/$eventId/own/book",
+        "/_user/event/$eventId/own/update"
+      ]
+    },
     "/_user/events/new": {
       "filePath": "_user/events/new.tsx",
       "parent": "/_user"
     },
     "/_user/event/$eventId/edit": {
       "filePath": "_user/event/$eventId/edit.tsx",
-      "parent": "/_user"
+      "parent": "/_user/event/$eventId"
+    },
+    "/_user/event/$eventId/manage": {
+      "filePath": "_user/event/$eventId/manage.tsx",
+      "parent": "/_user/event/$eventId",
+      "children": [
+        "/_user/event/$eventId/manage/bookings",
+        "/_user/event/$eventId/manage/campers",
+        "/_user/event/$eventId/manage/roles",
+        "/_user/event/$eventId/manage/"
+      ]
+    },
+    "/_user/event/$eventId/manage/bookings": {
+      "filePath": "_user/event/$eventId/manage/bookings.tsx",
+      "parent": "/_user/event/$eventId/manage"
+    },
+    "/_user/event/$eventId/manage/campers": {
+      "filePath": "_user/event/$eventId/manage/campers.tsx",
+      "parent": "/_user/event/$eventId/manage"
+    },
+    "/_user/event/$eventId/manage/roles": {
+      "filePath": "_user/event/$eventId/manage/roles.tsx",
+      "parent": "/_user/event/$eventId/manage"
     },
     "/_user/event/$eventId/own/book": {
       "filePath": "_user/event/$eventId/own/book.tsx",
-      "parent": "/_user"
+      "parent": "/_user/event/$eventId"
     },
     "/_user/event/$eventId/own/update": {
       "filePath": "_user/event/$eventId/own/update.tsx",
-      "parent": "/_user"
+      "parent": "/_user/event/$eventId"
+    },
+    "/_user/event/$eventId/manage/": {
+      "filePath": "_user/event/$eventId/manage/index.tsx",
+      "parent": "/_user/event/$eventId/manage"
     }
   }
 }

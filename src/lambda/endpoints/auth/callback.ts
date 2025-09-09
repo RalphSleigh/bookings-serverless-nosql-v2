@@ -3,6 +3,7 @@ import cookie from 'cookie'
 import { RequestHandler } from 'express'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import jwksClient from 'jwks-rsa'
+import { v4 as uuidv4 } from 'uuid'
 
 import { TUser, UserSchema } from '../../../shared/schemas/user'
 import { DBRole, DBUser } from '../../dynamo'
@@ -97,7 +98,7 @@ export const authCallback: RequestHandler = async (req, res) => {
     user = UserSchema.parse(createResult.data)
 
     if (config.ENV === 'dev' && user.isWoodcraft) {
-      await DBRole.create({ userId: user.userId, role: 'admin' }).go()
+      await DBRole.create({ roleId: uuidv4(), userId: user.userId, role: 'admin', eventId: '*' }).go()
     }
 
     logToSystem(`New user created: ${JSON.stringify(user)}`)

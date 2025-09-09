@@ -34,6 +34,7 @@ export const DBUser = new Entity(
       },
       email: {
         type: 'string',
+        required: true,
       },
       avatar: {
         type: 'string',

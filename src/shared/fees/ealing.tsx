@@ -1,11 +1,12 @@
 import { Grid, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { Markdown as EmailMarkdown } from '@react-email/markdown'
 import dayjs from 'dayjs'
 import { useFormContext } from 'react-hook-form'
 
 import { AttendanceTypes } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
 import { TEalingFees, TEvent, TEventWithFees, TFees } from '../schemas/event'
-import { BookingFormDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
+import { BookingFormDisplayElement, EmailElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
 
 type EventWithEalingFees = TEvent & { fees: TEalingFees }
 
@@ -76,7 +77,9 @@ export class EalingFees implements FeeStructure<TEalingFees> {
 
     return (
       <>
-        <Title order={3} mt={8}>Pricing</Title>
+        <Title order={3} mt={8}>
+          Pricing
+        </Title>
         <Text>
           The discounted donation is offered to all families/individuals where there is no wage earner and/or the family/individual is on a low wage. This would include DFs and students as well as
           adults and families. Cost should never be a reason for people being unable to attend camp so please contact us if you need further discount.
@@ -85,8 +88,12 @@ export class EalingFees implements FeeStructure<TEalingFees> {
           <Table.Thead>
             <Table.Tr>
               <Table.Td></Table.Td>
-              <Table.Td><Text fw={700}>Standard</Text></Table.Td>
-              <Table.Td><Text fw={700}>Discounted</Text></Table.Td>
+              <Table.Td>
+                <Text fw={700}>Standard</Text>
+              </Table.Td>
+              <Table.Td>
+                <Text fw={700}>Discounted</Text>
+              </Table.Td>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -106,7 +113,9 @@ export class EalingFees implements FeeStructure<TEalingFees> {
             </Table.Tr>
             <Table.Tr>
               <Table.Td colSpan={3}>
-                <Text fw={700} ta="center">My Booking</Text>
+                <Text fw={700} ta="center">
+                  My Booking
+                </Text>
               </Table.Td>
             </Table.Tr>
             <Table.Tr>
@@ -118,6 +127,38 @@ export class EalingFees implements FeeStructure<TEalingFees> {
             </Table.Tr>
           </Table.Tbody>
         </Table>
+      </>
+    )
+  }
+
+  EmailElement: EmailElement<TEalingFees> = ({ event, booking }) => {
+    const lines = this.getFeeLines(event, booking)
+    const discountedLines = this.getFeeLinesDiscounted(event, booking)
+
+    return (
+      <>
+        <EmailMarkdown
+          children={event.fee.ealingData.paymentInstructions}
+          markdownCustomStyles={{
+            p: { fontSize: '14px' },
+          }}
+        />
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Standard</th>
+              <th>Discounted</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>My Booking: {lines[0].label}</td>
+              <td>{currency(lines[0].amount)}</td>
+              <td>{currency(discountedLines[0].amount)}</td>
+            </tr>
+          </tbody>
+        </table>
       </>
     )
   }

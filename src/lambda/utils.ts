@@ -2,6 +2,9 @@ import { RequestHandler, Request, Response } from 'express'
 import { ZodError } from "zod/v4";
 import { Abilities } from '../shared/permissions';
 import { ParamsDictionary } from 'express-serve-static-core';
+import { DB } from './dynamo';
+import { TBooking } from '../shared/schemas/booking';
+import { TPerson } from '../shared/schemas/person';
 
 export function am_in_lambda(): boolean {
   return process.env.LOCAL_SERVER !== 'true'
@@ -69,3 +72,12 @@ export const HandlerWrapper: HandlerWrapperType = <TPost, TResult>([action, subj
     }
   });
 }; */
+
+
+export const getBookingByIDs: (eventId: string, userId: string) => Promise<TBooking> = async (eventId, userId) => {
+  const bookingsResult = await DB.collections.booking({ eventId, userId }).go()
+  if(!bookingsResult.data.booking[0]) throw new Error('Booking not found')
+  const booking = bookingsResult.data.booking[0] as TBooking
+  booking.people = bookingsResult.data.person.filter((p) => !p.cancelled).sort((a,b) => a.createdAt - b.createdAt) as TPerson[]
+  return booking
+}

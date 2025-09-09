@@ -20,6 +20,8 @@ export type FeeLine = {
 
 export type GetFeeLineFunction<T extends TFees> = (event: TEventWithFees<T>, booking: PartialBookingType) => FeeLine[];
 
+export type EmailElement<T extends TFees> = React.FC<{event: TEventWithFees<T>, booking: TBookingForType}>
+
 export interface FeeStructure<T extends TFees = TFees> {
   typeName: T['feeStructure']
   name: string;
@@ -27,4 +29,5 @@ export interface FeeStructure<T extends TFees = TFees> {
   getFeeLines: GetFeeLineFunction<T>;
   ConfigurationElement: FeeStructureCondfigurationElement<T>;
   BookingFormDisplayElement: BookingFormDisplayElement<T>;
+  EmailElement: EmailElement<T>;
 }

@@ -4,6 +4,7 @@ import { CreateEntityItem, EntityIdentifiers, UpdateEntityItem } from 'electrodb
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
 import { HandlerWrapper } from '../../utils'
+import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
 
 export type TCreateBookingData = {
   booking: TBooking
@@ -86,20 +87,14 @@ export const updateBooking = HandlerWrapper(
       }
     }
 
-    /* for (const person of people) {
-      const createdPerson = await DBPerson.create({
-        ...person,
-        userId: user.userId,
-        eventId: event.eventId,
-      }).go()
-      const personHistoryItem: CreateEntityItem<typeof DBPersonHistory> = {
+    res.locals.logger.logToPath("Enqueuing async email task")
+    enqueueAsyncTask({
+      type: "emailBookingUpdated",
+      data: {
         eventId: event.eventId,
         userId: user.userId,
-        personId: createdPerson.data.personId,
-        versions: [createdPerson.data],
-      }
-      await DBPersonHistory.create(personHistoryItem).go()
-    } */
+      },
+    })
 
     res.json({ ok: 'ok' })
   },
