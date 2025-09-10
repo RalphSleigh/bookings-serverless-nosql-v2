@@ -7,7 +7,7 @@ const functionsDir = `src/lambda`;
 
 esbuild
     .build({
-       entryPoints: ["src/lambda/handler.ts"],
+       entryPoints: ["src/lambda/handler.ts", "src/lambda/asyncTaskHandler.ts"],
         bundle: true,
         minify: true,
         //splitting: true,
