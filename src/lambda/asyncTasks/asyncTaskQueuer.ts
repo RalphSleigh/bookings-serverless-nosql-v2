@@ -1,28 +1,35 @@
-import { am_in_lambda } from "../utils"
-import { asyncTasksExecutor } from "./asyncTasksExecutor"
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
+
+import { am_in_lambda } from '../utils'
+import { asyncTasksExecutor } from './asyncTasksExecutor'
 
 export type EmailBookingCreatedTask = {
-    type: "emailBookingCreated"
-    data: {
-        eventId: string
-        userId: string
-    }
+  type: 'emailBookingCreated'
+  data: {
+    eventId: string
+    userId: string
+  }
 }
 
 export type EmailBookingUpdatedTask = {
-    type: "emailBookingUpdated"
-    data: {
-        eventId: string
-        userId: string
-    }
+  type: 'emailBookingUpdated'
+  data: {
+    eventId: string
+    userId: string
+  }
 }
 
 export type AsyncTask = EmailBookingCreatedTask | EmailBookingUpdatedTask
 
 export const enqueueAsyncTask = async (task: AsyncTask) => {
-    if(am_in_lambda()) {
-        // Queue the task in SQS
-    } else {
-        await asyncTasksExecutor(task)
-    }
+  if (am_in_lambda()) {
+    const command = new SendMessageCommand({
+      QueueUrl: process.env.ASYNC_TASK_QUEUE_URL,
+      MessageBody: JSON.stringify(task),
+    })
+    const client = new SQSClient()
+    await client.send(command)
+  } else {
+    await asyncTasksExecutor(task)
+  }
 }
