@@ -93,7 +93,7 @@ resource "aws_iam_role_policy_attachment" "async_task_lambda_sqs_role_policy" {
 
 resource "aws_iam_role_policy_attachment" "async_task_lambda_policy_attachment_built_in" {
   role       = aws_iam_role.async_task_lambda_role.name
-  policy_arn = aws_iam_policy.lambda_async_exec_role_policy.arn
+  policy_arn = aws_iam_policy.lambda_async_execution_policy.arn
 }
 
 
@@ -120,4 +120,10 @@ data "aws_iam_policy_document" "lambda_async_exec_role_policy" {
     resources = [aws_dynamodb_table.bookings_table.arn, "${aws_dynamodb_table.bookings_table.arn}/index/*", aws_dynamodb_table.config_table.arn]
     effect = "Allow"
   }
+}
+
+resource "aws_iam_policy" "lambda_async_execution_policy" {
+  name   = "lambda__async_execution_policy"
+  path   = "/"
+  policy = data.aws_iam_policy_document.lambda_async_exec_role_policy.json
 }
