@@ -9,10 +9,11 @@ export const handler = async (event: SQSEvent, context: Context): Promise<SQSBat
             const data = JSON.parse(record.body)
             await asyncTasksExecutor(data);
         } catch (error) {
+            console.error(`Error processing record ${record.messageId}:`, error);
             batchItemFailures.push({ itemIdentifier: record.messageId });
         }
     }
 
-    return {batchItemFailures: batchItemFailures};
+    return { batchItemFailures: batchItemFailures };
 };
 
