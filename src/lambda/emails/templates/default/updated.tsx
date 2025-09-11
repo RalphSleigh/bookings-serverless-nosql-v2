@@ -11,7 +11,7 @@ export class BookingUpdatedEmail extends EmailTemplate {
   }
 
   HTMLBody(data: BookingEmailData, config: ConfigType) {
-    const editLink = `${config.BASE_URL}event/${data.event.eventId}/own/update`
+    const editLink = `${config.BASE_URL}/event/${data.event.eventId}/own/update`
 
     const participantsList = data.booking.people.map((p, i) => (
       <li key={i} style={{ fontSize: '14px' }}>
