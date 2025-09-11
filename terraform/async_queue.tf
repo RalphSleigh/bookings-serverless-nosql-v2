@@ -91,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "async_task_lambda_sqs_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "async_task_lambda_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "async_task_lambda_policy_attachment_built_in" {
   role       = aws_iam_role.async_task_lambda_role.name
   policy_arn = aws_iam_policy.lambda_execution_policy.arn
 }
