@@ -39,7 +39,7 @@ resource "aws_cloudwatch_log_group" "async_task_lambda_log_group" {
 resource "aws_lambda_function" "async_task_lambda" {
   function_name = "function_async_task"
   role          = aws_iam_role.async_task_lambda_role.arn
-  handler       = "async_task.lambdaHandler"
+  handler       = "asyncTaskHandler.handler"
 
   s3_bucket = aws_s3_bucket.lambda_code.id
   s3_key    = resource.aws_s3_object.async_task_lambda_code.key
