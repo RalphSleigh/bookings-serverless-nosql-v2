@@ -10,7 +10,7 @@ export const asyncTasksExecutor = async (task: AsyncTask) => {
             break;
         case "emailBookingUpdated":
             console.log("Handling emailBookingUpdated");
-            sendBookingUpdatedEmails(task, config);
+            await sendBookingUpdatedEmails(task, config);
             break;
     }
 }
