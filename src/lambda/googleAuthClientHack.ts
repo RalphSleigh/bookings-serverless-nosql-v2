@@ -119,10 +119,10 @@ export async function getAccessTokenFunction(config: ConfigType) {
     // The credentials are stored in environment variables that the Google Auth Library will pick up automatically
     // See: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
     // and https://cloud.google.com/docs/authentication/production#finding_credentials
-    const command = new GetCallerIdentityCommand()
+/*     const command = new GetCallerIdentityCommand()
     const client = new STSClient({ region: 'eu-west-2' })
     const result = await client.send(command)
-    console.log('Authenticated to AWS as:', result.Arn)
+    console.log('Authenticated to AWS as:', result.Arn) */
     const googlePoolConf = {
       universe_domain: 'googleapis.com',
       type: 'external_account',
