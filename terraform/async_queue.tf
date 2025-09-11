@@ -1,6 +1,6 @@
 resource "aws_sqs_queue" "async_task_queue" {
   name                       = "async-task-queue"
-  visibility_timeout_seconds = 300
+  visibility_timeout_seconds = 900
 }
 
 resource "aws_sqs_queue" "async_task_dead_letter_queue" {
