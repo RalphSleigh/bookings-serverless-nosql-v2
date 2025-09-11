@@ -59,6 +59,8 @@ const googlePoolConf = {
   },
 }
 
+let oauth2Client: any = null
+
 export async function sendEmail(data: EmailData, config: ConfigType) {
   try {
     const { recipient, event } = data
@@ -91,15 +93,19 @@ export async function sendEmail(data: EmailData, config: ConfigType) {
 
     const message = await new MailComposer(mail_options).compile().build()
 
-    const accessToken = await (await getAccessTokenFunction(config))(
-      config.GOOGLE_WORKSPACE_EMAIL, // The email of the user to impersonate
-      config.GOOGLE_SERVICE_ACCOUNT_EMAIL, // The service account email
-      ['https://www.googleapis.com/auth/gmail.send'], // The scopes to request
-      15 * 60, // Lifetime of the access token, it cannot be greater than 1h
-    )
+    if (!oauth2Client) {
+      const accessToken = await (
+        await getAccessTokenFunction(config)
+      )(
+        config.GOOGLE_WORKSPACE_EMAIL, // The email of the user to impersonate
+        config.GOOGLE_SERVICE_ACCOUNT_EMAIL, // The service account email
+        ['https://www.googleapis.com/auth/gmail.send'], // The scopes to request
+        15 * 60, // Lifetime of the access token, it cannot be greater than 1h
+      )
 
-    const oauth2Client = new auth.OAuth2()
-    oauth2Client.setCredentials({ access_token: accessToken })
+      oauth2Client = new auth.OAuth2()
+      oauth2Client.setCredentials({ access_token: accessToken })
+    }
 
     const gmail_instance = gmail({ version: 'v1', auth: oauth2Client })
 

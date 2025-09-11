@@ -95,3 +95,35 @@ resource "aws_iam_role_policy_attachment" "async_task_lambda_policy_attachment" 
   role       = aws_iam_role.async_task_lambda_role.name
   policy_arn = aws_iam_policy.lambda_execution_policy.arn
 }
+
+
+data "aws_iam_policy_document" "lambda_async_exec_role_policy" {
+  statement {
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.lambda-errors.arn]
+  }
+
+  statement {
+    actions = [
+      "dynamodb:DeleteItem",
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:GetRecords",
+      "dynamodb:ListTables",
+      "dynamodb:PutItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:UpdateItem",
+      "dynamodb:UpdateTable",
+    ]
+
+    resources = [aws_dynamodb_table.bookings_table.arn, "${aws_dynamodb_table.bookings_table.arn}/index/*", aws_dynamodb_table.config_table.arn]
+    effect = "Allow"
+  }
+
+}
+
+resource "aws_iam_role_policy_attachment" "async_task_lambda_policy_attachment" {
+  role       = aws_iam_role.async_task_lambda_role.name
+  policy_arn = aws_iam_policy.lambda_async_exec_role_policy.arn
+}
