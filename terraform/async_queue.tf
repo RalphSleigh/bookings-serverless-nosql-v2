@@ -96,7 +96,6 @@ resource "aws_iam_role_policy_attachment" "async_task_lambda_policy_attachment_b
   policy_arn = aws_iam_policy.lambda_async_execution_policy.arn
 }
 
-
 data "aws_iam_policy_document" "lambda_async_exec_role_policy" {
   statement {
     actions   = ["sns:Publish"]

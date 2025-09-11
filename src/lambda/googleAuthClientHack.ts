@@ -1,5 +1,5 @@
 import { GoogleAuth } from 'google-auth-library'
-import { GetSessionTokenCommand, STSClient } from '@aws-sdk/client-sts'
+import { GetCallerIdentityCommand, GetSessionTokenCommand, STSClient } from '@aws-sdk/client-sts'
 import { ConfigType } from './getConfig'
 
 const GOOGLE_OAUTH2_TOKEN_API_URL = 'https://oauth2.googleapis.com/token'
@@ -119,16 +119,10 @@ export async function getAccessTokenFunction(config: ConfigType) {
     // The credentials are stored in environment variables that the Google Auth Library will pick up automatically
     // See: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
     // and https://cloud.google.com/docs/authentication/production#finding_credentials
-/*     const command = new GetSessionTokenCommand({
-      DurationSeconds: 3600,
-    })
+    const command = new GetCallerIdentityCommand()
     const client = new STSClient({ region: 'eu-west-2' })
     const result = await client.send(command)
-    process.env.AWS_ACCESS_KEY_ID = result.Credentials?.AccessKeyId
-    process.env.AWS_SECRET_ACCESS_KEY = result.Credentials?.SecretAccessKey
-    process.env.AWS_SESSION_TOKEN = result.Credentials?.SessionToken
-    process.env.AWS_REGION = 'eu-west-2' */
-
+    console.log('Authenticated to AWS as:', result.Arn)
     const googlePoolConf = {
       universe_domain: 'googleapis.com',
       type: 'external_account',
