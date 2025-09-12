@@ -1,15 +1,17 @@
 import { subject } from '@casl/ability'
-import { Button, Container, Paper, Text, Title } from '@mantine/core'
+import { Button, Container, Paper, Table, Text, Title } from '@mantine/core'
 import { useRouteContext } from '@tanstack/react-router'
+import dayjs from 'dayjs'
+import AdvancedFormat from 'dayjs/plugin/advancedFormat'
 import Markdown from 'react-markdown'
 
+import { getFeeType } from '../../../shared/fees/fees.js'
 import { TBooking } from '../../../shared/schemas/booking.js'
 import { TEvent } from '../../../shared/schemas/event.js'
+import { ageGroupFromPerson } from '../../../shared/woodcraft.js'
 import { Can } from '../permissionContext'
 import { CustomLink, toLocalDate } from '../utils.js'
 import { CustomButtonLink } from './custom-inputs/customLinkButton.js'
-import dayjs from 'dayjs'
-import AdvancedFormat from 'dayjs/plugin/advancedFormat'
 
 dayjs.extend(AdvancedFormat)
 
@@ -34,8 +36,12 @@ export function EventList({ events, bookings }: { events: TEvent[]; bookings: TB
     <>
       <Container>
         {cards}
-        {manageCards.length > 0 ? <><Title size="h1">Past Events</Title>
-                    {manageCards}</> : null }
+        {manageCards.length > 0 ? (
+          <>
+            <Title size="h1">Past Events</Title>
+            {manageCards}
+          </>
+        ) : null}
       </Container>
     </>
   )
@@ -57,8 +63,8 @@ function EventCard({ event, booking }: { event: TEvent; booking?: TBooking }) {
         {dayjs(startDate).format(startDataFormat)} - {dayjs(endDate).format('Do MMMM YYYY')}
       </Title>
       {event.description ? <Markdown>{event.description}</Markdown> : null}
-      {/* {booking && !booking.deleted ? <YourBooking event={event} booking={booking}></YourBooking> : null} */}
-      <Text ta="right">
+      {booking ? <YourBooking event={event} booking={booking} /> : null}
+      <Text ta="right" mt={8}>
         <Can I="edit" a="event">
           <CustomLink to={`/event/$eventId/edit`} params={{ eventId: event.eventId }}>
             Edit
@@ -127,28 +133,43 @@ function BookingButton({ event, booking }: { event: TEvent; booking?: TBooking }
  */
 }
 
-/* function YourBooking({ event, booking }: { event: JsonEventType, booking: JsonBookingType }) {
+const YourBooking = ({ event, booking }: { event: TEvent; booking: TBooking }) => {
+  const fees = getFeeType(event)
 
-    const enhancedBooking = addComputedFieldsToBookingsQueryResult([booking], event)[0]
+  const ageGroupFilter = ageGroupFromPerson(event)
 
-    const fee = getFee(event)
+  const people = booking.people.map((p, i) => (
+    <Table.Tr key={i}>
+      <Table.Td>{p.basic.name}</Table.Td>
+      <Table.Td>{ageGroupFilter(p).singular}</Table.Td>
+    </Table.Tr>
+  ))
 
-    const people = enhancedBooking.participants.map((p, i) => <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-        <TableCell component="th" scope="row">{p.basic?.name}</TableCell>
-        <TableCell component="td">{p.ageGroup.displayAgeGroup(p.age)}</TableCell>
-        <TableCell component="td">{p.kp?.diet}</TableCell>
-    </TableRow>)
-
-    return <>
-        <Typography variant="subtitle1">You have booked {booking.participants.length} {booking.participants.length > 1 ? `people` : `person`}:</Typography>
-        <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
-            <Table size="small">
-                <TableBody>
-                    {people}
-                </TableBody>
-            </Table>
-        </TableContainer>
-        <fee.DescriptionElement event={event} booking={enhancedBooking} />
-        <fee.StripeElement event={event} booking={booking} />
+  return (
+    <>
+      <Title order={5} mt={8}>
+        Your Booking
+      </Title>
+      <Text mt={8}>
+        You have booked {booking.people.length} {booking.people.length > 1 ? `people` : `person`}:
+      </Text>
+      <Table striped mt={8}>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Td>
+              <Text fw={700}>Name</Text>
+            </Table.Td>
+            <Table.Td>
+              <Text fw={700}>Age Group</Text>
+            </Table.Td>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{people}</Table.Tbody>
+      </Table>
+      <Title order={5} mt={8}>
+        Money
+      </Title>
+      <fees.EventListDisplayElement event={event} booking={booking} />
     </>
-} */
+  )
+}

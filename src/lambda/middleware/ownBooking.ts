@@ -8,6 +8,7 @@ import { RoleSchema } from '../../shared/schemas/role'
 import { UserSchema } from '../../shared/schemas/user'
 import { DB, DBEvent } from '../dynamo'
 import { TBooking } from '../../shared/schemas/booking'
+import { ElectroEvent } from 'electrodb'
 
 export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
   try {
@@ -17,7 +18,12 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
       throw new Error('Event not Found or User not authenticated')
     }
 
-    const bookingResult = await DB.collections.bookingByUserId({userId: user.userId, eventId: event.eventId}).go()
+
+
+    const logger = (event: ElectroEvent) => {
+    console.log(JSON.stringify(event, null, 4));
+    };
+    const bookingResult = await DB.collections.bookingByUserId({userId: user.userId, eventId: event.eventId}).go({logger})
     const booking = bookingResult.data.booking[0]
     if (!booking) {
       next()

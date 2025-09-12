@@ -1,5 +1,5 @@
-import { GoogleAuth } from 'google-auth-library'
-import { GetCallerIdentityCommand, GetSessionTokenCommand, STSClient } from '@aws-sdk/client-sts'
+import { AwsClient, GoogleAuth, OAuth2Client } from 'google-auth-library'
+
 import { ConfigType } from './getConfig'
 
 const GOOGLE_OAUTH2_TOKEN_API_URL = 'https://oauth2.googleapis.com/token'
@@ -23,7 +23,7 @@ const GOOGLE_OAUTH2_TOKEN_API_URL = 'https://oauth2.googleapis.com/token'
  * @param lifetime Lifetime, in seconds, of the generated access token. It can't be greater than 1h
  * @returns the generated access token
  */
-export const getDomainWideDelegationAccessToken = (auth_client: GoogleAuth) => async (impersonationEmail: string, serviceAccountEmail: string, googleApiScopes: string[], lifetime: number) => {
+const getDomainWideDelegationAccessToken = (auth_client: GoogleAuth<AwsClient>) => async (impersonationEmail: string, serviceAccountEmail: string, googleApiScopes: string[], lifetime: number) => {
   if (!impersonationEmail) {
     throw Error('impersonationEmail is required')
   }
@@ -39,7 +39,7 @@ export const getDomainWideDelegationAccessToken = (auth_client: GoogleAuth) => a
 
   // Sign JWT token using a system-managed private key of the given service account
   const signJwtResponse = (
-    await auth_client.request({
+    await auth_client.request<{ signedJwt: string }>({
       url: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${serviceAccountEmail}:signJwt`,
       body: JSON.stringify({
         payload: unsignedJwt,
@@ -108,21 +108,11 @@ async function generateDomainWideDelegationAccessToken(signedJwt: string): Promi
   }
 }
 
-let auth_client: GoogleAuth | null = null
+let awsAuthClient: GoogleAuth<AwsClient> | null = null
+const authScopeMap: Record<string, OAuth2Client> = {}
 
-export async function getAccessTokenFunction(config: ConfigType) {
-  if (!auth_client) {
-
-    // Get temporary AWS credentials to authenticate to the Workload Identity Pool
-    // These credentials are automatically rotated by the AWS SDK
-    // We just need to make sure we have valid credentials when we create the Google Auth Client
-    // The credentials are stored in environment variables that the Google Auth Library will pick up automatically
-    // See: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
-    // and https://cloud.google.com/docs/authentication/production#finding_credentials
-/*     const command = new GetCallerIdentityCommand()
-    const client = new STSClient({ region: 'eu-west-2' })
-    const result = await client.send(command)
-    console.log('Authenticated to AWS as:', result.Arn) */
+export const getAuthClientForScope = async (config: ConfigType, scopes: string[]): Promise<OAuth2Client> => {
+  if (awsAuthClient === null) {
     const googlePoolConf = {
       universe_domain: 'googleapis.com',
       type: 'external_account',
@@ -135,12 +125,27 @@ export async function getAccessTokenFunction(config: ConfigType) {
         regional_cred_verification_url: 'https://sts.eu-west-2.amazonaws.com?Action=GetCallerIdentity&Version=2011-06-15',
       },
     }
-
-    // Build client using Application Default Credentials
-    auth_client = new GoogleAuth({
+    awsAuthClient = new GoogleAuth<AwsClient>({
       credentials: googlePoolConf,
       scopes: ['https://www.googleapis.com/auth/cloud-platform'],
     })
   }
-  return getDomainWideDelegationAccessToken(auth_client)
+
+  const scope = scopes.join(',')
+
+  if (!authScopeMap[scope]) {
+    const accessToken = await (
+      await getDomainWideDelegationAccessToken(awsAuthClient)
+    )(
+      config.GOOGLE_WORKSPACE_EMAIL, // The email of the user to impersonate
+      config.GOOGLE_SERVICE_ACCOUNT_EMAIL, // The service account email
+      scopes,
+      15 * 60, // Lifetime of the access token, it cannot be greater than 1h
+    )
+
+    const oauth2Client = new OAuth2Client()
+    oauth2Client.setCredentials({ access_token: accessToken })
+    authScopeMap[scope] = oauth2Client
+  }
+  return authScopeMap[scope]
 }

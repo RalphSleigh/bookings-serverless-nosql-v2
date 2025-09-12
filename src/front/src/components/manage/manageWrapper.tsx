@@ -1,32 +1,34 @@
 import { subject } from '@casl/ability'
-import { Grid, Tabs } from '@mantine/core'
-import { getRouteApi, Outlet, useRouterState } from '@tanstack/react-router'
+import { Grid, Paper, Tabs } from '@mantine/core'
+import { getRouteApi, Outlet, useLocation, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 
 import { Can } from '../../permissionContext'
 import { CustomLink } from '../../utils'
 
 export const ManageWrapper = () => {
-  const route = getRouteApi('/_user/event/$eventId/manage')
-  const { eventId } = route.useParams()
+  const location = useLocation()
+  const { eventId } = useParams({from: '/_user/event/$eventId/manage'})
+
+  const navigate = useNavigate()
 
   return (
     <>
       <Grid>
         <Grid.Col span={12}>
-          <CustomLink to="/event/$eventId/manage/campers" params={{ eventId }}>
-            Campers
-          </CustomLink>
-          <CustomLink to="/event/$eventId/manage/bookings" params={{ eventId }}>
-            Bookings
-          </CustomLink>
-          <Can I="viewRoles" this={subject('eventId', { eventId })}>
-            <CustomLink to="/event/$eventId/manage/roles" params={{ eventId }}>
-              Roles
-            </CustomLink>
-          </Can>
+          <Paper data-breakout shadow="md" radius="md" withBorder m={8} p="md">
+            <Tabs onChange={(value) => navigate({ to: `/event/$eventId/manage/${value}`, params: {} })} mt={-8} value={location.pathname.split('/').pop() || 'campers'}>
+              <Tabs.List>
+                <Tabs.Tab value="campers">Campers</Tabs.Tab>
+                <Tabs.Tab value="bookings">Bookings</Tabs.Tab>
+                <Can I="viewRoles" this={subject('eventId', { eventId })}>
+                  <Tabs.Tab value="roles">Roles</Tabs.Tab>
+                </Can>
+              </Tabs.List>
+            </Tabs>
+            <Outlet />
+          </Paper>
         </Grid.Col>
       </Grid>
-      <Outlet />
     </>
   )
 }

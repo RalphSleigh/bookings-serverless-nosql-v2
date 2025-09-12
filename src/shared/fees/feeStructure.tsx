@@ -3,7 +3,7 @@ import { PartialDeep } from 'type-fest';
 
 import { AttendanceTypes } from '../attendance/attendance';
 import { TEvent, TEventWithFees, TFees } from '../schemas/event';
-import { PartialBookingType, TBookingForType } from '../schemas/booking';
+import { PartialBookingType, TBooking, TBookingForType } from '../schemas/booking';
 
 export type FeeStructureConfigData<T extends TFees> = Required<Pick<T, 'feeStructure'>> & PartialDeep<T>;
 export type FeeStructureCondfigurationElement<T extends TFees> = React.FC<{
@@ -11,12 +11,14 @@ export type FeeStructureCondfigurationElement<T extends TFees> = React.FC<{
   //update: Dispatch<SetStateAction<PartialDeep<T>>>;
 }>;
 
-export type BookingFormDisplayElement<T> = React.FC<{event: TEventWithFees<T>}>
+export type BookingFormDisplayElement<T  extends TFees> = React.FC<{event: TEventWithFees<T>}>
 
 export type FeeLine = {
   label: string;
   amount: number;
 }
+
+export type EventListDisplayElement<T  extends TFees> = React.FC<{event: TEventWithFees<T>, booking: TBooking}>
 
 export type GetFeeLineFunction<T extends TFees> = (event: TEventWithFees<T>, booking: PartialBookingType) => FeeLine[];
 
@@ -29,5 +31,6 @@ export interface FeeStructure<T extends TFees = TFees> {
   getFeeLines: GetFeeLineFunction<T>;
   ConfigurationElement: FeeStructureCondfigurationElement<T>;
   BookingFormDisplayElement: BookingFormDisplayElement<T>;
+  EventListDisplayElement: EventListDisplayElement<T>;
   EmailElement: EmailElement<T>;
 }

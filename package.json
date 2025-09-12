@@ -36,7 +36,7 @@
     "@casl/react": "^5.0.0",
     "@codegenie/serverless-express": "^4.16.0",
     "@google-cloud/iam-credentials": "^4.2.0",
-    "@googleapis/admin": "^23.5.0",
+    "@googleapis/admin": "^27.0.0",
     "@googleapis/gmail": "^14.0.1",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^5.2.1",
@@ -63,6 +63,7 @@
     "electrodb": "^3.4.1",
     "exponential-backoff": "^3.1.2",
     "express": "^5.1.0",
+    "google-auth-library": "^10.3.0",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.2.0",
     "lodash": "^4.17.21",
@@ -73,6 +74,7 @@
     "react-email": "^4.2.8",
     "react-hook-form": "^7.56.0",
     "react-markdown": "^10.1.0",
+    "use-local-storage-state": "^19.5.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"
   }

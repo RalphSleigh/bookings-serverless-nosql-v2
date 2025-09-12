@@ -9,6 +9,7 @@ import { DefaultValues, FormProvider, useForm } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 import { z } from 'zod/v4'
 
+import { getFeeType } from '../../../../shared/fees/fees.js'
 //import { getAttendance } from "../../../shared/attendance/attendance.js";
 //import { organisations } from "../../../shared/ifm.js";
 //import { MemoBookingExtraContactFields } from "./extraContacts.js";
@@ -21,10 +22,9 @@ import { BasicFieldsBig, BasicFieldsSmall } from './basicFields.js'
 import { ExtraContactsForm } from './extraContacts.js'
 import { OtherQuestionsForm } from './otherQuestions.js'
 import { PeopleForm } from './people.js'
+import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { ValidationErrors } from './validation.js'
-import { getFeeType } from '../../../../shared/fees/fees.js'
-import { PermissionForm } from './permission.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -75,7 +75,6 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
 
   const matches = useMediaQuery('(min-width: 62em)')
 
-
   const fees = getFeeType(event)
 
   const [checked, setChecked] = React.useState(false)
@@ -90,6 +89,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               {event.bigCampMode && <ExtraContactsForm />}
               <PeopleForm event={event} />
               <OtherQuestionsForm />
+              <Title order={3} mt={8}>
+                Pricing
+              </Title>
               <fees.BookingFormDisplayElement event={event} />
               <MemoValidate schema={schema} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />

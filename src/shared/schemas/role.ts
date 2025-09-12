@@ -14,6 +14,7 @@ const globalRole = z
     roleId: z.uuidv4(),
     userId: z.uuidv4(),
     role: z.enum(['admin']),
+    eventId: z.literal('global'),
   })
   .strict()
 

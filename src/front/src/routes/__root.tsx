@@ -19,9 +19,13 @@ export const Route = createRootRouteWithContext<{
   permission: ReturnType<typeof getPermissionsFromUser>
 }>()({
   component: RootComponent,
-  loader: ({ context: { queryClient } }) => {
-    return Promise.all([queryClient.ensureQueryData(envQueryOptions), queryClient.ensureQueryData(getEventsQueryOptions), queryClient.ensureQueryData(getUserBookingsQueryOptions)])
+  beforeLoad: async ({ context }) => {
+    const { queryClient } = context
+    queryClient.ensureQueryData(envQueryOptions)
+    queryClient.ensureQueryData(getEventsQueryOptions)
+    queryClient.ensureQueryData(getUserBookingsQueryOptions)
   },
+
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
     // validate and parse the search params into a typed state
     if (search.redirect) return { redirect: search.redirect as string }

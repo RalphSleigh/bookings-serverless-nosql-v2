@@ -6,13 +6,20 @@ import { useMemo } from 'react'
 import { TPerson } from '../../../../shared/schemas/person'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
-import 'mantine-react-table/styles.css';
-import { Container, Paper } from '@mantine/core'
+import 'mantine-react-table/styles.css'
+
+import { Box, Container, Paper } from '@mantine/core'
+import useLocalStorageState from 'use-local-storage-state'
+
+import { personFields } from '../../../../shared/personFields'
+import styles from '../../css/dataTable.module.css'
+import { useEvent } from '../../utils'
 
 export const ManageCampers = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
   const { eventId } = route.useParams()
   const bookingsQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
+  const event = useEvent()
 
   const bookings = bookingsQuery.data.bookings.map((b) => (
     <div key={b.userId}>
@@ -20,40 +27,44 @@ export const ManageCampers = () => {
     </div>
   ))
 
-  const campers = useMemo(() => bookingsQuery.data.bookings.reduce<TPerson[]>((acc, booking) => {
-    return [...acc, ...booking.people]
-  }, []), [bookingsQuery.data])
-
-  const columns = useMemo<MRT_ColumnDef<TPerson>[]>(
-    () => [
-      {
-        accessorKey: 'basic.name', //access nested data with dot notation
-        header: 'Name',
-      },
-
-      {
-        accessorKey: 'basic.email',
-        header: 'Email',
-      },
-
-      {
-        accessorKey: 'basic.dob', //normal accessorKey
-        header: 'DoB',
-      },
-    ],
-    [],
+  const campers = useMemo(
+    () =>
+      bookingsQuery.data.bookings.reduce<TPerson[]>((acc, booking) => {
+        return [...acc, ...booking.people]
+      }, []),
+    [bookingsQuery.data],
   )
+
+  const fields = useMemo(() => personFields(event).filter((f) => f.enabled(event)), [])
+  const visibilityDefault = fields.reduce(
+    (acc, f) => {
+      acc[f.name] = !f.hideByDefault
+      return acc
+    },
+    {} as Record<string, boolean>,
+  )
+
+  const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-campers-column-visibility-default`, { defaultValue: visibilityDefault })
+
+  const columns = useMemo<MRT_ColumnDef<TPerson>[]>(() => fields.map((f) => f.personTableDef()), [])
 
   const table = useMantineReactTable({
     columns,
     data: campers, //must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    mantineTableProps: {
+      className: styles.table,
+    },
+    state: { columnVisibility: columnVisibility },
+    onColumnVisibilityChange: setColumnVisibility,
   })
 
   return (
-    <Container strategy="grid" fluid>
-      <Paper data-breakout shadow="md" radius="md" withBorder m={8} p="md">
+    <Container strategy="grid" fluid mt={8}>
+      <Box data-breakout>
         <MantineReactTable table={table} />
-      </Paper>
+      </Box>
     </Container>
   )
 }
+
+//initialState={{ columnVisibility: { address: false } }}

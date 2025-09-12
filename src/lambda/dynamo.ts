@@ -31,6 +31,7 @@ export const DBUser = new Entity(
       },
       name: {
         type: 'string',
+        required: true,
       },
       email: {
         type: 'string',
@@ -99,6 +100,8 @@ export const DBRole = new Entity(
       },
       eventId: {
         type: 'string',
+        required: true,
+        default: 'global',
       },
     },
     indexes: {
@@ -359,25 +362,27 @@ export const DBBooking = new Entity(
     indexes: {
       natural: {
         collection: 'booking',
+        type: 'clustered',
         pk: {
           field: 'pk',
-          composite: [],
+          composite: ['eventId'],
         },
         sk: {
           field: 'sk',
-          composite: ['eventId', 'userId'],
+          composite: ['userId'],
         },
       },
       byUserId: {
         collection: 'bookingByUserId',
         index: 'gsi1pk-gsi1sk-index',
+        type: 'clustered',
         pk: {
           field: 'gsi1pk',
-          composite: [],
+          composite: ['userId']
         },
         sk: {
           field: 'gsi1sk',
-          composite: ['userId', 'eventId'],
+          composite: ['eventId'],
         },
       },
     },
@@ -439,24 +444,27 @@ export const DBBookingHistory = new Entity(
     indexes: {
       natural: {
         collection: 'bookingHistory',
+        type: 'clustered',
         pk: {
           field: 'pk',
-          composite: [],
+          composite: ['eventId'],
         },
         sk: {
           field: 'sk',
-          composite: ['eventId', 'userId'],
+          composite: ['userId'],
         },
       },
       byUserId: {
         index: 'gsi1pk-gsi1sk-index',
+        collection: 'bookingHistoryByUserId',
+        type: 'clustered',
         pk: {
           field: 'gsi1pk',
-          composite: [],
+          composite: ['userId'],
         },
         sk: {
           field: 'gsi1sk',
-          composite: ['userId', 'eventId'],
+          composite: ['eventId'],
         },
       },
     },
@@ -533,25 +541,27 @@ export const DBPerson = new Entity(
     indexes: {
       natural: {
         collection: 'booking',
+        type: 'clustered',
         pk: {
           field: 'pk',
-          composite: [],
+          composite: ['eventId'],
         },
         sk: {
           field: 'sk',
-          composite: ['eventId', 'userId', 'personId'],
+          composite: ['userId', 'personId'],
         },
       },
       byUserId: {
         collection: 'bookingByUserId',
+        type: 'clustered',
         index: 'gsi1pk-gsi1sk-index',
         pk: {
           field: 'gsi1pk',
-          composite: [],
+          composite: ['userId'],
         },
         sk: {
           field: 'gsi1sk',
-          composite: ['userId', 'eventId', 'personId'],
+          composite: ['eventId', 'personId'],
         },
       },
     },
@@ -617,24 +627,27 @@ export const DBPersonHistory = new Entity(
     indexes: {
       natural: {
         collection: 'bookingHistory',
+        type: 'clustered',
         pk: {
           field: 'pk',
-          composite: [],
+          composite: ['eventId'],
         },
         sk: {
           field: 'sk',
-          composite: ['eventId', 'userId', 'personId'],
+          composite: ['userId', 'personId'],
         },
       },
       byUserId: {
+        collection: 'bookingHistoryByUserId',
         index: 'gsi1pk-gsi1sk-index',
+        type: 'clustered',
         pk: {
           field: 'gsi1pk',
-          composite: [],
+          composite: ['userId'],
         },
         sk: {
           field: 'gsi1sk',
-          composite: ['userId', 'eventId', 'personId'],
+          composite: ['eventId', 'personId'],
         },
       },
     },

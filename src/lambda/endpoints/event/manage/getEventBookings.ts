@@ -3,6 +3,7 @@ import { subject } from '@casl/ability'
 import { TBooking } from '../../../../shared/schemas/booking'
 import { DB } from '../../../dynamo'
 import { HandlerWrapper } from '../../../utils'
+import { ElectroEvent } from 'electrodb'
 
 export type GetEventBookingsResponseType = { bookings: TBooking[] }
 
@@ -11,10 +12,13 @@ export const getEventBookings = HandlerWrapper(
   async (req, res) => {
     try {
       const event = res.locals.event
-      const bookings = await DB.collections.booking({ eventId: event.eventId }).go()
+      const logger = (event: ElectroEvent) => {
+          console.log(JSON.stringify(event, null, 4));
+          };
+      const bookings = await DB.collections.booking({ eventId: event.eventId }).go({logger})
       if (bookings.data) {
         const bookingsWithPeople = bookings.data.booking.map((b) => {
-          const people = bookings.data.person.filter((p) => p.eventId === b.eventId && !p.cancelled).sort((a, b) => a.createdAt - b.createdAt)
+          const people = bookings.data.person.filter((p) => p.userId === b.userId && p.eventId === b.eventId && !p.cancelled).sort((a, b) => a.createdAt - b.createdAt)
           return { ...b, people } as TBooking
         })
         res.json({ bookings: bookingsWithPeople })

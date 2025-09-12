@@ -16,7 +16,10 @@ export const getUserBookings = HandlerWrapper(
     if (!user) {
         res.json({ bookings: [] } as TUserBookingsResponseType)
     } else {
-        const bookingsResult = await DB.collections.bookingByUserId({userId: user.userId}).go()
+      const logger = (event: ElectroEvent) => {
+    console.log(JSON.stringify(event, null, 4));
+    };
+        const bookingsResult = await DB.collections.bookingByUserId({userId: user.userId}).go({logger})
         const bookings: TBooking[] = bookingsResult.data.booking.map(b => {
             const people = bookingsResult.data.person.filter((p) => p.eventId === b.eventId && !p.cancelled).sort((a,b) => a.createdAt - b.createdAt)
             return {...b, people } as TBooking})

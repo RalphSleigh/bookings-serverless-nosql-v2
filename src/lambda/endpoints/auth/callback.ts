@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { TUser, UserSchema } from '../../../shared/schemas/user'
 import { DBRole, DBUser } from '../../dynamo'
+import { getAuthClientForScope } from '../../googleAuthClientHack'
 
 export const authCallback: RequestHandler = async (req, res) => {
   const logToPath = res.locals.logger.logToPath.bind(res.locals.logger)
@@ -61,18 +62,12 @@ export const authCallback: RequestHandler = async (req, res) => {
     let email = profile.email
 
     if (source === 'google-oauth2') {
-      const auth_client = new auth.JWT(
-        config.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        '',
-        config.GOOGLE_PRIVATE_KEY,
-        ['https://www.googleapis.com/auth/admin.directory.user.readonly'],
-        config.GOOGLE_WORKSPACE_EMAIL,
-      )
+      const oauth2Client = await getAuthClientForScope(config, ['https://www.googleapis.com/auth/admin.directory.user.readonly'])
 
       try {
         const directory = admin({
           version: 'directory_v1',
-          auth: auth_client,
+          auth: oauth2Client,
         })
         const user = await directory.users.get({
           userKey: sub,
@@ -98,7 +93,7 @@ export const authCallback: RequestHandler = async (req, res) => {
     user = UserSchema.parse(createResult.data)
 
     if (config.ENV === 'dev' && user.isWoodcraft) {
-      await DBRole.create({ roleId: uuidv4(), userId: user.userId, role: 'admin', eventId: '*' }).go()
+      await DBRole.create({ roleId: uuidv4(), userId: user.userId, role: 'admin'}).go()
     }
 
     logToSystem(`New user created: ${JSON.stringify(user)}`)

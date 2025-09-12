@@ -1,0 +1,19 @@
+/*  styles.module.css */
+.table {
+  /* ... */
+  /* Resolve https://github.com/KevinVandy/mantine-react-table/issues/327 */
+  background-color: unset !important;
+  tbody, thead {
+    /* Resolve https://github.com/KevinVandy/mantine-react-table/issues/327 */
+    background-color: unset !important;
+  }
+  tr {
+    /* Resolve https://github.com/KevinVandy/mantine-react-table/issues/327 */
+    background-color: unset !important;
+  }
+  td {
+    /* Resolve https://github.com/KevinVandy/mantine-react-table/issues/327 */
+    /* see https://bugzilla.mozilla.org/show_bug.cgi?id=688556#c43 */
+    background-clip: padding-box;
+  }
+}

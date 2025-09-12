@@ -1,4 +1,4 @@
-import { auth, gmail } from '@googleapis/gmail'
+import { gmail } from '@googleapis/gmail'
 import { render } from '@react-email/render'
 import { backOff } from 'exponential-backoff'
 import MailComposer from 'nodemailer/lib/mail-composer/index.js'
@@ -8,7 +8,7 @@ import { TBooking } from '../../shared/schemas/booking'
 import { TEvent } from '../../shared/schemas/event'
 import { TUser } from '../../shared/schemas/user'
 import { ConfigType } from '../getConfig'
-import { getAccessTokenFunction } from '../googleAuthClientHack'
+import { getAuthClientForScope } from '../googleAuthClientHack'
 import { am_in_lambda } from '../utils'
 import { getEmailTemplate } from './templates/getTemplate'
 
@@ -59,10 +59,14 @@ const googlePoolConf = {
   },
 }
 
-let oauth2Client: any = null
-
 export async function sendEmail(data: EmailData, config: ConfigType) {
   try {
+
+    if (!config.EMAIL_ENABLED) {
+      console.log('Email not enabled, not sending email')
+      return
+    }
+
     const { recipient, event } = data
 
     if (!recipient!.email) {
@@ -93,19 +97,7 @@ export async function sendEmail(data: EmailData, config: ConfigType) {
 
     const message = await new MailComposer(mail_options).compile().build()
 
-    if (!oauth2Client) {
-      const accessToken = await (
-        await getAccessTokenFunction(config)
-      )(
-        config.GOOGLE_WORKSPACE_EMAIL, // The email of the user to impersonate
-        config.GOOGLE_SERVICE_ACCOUNT_EMAIL, // The service account email
-        ['https://www.googleapis.com/auth/gmail.send'], // The scopes to request
-        15 * 60, // Lifetime of the access token, it cannot be greater than 1h
-      )
-
-      oauth2Client = new auth.OAuth2()
-      oauth2Client.setCredentials({ access_token: accessToken })
-    }
+    const oauth2Client = await getAuthClientForScope(config, ['https://www.googleapis.com/auth/gmail.send'])
 
     const gmail_instance = gmail({ version: 'v1', auth: oauth2Client })
 

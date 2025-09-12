@@ -14,7 +14,8 @@ export type ConfigType = {
   JWT_SECRET: string
   ENV: 'dev' | 'prod'
   COOKIE_EXPIRY: number
-  BASE_URL: string
+  BASE_URL: string,
+  EMAIL_ENABLED: boolean
 }
 
 let configData: ConfigType
