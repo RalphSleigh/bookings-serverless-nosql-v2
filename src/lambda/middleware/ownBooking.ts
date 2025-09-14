@@ -1,14 +1,14 @@
 import cookie from 'cookie'
+import { ElectroEvent } from 'electrodb'
 import { RequestHandler } from 'express'
 import jwt from 'jsonwebtoken'
 
 import { getPermissionsFromUser } from '../../shared/permissions'
+import { TBooking } from '../../shared/schemas/booking'
 import { EventSchema } from '../../shared/schemas/event'
 import { RoleSchema } from '../../shared/schemas/role'
 import { UserSchema } from '../../shared/schemas/user'
 import { DB, DBEvent } from '../dynamo'
-import { TBooking } from '../../shared/schemas/booking'
-import { ElectroEvent } from 'electrodb'
 
 export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
   try {
@@ -18,17 +18,12 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
       throw new Error('Event not Found or User not authenticated')
     }
 
-
-
-    const logger = (event: ElectroEvent) => {
-    console.log(JSON.stringify(event, null, 4));
-    };
-    const bookingResult = await DB.collections.bookingByUserId({userId: user.userId, eventId: event.eventId}).go({logger})
+    const bookingResult = await DB.collections.bookingByUserId({ userId: user.userId, eventId: event.eventId }).go()
     const booking = bookingResult.data.booking[0]
     if (!booking) {
       next()
     } else {
-      res.locals.booking = {...booking, people: bookingResult.data.person.filter((p) => p.eventId === booking.eventId)} as TBooking
+      res.locals.booking = { ...booking, people: bookingResult.data.person.filter((p) => p.eventId === booking.eventId) } as TBooking
       next()
     }
   } catch (error) {

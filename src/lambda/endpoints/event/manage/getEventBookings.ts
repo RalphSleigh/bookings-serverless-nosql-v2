@@ -12,10 +12,7 @@ export const getEventBookings = HandlerWrapper(
   async (req, res) => {
     try {
       const event = res.locals.event
-      const logger = (event: ElectroEvent) => {
-          console.log(JSON.stringify(event, null, 4));
-          };
-      const bookings = await DB.collections.booking({ eventId: event.eventId }).go({logger})
+      const bookings = await DB.collections.booking({ eventId: event.eventId }).go()
       if (bookings.data) {
         const bookingsWithPeople = bookings.data.booking.map((b) => {
           const people = bookings.data.person.filter((p) => p.userId === b.userId && p.eventId === b.eventId && !p.cancelled).sort((a, b) => a.createdAt - b.createdAt)

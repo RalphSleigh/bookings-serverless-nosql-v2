@@ -10,6 +10,7 @@
   tr {
     /* Resolve https://github.com/KevinVandy/mantine-react-table/issues/327 */
     background-color: unset !important;
+    cursor: pointer;
   }
   td {
     /* Resolve https://github.com/KevinVandy/mantine-react-table/issues/327 */

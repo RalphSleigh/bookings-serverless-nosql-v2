@@ -24,6 +24,9 @@ import { getEventRoles } from './endpoints/event/manage/getEventRoles'
 import { getUsers } from './endpoints/event/manage/getUsers'
 import { createRole } from './endpoints/event/manage/createRole'
 import { deleteRole } from './endpoints/event/manage/deleteRole'
+import { getBookingHasSheet } from './endpoints/booking/getBookingHasSheet'
+import { createSheetForBookingEndpoint } from './endpoints/booking/createSheetForBooking'
+import { getDataFromSheetEndpoint } from './endpoints/booking/getDataFromSheet'
 
 export const router = express.Router()
 export const app = express()
@@ -52,6 +55,9 @@ router.use('/event/:eventId/{*splat}', [eventMiddleware, ownBookingMiddleware])
 router.post('/event/:eventId/edit', editEvent)
 router.post('/event/:eventId/booking/create', createBooking)
 router.post('/event/:eventId/booking/update', updateBooking)
+router.get('/event/:eventId/booking/:userId/sheet', getBookingHasSheet)
+router.post('/event/:eventId/booking/:userId/sheet', createSheetForBookingEndpoint)
+router.get('/event/:eventId/booking/:userId/sheet/data', getDataFromSheetEndpoint)
 
 router.get('/event/:eventId/manage/bookings', getEventBookings)
 router.get('/event/:eventId/manage/roles', getEventRoles)

@@ -94,3 +94,5 @@ export const BookingSchemaForTypeBasicBig = BookingSchemaForType.extend({
 
 export type TBooking = z.infer<typeof BookingSchemaForType>
 export type PartialBookingType = PartialDeep<TBookingForType, { recurseIntoArrays: true }>
+
+export type TBasicBig = z.infer<typeof basicBig>

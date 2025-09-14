@@ -1,21 +1,22 @@
 import ReactDOM from 'react-dom/client'
 
 import '@mantine/core/styles.css'
-import '@mantine/dates/styles.css';
-import '@mantine/notifications/styles.css';
+import '@mantine/dates/styles.css'
+import '@mantine/notifications/styles.css'
 
 import { createTheme, MantineProvider, virtualColor } from '@mantine/core'
+import { DatesProvider } from '@mantine/dates'
+import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider, useSuspenseQuery } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
 import { getPermissionsFromUser } from '../../shared/permissions'
 import { useAuth } from './auth'
-import { SuspenseWrapper } from './components/suspense'
+import { SuspenseLoader, SuspenseWrapper } from './components/suspense'
 import { AbilityContext } from './permissionContext'
+import { userQueryOptions } from './queries/user'
 import { routeTree } from './routeTree.gen'
-import { DatesProvider } from '@mantine/dates';
-import { Notifications } from '@mantine/notifications';
 
 const queryClient = new QueryClient()
 
@@ -30,7 +31,7 @@ const router = createRouter({
   context: { queryClient, auth: undefined!, permission: undefined! },
   routeTree,
   defaultPreload: 'intent',
-  defaultPendingComponent : SuspenseWrapper,
+  defaultPendingComponent: SuspenseLoader,
 })
 
 /* const theme = createTheme({
@@ -41,7 +42,9 @@ const router = createRouter({
  */
 
 const App = () => {
-  const auth = useAuth()
+  console.log('App render')
+  const user = useSuspenseQuery(userQueryOptions)
+  const auth = useAuth(user)
   useEffect(() => {
     router.invalidate()
   }, [auth.isAvailable, auth.loggedIn, auth.user])
@@ -61,12 +64,14 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <MantineProvider>
-      <DatesProvider settings={{ timezone: 'UTC' }}>
-      <QueryClientProvider client={queryClient}>
-      <Notifications />
-          <App />
-      </QueryClientProvider>
+      <SuspenseWrapper>
+      <DatesProvider settings={{ locale: 'en', firstDayOfWeek: 0 }}>
+        <QueryClientProvider client={queryClient}>
+          <Notifications />
+            <App />
+        </QueryClientProvider>
       </DatesProvider>
+      </SuspenseWrapper>
     </MantineProvider>,
   )
 }

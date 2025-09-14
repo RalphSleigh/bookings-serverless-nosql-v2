@@ -1,47 +1,64 @@
-import { z } from "zod/v4";
-import { KPBasicOptions } from "../kp/kp";
-import { keepPreviousData } from "@tanstack/react-query";
-import { TEvent } from "./event";
+import { keepPreviousData } from '@tanstack/react-query'
+import { z } from 'zod/v4'
 
+import { KPBasicOptions } from '../kp/kp'
+import { TEvent } from './event'
 
-const KPBasic = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional()}).strict(); 
-const KPLarge = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional()}).strict();
+const KPBasic = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional() }).strict()
+const KPLarge = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional() }).strict()
 
-export const PersonSchema = (event: TEvent) => z.object({
-    personId: z.string().nonempty(),
-    userId: z.string().nonempty(),
-    eventId: z.string().nonempty(),
-    cancelled: z.boolean().default(false),
-    basic: z.object({
+export const PersonSchema = (event: TEvent) => {
+  const basic = event.allParticipantEmails
+    ? z.object({
         name: z.string().nonempty(),
         dob: z.iso.datetime(),
-        email: event.allParticipantEmails ? z.email() : z.undefined(),
-    }).strict(),
-    kp: event.kp.kpStructure === 'basic' ? KPBasic : KPLarge,
-    health: z.object({
-        medical: z.string().optional(),
-    }).strict(),
-    createdAt: z.number().optional(),
-    updatedAt: z.number().optional(),
-}).strict()
+        email: z.email(),
+      })
+    : z.object({
+        name: z.string().nonempty(),
+        dob: z.iso.datetime(),
+      })
+  return z
+    .object({
+      personId: z.string().nonempty(),
+      userId: z.string().nonempty(),
+      eventId: z.string().nonempty(),
+      cancelled: z.boolean().default(false),
+      basic: basic.strict(),
+      kp: event.kp.kpStructure === 'basic' ? KPBasic : KPLarge,
+      health: z
+        .object({
+          medical: z.string().optional(),
+        })
+        .strict(),
+      createdAt: z.number().optional(),
+      updatedAt: z.number().optional(),
+    })
+    .strict()
+}
 
-
-export const PersonSchemaForType = z.object({
+export const PersonSchemaForType = z
+  .object({
     personId: z.string().nonempty(),
     userId: z.string().nonempty(),
     eventId: z.string().nonempty(),
     cancelled: z.boolean().default(false),
-    basic: z.object({
+    basic: z
+      .object({
         name: z.string().nonempty(),
         dob: z.iso.datetime(),
         email: z.email().optional(),
-    }).strict(),
+      })
+      .strict(),
     kp: KPBasic.or(KPLarge),
-    health: z.object({
+    health: z
+      .object({
         medical: z.string().optional(),
-    }).strict(),
+      })
+      .strict(),
     createdAt: z.number().optional(),
     updatedAt: z.number().optional(),
-}).strict()
+  })
+  .strict()
 
 export type TPerson = z.infer<typeof PersonSchemaForType>

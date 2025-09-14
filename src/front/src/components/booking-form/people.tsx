@@ -1,46 +1,55 @@
 import { ActionIcon, Anchor, Button, Flex, Grid, Paper, Textarea, TextInput, Title } from '@mantine/core'
-import { IconX } from '@tabler/icons-react'
+import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
+import { useRouteContext } from '@tanstack/react-router'
 import React, { useState } from 'react'
-import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext } from 'react-hook-form'
+import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
-import { z } from "zod/v4";
+import { z } from 'zod/v4'
 
+import { app } from '../../../../lambda/app.js'
 import { KPBasicOptions } from '../../../../shared/kp/kp.js'
 import { BookingSchema, BookingSchemaForType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
-import { PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
+import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
 import { errorProps } from '../../utils.js'
 import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
 import { CustomSelect } from '../custom-inputs/customSelect.js'
-import { useRouteContext } from '@tanstack/react-router'
-import { app } from '../../../../lambda/app.js'
+import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
+import { SheetsInput } from './sheetsInput.js'
 
 type PeopleFormProps = {
-  event: TEvent,
+  event: TEvent
 }
 
 export const PeopleForm: React.FC<PeopleFormProps> = ({ event }) => {
-const { user } = useRouteContext({ from: '/_user' })
+  const { user } = useRouteContext({ from: '/_user' })
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray<z.infer<typeof BookingSchemaForType>>({
     name: 'people', // unique name for your Field Array
   })
 
-  const { watch } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const defaultCollapsed = fields.length > 10
+
+  const peopleSchema = PersonSchema(event)
 
   const people = fields.map((f, i) => {
-    return <PersonForm event={event} index={i} key={f.id} remove={remove} />
+    return <PersonForm event={event} index={i} key={f.id} remove={remove} defaultCollapsed={defaultCollapsed} peopleSchema={peopleSchema} />
   })
 
   const appendFn = () => {
-    const newPerson = { personId: uuidv4(), eventId: event.eventId, userId: user.userId, cancelled: false}
+    const newPerson = { personId: uuidv4(), eventId: event.eventId, userId: user.userId, cancelled: false }
     append(newPerson as TPerson)
   }
+
+
 
   return (
     <>
       <Title order={2} size="h5" mt={16}>
         People
       </Title>
+      <SmallSuspenseWrapper>
+        <SheetsInput event={event} />
+      </SmallSuspenseWrapper>
       {people}
       <Button onClick={appendFn} mt={16} variant="outline">
         Add person
@@ -48,8 +57,45 @@ const { user } = useRouteContext({ from: '/_user' })
     </>
   )
 }
+const PersonForm = ({ event, index, remove, defaultCollapsed, peopleSchema }: { event: TEvent; index: number; remove: UseFieldArrayRemove; defaultCollapsed: boolean; peopleSchema: z.ZodSchema<TPerson> }) => {
+  const [collapsed, setCollapsed] = useState(defaultCollapsed)
+  if (collapsed) {
+    return <CollapsedPersonForm index={index} setCollapsed={setCollapsed} peopleSchema={peopleSchema} />
+  } else {
+    return <ExpandedPersonForm event={event} index={index} remove={remove} setCollapsed={setCollapsed}/>
+  }
+}
 
-const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; remove: UseFieldArrayRemove }) => {
+const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: number; setCollapsed: (collapsed: boolean) => void; peopleSchema: z.ZodSchema<TPerson> }) => {
+  const { register, control, formState, watch } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const person = watch(`people.${index}`)
+  const valid = peopleSchema.safeParse(person).success
+  return (
+    <Paper shadow="md" radius="md" withBorder mt={16} id={person.personId} onClick={() => setCollapsed(false)} pl={8}>
+      <Flex justify="flex-end" m={8} align="center">
+        <Title order={3} size="h4" style={{ cursor: 'pointer', flexGrow: 1 }}>
+          {person.basic.name} = {valid ? '✅' : '❌'}
+        </Title>
+        <ActionIcon variant="default" size="input-sm" onClick={() => setCollapsed(true)} ml={8}>
+          <IconChevronDown size={16} stroke={3} />
+        </ActionIcon>
+      </Flex>
+    </Paper>
+  )
+}
+
+const ExpandedPersonForm = ({
+  event,
+  index,
+  remove,
+  setCollapsed,
+}: {
+  event: TEvent
+  index: number
+  remove: UseFieldArrayRemove
+  setCollapsed: (collapsed: boolean) => void
+}) => {
+  const personId = useFormContext<z.infer<typeof BookingSchemaForType>>().watch(`people.${index}.personId`)
   const { register, control, formState, watch } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
@@ -60,9 +106,6 @@ const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; re
       remove(index)
     }
   }
-
-  const personId = watch(`people.${index}.personId`)
-
   const emailAndDiet = event.allParticipantEmails ? (
     <>
       <Grid.Col span={8}>
@@ -115,25 +158,28 @@ const PersonForm = ({ event, index, remove }: { event: TEvent; index: number; re
             {...register(`people.${index}.kp.details` as const)}
             {...e(`people.${index}.kp.details`)}
             autosize
-        minRows={2}
+            minRows={2}
           />
         </Grid.Col>
         <Grid.Col span={12}>
-            <Textarea
-              autoComplete={`section-person-${index} health-medical`}
-              id={`person-health-medical-${index}`}
-              data-form-type="other"
-              label="Details of relevant medical conditions, medication taken or addtional needs"
-              {...register(`people.${index}.health.medical` as const)}
-              {...e(`people.${index}.health.medical`)}
-              autosize
-              minRows={2}
-            />
+          <Textarea
+            autoComplete={`section-person-${index} health-medical`}
+            id={`person-health-medical-${index}`}
+            data-form-type="other"
+            label="Details of relevant medical conditions, medication taken or addtional needs"
+            {...register(`people.${index}.health.medical` as const)}
+            {...e(`people.${index}.health.medical`)}
+            autosize
+            minRows={2}
+          />
         </Grid.Col>
         <Grid.Col span={12}>
           <Flex justify="flex-end">
             <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>
-              <IconX size={16} stroke={1.5} color="red" />
+              <IconX size={16} stroke={3} color="red" />
+            </ActionIcon>
+            <ActionIcon variant="default" size="input-sm" onClick={() => setCollapsed(true)} ml={8}>
+              <IconChevronUp size={16} stroke={3} />
             </ActionIcon>
           </Flex>
         </Grid.Col>
