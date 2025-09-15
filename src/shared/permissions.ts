@@ -51,7 +51,7 @@ export const getPermissionsFromUser = (user: ContextUser) => {
   can('getSheetData', 'eventBookingIds', (ids) => ids.userId === user.userId)
 
   //book into an event
-  can('book', 'event', (e) => e.bigCampMode === false && dayjs(e.bookingDeadline).isAfter(new Date()))
+  can('book', 'event', (e) => dayjs(e.bookingDeadline).isAfter(new Date()))
 
   for (const role of user.roles) {
     permissionsFunctions[role.role](can)
