@@ -8,6 +8,8 @@ import { TUser } from '../shared/schemas/user'
 import { ConfigType } from './getConfig'
 import { getAuthClientForScope } from './googleAuthClientHack'
 
+const HEADER_ROW_INDEX = 6
+
 export const getEventHasSheet = async (config: ConfigType, event: TEvent, user: TUser) => {
   const auth = await getAuthClientForScope(config, ['https://www.googleapis.com/auth/drive.readonly'])
   const drive_instance = drive({ version: 'v3', auth })
@@ -96,7 +98,6 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
 
     const sheets_instance = sheets({ version: 'v4', auth: auth })
 
-    //@ts-ignore
     const update = await sheets_instance.spreadsheets.batchUpdate({
       spreadsheetId: newSheet.data.id!,
       requestBody: {
@@ -106,6 +107,69 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
               start: {
                 sheetId: 0,
                 rowIndex: 0,
+                columnIndex: 0,
+              },
+              rows: [
+                {
+                  values: ['Instructions', '', '', '', '', 'Tips & Tricks'].map((v) => {
+                    return { userEnteredValue: { stringValue: v } }
+                  }),
+                },
+                {
+                  values: ['1) Fill in details of your campers below', '', '', '', '', ' * Rows without the name column filled in will be ignored'].map((v) => {
+                    return { userEnteredValue: { stringValue: v } }
+                  }),
+                },
+                {
+                  values: [
+                    '2) Return to the booking form and press the "Import Campers to Form" button"',
+                    '',
+                    '',
+                    '',
+                    '',
+                    ' * If you mess up, you can use file -> version history to restore an earlier version of the spreadsheet',
+                  ].map((v) => {
+                    return { userEnteredValue: { stringValue: v } }
+                  }),
+                },
+                {
+                  values: ['3) Fix any validation errors then press "Submit Booking" at the bottom of the form', '', '', '', '', ' * The fields with a grey background are optional'].map((v) => {
+                    return { userEnteredValue: { stringValue: v } }
+                  }),
+                },
+                {
+                  values: [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    ' * If your data already exists in another google sheet, you can use the IMPORTRANGE function to import it (The checkboxes will require the values "Yes" or "No" imported) ',
+                  ].map((v) => {
+                    return { userEnteredValue: { stringValue: v } }
+                  }),
+                },
+              ],
+              fields: 'userEnteredValue.stringValue',
+            },
+          },
+          {
+            repeatCell: {
+              range: {
+                sheetId: 0,
+                startRowIndex: 0,
+                startColumnIndex: 0,
+                endRowIndex: 1,
+              },
+              cell: { userEnteredFormat: { textFormat: { bold: true } } },
+              fields: 'userEnteredFormat',
+            },
+          },
+          {
+            updateCells: {
+              start: {
+                sheetId: 0,
+                rowIndex: HEADER_ROW_INDEX,
                 columnIndex: 0,
               },
               rows: [
@@ -145,9 +209,9 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 0,
+                startRowIndex: HEADER_ROW_INDEX,
                 startColumnIndex: 0,
-                endRowIndex: 1,
+                endRowIndex: HEADER_ROW_INDEX + 1,
               },
               cell: { userEnteredFormat: { textFormat: { bold: true }, borders: { bottom: { style: 'SOLID' } } } },
               fields: 'userEnteredFormat',
@@ -157,7 +221,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 1,
+                startRowIndex: HEADER_ROW_INDEX + 1,
                 startColumnIndex: 1,
                 endColumnIndex: 2,
               },
@@ -169,7 +233,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 1,
+                startRowIndex: HEADER_ROW_INDEX + 1,
                 startColumnIndex: 2,
                 endColumnIndex: 3,
               },
@@ -225,7 +289,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 1,
+                startRowIndex: HEADER_ROW_INDEX + 1,
                 startColumnIndex: 7,
                 endColumnIndex: 16,
               },
@@ -237,7 +301,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 1,
+                startRowIndex: HEADER_ROW_INDEX + 1,
                 startColumnIndex: 16,
                 endColumnIndex: 18,
               },
@@ -249,7 +313,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 1,
+                startRowIndex: HEADER_ROW_INDEX + 1,
                 startColumnIndex: 20,
                 endColumnIndex: 22,
               },
@@ -261,7 +325,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 1,
+                startRowIndex: HEADER_ROW_INDEX + 1,
                 startColumnIndex: 5,
                 endColumnIndex: 16,
               },
@@ -273,7 +337,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
             repeatCell: {
               range: {
                 sheetId: 0,
-                startRowIndex: 1,
+                startRowIndex: HEADER_ROW_INDEX + 1,
                 startColumnIndex: 18,
                 endColumnIndex: 22,
               },
@@ -281,7 +345,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
               fields: 'userEnteredFormat',
             },
           },
-          {
+          /* {
             addProtectedRange: {
               protectedRange: {
                 range: {
@@ -298,7 +362,7 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
                 },
               },
             },
-          },
+          }, */
         ],
       },
     })
@@ -403,7 +467,7 @@ export const getCampersFromSheet = async (config: ConfigType, event: TEvent, use
   if (!response.data.values) throw new Error('No data found')
 
   const people = response.data.values
-    .slice(1)
+    .slice(HEADER_ROW_INDEX + 1)
     .filter((row) => row[0])
     .map((row, i) => getPersonFromRow(row, i, event, user.userId))
 

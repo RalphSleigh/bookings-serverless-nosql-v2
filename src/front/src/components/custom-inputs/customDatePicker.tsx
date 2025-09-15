@@ -5,13 +5,12 @@ import { Controller, ControllerProps, FieldValues, useController, UseControllerP
 export type CustomDateInputProps<T extends FieldValues> = UseControllerProps<T> & Omit<DateInputProps, 'value' | 'defaultValue'>
 
 export function CustomDatePicker<T extends FieldValues>(props: CustomDateInputProps<T>) {
-  const { name, control, ...inputProps } = props
+  const { name, ...inputProps } = props
   const {
     field: { value, onChange: fieldOnChange, ...field },
     fieldState,
   } = useController<T>({
-    name,
-    control,
+    name
   })
   const valueAsDate = value != undefined ? dayjs(value).toDate() : undefined
   //const formValue = valueAsDate ? new Date(valueAsDate.getTime() + valueAsDate.getTimezoneOffset() * 60000) : undefined

@@ -1,6 +1,6 @@
 //import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox, Alert, AlertTitle } from "@mui/material"
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { Button, Container, Grid, Paper, Text, Textarea, Title } from '@mantine/core'
+import { Button, Container, Flex, Grid, Paper, Text, Textarea, Title } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { UseMutationResult } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
@@ -25,13 +25,14 @@ import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { ValidationErrors } from './validation.js'
+import { cancelBooking } from '../../mutations/cancelBooking.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
 type BookingFormProps = {
   mode: 'create' | 'edit' | 'rebook' | 'view'
   event: TEvent
-  inputData: DefaultValues<TBooking>
+  inputData: DefaultValues<TBooking> & { userId: string; eventId: string }
   mutation: UseMutationResult<any, any, any, any>
 }
 
@@ -54,6 +55,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
     },
     [event, mutation],
   )
+
+  const cancelBookingMutation = cancelBooking(event.eventId, inputData.userId)
+
+  const cancelOnClick = () => {
+    if (window.confirm('Are you sure you want to cancel your booking?')) {
+      cancelBookingMutation.mutate()
+    }
+  }
 
   const BasicFields = event.bigCampMode ? BasicFieldsBig : BasicFieldsSmall //MemoBookingGroupContactFields : MemoBookingIndvidualContactFields
 
@@ -87,7 +96,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
             <Paper shadow="md" radius="md" withBorder m={8} p="md">
               <BasicFields event={event} />
               {event.bigCampMode && <ExtraContactsForm />}
-              <PeopleForm event={event} />
+              <PeopleForm event={event} userId={inputData.userId} />
               <OtherQuestionsForm />
               <Title order={3} mt={8}>
                 Pricing
@@ -95,9 +104,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               <fees.BookingFormDisplayElement event={event} />
               <MemoValidate schema={schema} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
-              <Button variant="contained" type="submit" mt={16} loading={mutation.isPending} disabled={!isValid || mutation.isPending || !checked}>
-                Submit Booking
+              <Flex gap={8} mt={16}>
+              <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid}>
+                {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
               </Button>
+              { mode === 'edit' && <Button variant="gradient" gradient={{ from: 'red', to: 'pink', deg: 110 }} loading={cancelBookingMutation.isPending} onClick={cancelOnClick}>
+                Cancel Booking
+              </Button> }
+              </Flex>
             </Paper>
           </Grid.Col>
           {matches && (

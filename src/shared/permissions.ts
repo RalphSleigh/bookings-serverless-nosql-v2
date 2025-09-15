@@ -20,7 +20,7 @@ export type Abilities =
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
   | ['delete', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
-  | ['createSheet' | 'getSheetData', 'eventBookingIds' | ({eventId: string, userId: string} & ForcedSubject<'eventBookingIds'>)]
+  | ['createSheet' | 'getSheetData' | 'cancelBooking', 'eventBookingIds' | ({ eventId: string; userId: string } & ForcedSubject<'eventBookingIds'>)]
 
 const lambdaMatcher: ConditionsMatcher<MatchConditions> = (matchConditions) => matchConditions
 
@@ -34,16 +34,16 @@ export const getPermissionsFromUser = (user: ContextUser) => {
   can('get', 'currentUser')
   can('get', 'env')
   can('get', 'events')
+  can('get', 'ownBookings')
 
   if (!user) {
     return build()
     //return build({conditionsMatcher: lambdaMatcher})
   }
 
-  can('get', 'ownBookings')
-
   //edit own bookings
   can('update', 'eventBooking', ({ booking: b }) => b.userId === user.userId)
+  can('cancelBooking', 'eventBookingIds', (ids) => ids.userId === user.userId)
 
   //get the sheet for own bookings
   can('getSheet', 'eventBooking', ({ booking: b }) => b.userId === user.userId)

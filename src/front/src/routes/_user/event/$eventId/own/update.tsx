@@ -5,10 +5,11 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Navigate, redirect, useRouteContext } from '@tanstack/react-router'
 import { useContext } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
-import { getEventsQueryOptions } from '../../../../../queries/getEvents'
+
 import { BookingForm } from '../../../../../components/booking-form/form'
 import { updateBookingMuation } from '../../../../../mutations/updateBooking'
+import { getEventsQueryOptions } from '../../../../../queries/getEvents'
+import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
 import { useEvent } from '../../../../../utils'
 
 export const Route = createFileRoute('/_user/event/$eventId/own/update')({
@@ -30,9 +31,7 @@ function EditBookingComponent() {
   const event = useEvent()
   const booking = bookingsQuery.data.bookings.find((booking) => booking.eventId === event.eventId && booking.userId === user.userId)
 
-
-
-  if (!event || !booking || !permission.can('update', subject('eventBooking', {event, booking}))) {
+  if (!event || !booking || !permission.can('update', subject('eventBooking', { event, booking }))) {
     notifications.show({
       title: 'Error',
       message: `Event  not found, or you don't have permission to book it`,
@@ -40,5 +39,5 @@ function EditBookingComponent() {
     })
     return <Navigate to="/" />
   }
-  return <BookingForm mode="edit" event={event} inputData={booking} mutation={updateBookingMuation()} />
+  return <BookingForm mode={booking.cancelled ? 'rebook' : 'edit'} event={event} inputData={booking} mutation={updateBookingMuation()} />
 }

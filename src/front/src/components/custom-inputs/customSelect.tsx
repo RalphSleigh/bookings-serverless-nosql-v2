@@ -6,13 +6,12 @@ import { errorProps } from "../../utils";
 
 type CustomSelectProps<T extends FieldValues> = UseControllerProps<T> & Omit<SelectProps, 'value' | 'defaultValue'>
 
-export function CustomSelect<T extends FieldValues>({ name, control, ...inputProps }: CustomSelectProps<T>) {
+export function CustomSelect<T extends FieldValues>({ name, ...inputProps }: CustomSelectProps<T>) {
   const {
     field: { value, onChange: fieldOnChange, ...field },
     fieldState,
   } = useController({
     name,
-    control,
   })
 
   const { error } = fieldState

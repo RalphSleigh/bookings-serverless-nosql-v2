@@ -1,35 +1,35 @@
 import { drive_v3 } from '@googleapis/drive'
-import { Button, Paper, Text, Title } from '@mantine/core'
+import { Button, Flex, Paper, Text, Title } from '@mantine/core'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
 import { MouseEventHandler, useContext, useEffect } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import z from 'zod/v4'
 
-import { BookingSchemaForType, BookingSchemaForTypeBasicBig, TBasicBig } from '../../../../shared/schemas/booking'
+import { BookingSchemaForType, BookingSchemaForTypeBasicBig, TBasicBig, TBookingSchemaForTypeBasicBig } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { TUser } from '../../../../shared/schemas/user'
 import { createSheetForBooking } from '../../mutations/createSheetForBooking'
 import { getCampersFromSheetMutation } from '../../mutations/getCampersFromSheet'
 import { getDoesBookingHaveSpreadsheet } from '../../queries/getDoesBookingHaveSpreadsheet'
 
-export const SheetsInput: React.FC<{ event: TEvent }> = ({ event }) => {
+export const SheetsInput: React.FC<{ event: TEvent; userId: string }> = ({ event, userId }) => {
   if (!event.bigCampMode) return null
 
   const { permission, user } = useRouteContext({ from: '/_user' })
-  const hasSheetsQuery = useSuspenseQuery(getDoesBookingHaveSpreadsheet(event.eventId, user.userId))
+  const hasSheetsQuery = useSuspenseQuery(getDoesBookingHaveSpreadsheet(event.eventId, userId))
 
   if (hasSheetsQuery.data.sheet) {
-    return <SheetBoxHasSheets sheet={hasSheetsQuery.data.sheet} event={event} user={user} />
+    return <SheetBoxHasSheets sheet={hasSheetsQuery.data.sheet} event={event} userId={userId} />
   } else {
     return <SheetBoxNoSheets event={event} />
   }
 }
 
 const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
-  const { watch } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
-  const basic = watch('basic')
-  const userId = watch('userId')
+  //const { watch } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
+  const basic = useWatch<TBookingSchemaForTypeBasicBig>({ name: 'basic' }) as TBookingSchemaForTypeBasicBig['basic']
+  const userId = useWatch<TBookingSchemaForTypeBasicBig>({ name: 'userId' }) as string
   const createSheet = createSheetForBooking(event.eventId)
 
   if (basic.type !== 'group') return null
@@ -52,13 +52,15 @@ const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
           Please fill in your name, email and district to use this feature.
         </Text>
       ) : (
-        <Button onClick={() => createSheet.mutate({ userId, name: basic.name, email: basic.email, district: basic.district })}>Create Sheet</Button>
+        <Flex mt={8} justify="flex-end">
+          <Button loading={createSheet.isPending} gradient={{ from: 'cyan', to: 'green', deg: 110 }} variant='gradient' onClick={() => createSheet.mutate({ userId, name: basic.name, email: basic.email, district: basic.district })}>Create Sheet</Button>
+        </Flex>
       )}
     </Paper>
   )
 }
 
-const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; user: TUser }> = ({ sheet, event, user }) => {
+const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; userId: string }> = ({ sheet, event, userId }) => {
   const getPeopleMutation = getCampersFromSheetMutation()
 
   const { setValue } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
@@ -70,11 +72,10 @@ const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; 
     }
   }, [getPeopleMutation.isSuccess, getPeopleMutation.data])
 
-    const updatePeopleFromSheet: MouseEventHandler<HTMLButtonElement> = (e) => {
+  const updatePeopleFromSheet: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault()
-    getPeopleMutation.mutate({ eventId: event.eventId, userId: user.userId })
+    getPeopleMutation.mutate({ eventId: event.eventId, userId: userId })
   }
-
 
   return (
     <Paper mt={8} bd="1 solid green" bg="green.0" c="green.9" p={8} style={{ bd: '1 solid green', bg: 'green.0', c: 'green.9' }}>
@@ -89,7 +90,15 @@ const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; 
         .<br />
         Once you have filled it in, please click the button below to import your campers to the form. This will overwrite any existing data you have entered.
       </Text>
-      <Button onClick={updatePeopleFromSheet}>Update People</Button>
+      {getPeopleMutation.isPending && <Text ml={8}>Loading...</Text>}
+      {getPeopleMutation.isSuccess && (
+        <Text ml={8}>
+          Data Imported, please resolve any validation issues and then <b>submit the form.</b>
+        </Text>
+      )}
+      <Flex mt={8} justify="flex-end">
+        <Button gradient={{ from: 'cyan', to: 'green', deg: 110 }} loading={getPeopleMutation.isPending} variant='gradient' onClick={updatePeopleFromSheet}>Import Campers to Form</Button>
+      </Flex>
     </Paper>
   )
 }

@@ -27,7 +27,7 @@ export const updateBooking = HandlerWrapper(
 
     const { userId, eventId, createdAt, updatedAt, ...bookingUpdateData } = validatedBooking
 
-    const updatedBooking = await DBBooking.patch(validatedBooking).set(bookingUpdateData).go({ response: 'all_new' })
+    const updatedBooking = await DBBooking.patch(validatedBooking).set({...bookingUpdateData, cancelled: false }).go({ response: 'all_new' })
     const bookingHistoryItem: EntityIdentifiers<typeof DBBookingHistory> = {
       eventId: event.eventId,
       userId: user.userId,
@@ -44,7 +44,7 @@ export const updateBooking = HandlerWrapper(
       if (existingPeopleIds.has(person.personId)) {
         // Update existing person
         const { personId, userId, eventId, createdAt, updatedAt, ...personUpdateData } = person
-        const newPerson = await DBPerson.patch(person).set(personUpdateData).go({ response: 'all_new' })
+        const newPerson = await DBPerson.patch(person).set({...personUpdateData, cancelled: false}).go({ response: 'all_new' })
         const personHistoryItem: EntityIdentifiers<typeof DBPersonHistory> = {
           eventId: event.eventId,
           userId: user.userId,

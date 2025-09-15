@@ -85,14 +85,21 @@ function BookingButton({ event, booking }: { event: TEvent; booking?: TBooking }
   const user = auth.loggedIn ? auth.user : undefined
   if (!user)
     return (
-      <Button component="a" style={{ float: 'right' }} href="/api/auth/redirect">
+      <Button component="a" variant="gradient" gradient={{ from: 'yellow', to: 'orange', deg: 110 }} style={{ float: 'right' }} href="/api/auth/redirect">
         Login to Book
       </Button>
     )
 
+  if (booking && booking.cancelled && permission.can('update', subject('eventBooking', { event, booking })))
+    return (
+      <CustomButtonLink variant="gradient" gradient={{ from: 'cyan', to: 'violet', deg: 110 }} to={`/event/$eventId/own/update`} params={{ eventId: event.eventId }} style={{ float: 'right' }}>
+        Book
+      </CustomButtonLink>
+    )
+
   if (booking && permission.can('update', subject('eventBooking', { event, booking })))
     return (
-      <CustomButtonLink to={`/event/$eventId/own/update`} params={{ eventId: event.eventId }} style={{ float: 'right' }}>
+      <CustomButtonLink variant="gradient" gradient={{ from: 'cyan', to: 'violet', deg: 110 }} to={`/event/$eventId/own/update`} params={{ eventId: event.eventId }} style={{ float: 'right' }}>
         Update Booking
       </CustomButtonLink>
     )
@@ -106,7 +113,7 @@ function BookingButton({ event, booking }: { event: TEvent; booking?: TBooking }
 
   if (permission.can('book', subject('event', event)))
     return (
-      <CustomButtonLink style={{ float: 'right' }} to={`/event/$eventId/own/book`} params={{ eventId: event.eventId }}>
+      <CustomButtonLink variant="gradient" gradient={{ from: 'cyan', to: 'violet', deg: 110 }} style={{ float: 'right' }} to={`/event/$eventId/own/book`} params={{ eventId: event.eventId }}>
         Book
       </CustomButtonLink>
     )

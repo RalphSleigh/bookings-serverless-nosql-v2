@@ -2,13 +2,13 @@ import { Alert, Box, Grid, Paper, Radio, RadioGroup, Text, TextInput, Title } fr
 import { IconInfoCircle } from '@tabler/icons-react'
 import React from 'react'
 import { useController, useFormContext } from 'react-hook-form'
-import { z } from "zod/v4";
+import { z } from 'zod/v4'
 
+import { organisations } from '../../../../shared/ifm'
 import { BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
-import { CustomSelect } from '../custom-inputs/customSelect'
-import { organisations } from '../../../../shared/ifm'
 import { errorProps } from '../../utils'
+import { CustomSelect } from '../custom-inputs/customSelect'
 
 const PrivateRelayWarning = () => {
   const { watch } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicSmall>>()
@@ -31,7 +31,7 @@ type BasicBookingFieldsProps = {
 }
 
 export const BasicFieldsSmall: React.FC<BasicBookingFieldsProps> = ({ event }) => {
-  const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicSmall>>()
+  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicSmall>>()
 
   //({ data, update, readOnly }: { data: PartialDeep<JsonBookingType>["basic"], update: any, readOnly: boolean }) {
 
@@ -45,9 +45,9 @@ export const BasicFieldsSmall: React.FC<BasicBookingFieldsProps> = ({ event }) =
     <>
       <Title size="h4" order={2}>{`Your details`}</Title>
       <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')} />
-      <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')}/>
+      <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')} />
       <PrivateRelayWarning />
-      <TextInput autoComplete="tel" id="telephone" data-form-type="phone" required type="tel" label="Phone Number" {...register('basic.telephone')} {...e('basic.telephone')}/>
+      <TextInput autoComplete="tel" id="telephone" data-form-type="phone" required type="tel" label="Phone Number" {...register('basic.telephone')} {...e('basic.telephone')} />
     </>
   )
 }
@@ -111,13 +111,13 @@ export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => 
           </Grid.Col>
         </Grid>
       </RadioGroup>
-      <CustomSelect name="basic.organisation" label="Organisation" control={control} data={organisations.map(o => o[0])} required mt={16} {...e('basic.organisation')}/>
-      <TextInput autoComplete="district" id="district" data-form-type="other" required={bookingType === 'group'} label="District" {...register('basic.district')} {...e('basic.district')}/>
+      <CustomSelect name="basic.organisation" label="Organisation" control={control} data={organisations.map((o) => o[0])} required mt={16} {...e('basic.organisation')} />
+      <TextInput autoComplete="district" id="district" data-form-type="other" required={bookingType === 'group'} label="District" {...register('basic.district')} {...e('basic.district')} />
       <Title size="h4" order={2} mt={16}>{`Your details`}</Title>
-      <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')}/>
-      <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')}/>
+      <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')} />
+      <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')} />
       <PrivateRelayWarning />
-      <TextInput autoComplete="tel" id="telephone" data-form-type="phone" required type="tel" label="Phone Number" {...register('basic.telephone')} {...e('basic.telephone')}/>
+      <TextInput autoComplete="tel" id="telephone" data-form-type="phone" required type="tel" label="Phone Number" {...register('basic.telephone')} {...e('basic.telephone')} />
     </>
   )
 }

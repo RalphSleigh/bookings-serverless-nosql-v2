@@ -75,7 +75,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-email": "^4.2.8",
-    "react-hook-form": "^7.56.0",
+    "react-hook-form": "7.62",
     "react-markdown": "^10.1.0",
     "use-local-storage-state": "^19.5.0",
     "uuid": "^11.1.0",

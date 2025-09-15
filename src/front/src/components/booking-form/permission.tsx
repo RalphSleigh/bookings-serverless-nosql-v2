@@ -6,7 +6,7 @@ import { TEvent } from '../../../../shared/schemas/event'
 export const PermissionForm = ({ event, checked, setChecked }: { event: TEvent; checked: boolean; setChecked: Dispatch<SetStateAction<boolean>> }) => {
   return (
     <>
-      <Title order={3} m={8}>
+      <Title order={3} mt={8}>
         Permission
       </Title>
       <Grid>

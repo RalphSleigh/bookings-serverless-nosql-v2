@@ -1,11 +1,12 @@
 import { Grid, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { Markdown as EmailMarkdown } from '@react-email/markdown'
 import dayjs from 'dayjs'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 
 import { AttendanceTypes } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
 import { TEalingFees, TEvent, TEventWithFees, TFees } from '../schemas/event'
+import { TPerson } from '../schemas/person'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
 
 type EventWithEalingFees = TEvent & { fees: TEalingFees }
@@ -69,8 +70,9 @@ export class EalingFees implements FeeStructure<TEalingFees> {
   }
 
   BookingFormDisplayElement: BookingFormDisplayElement<TEalingFees> = ({ event }) => {
-    const { watch } = useFormContext<PartialBookingType>()
-    const people = watch('people') || []
+    const people = useWatch<PartialBookingType>({ name: 'people', compute: (people) => people || [] }) as TPerson[]
+    //const people = watch('people') || []
+    //const people = []
 
     const lines = this.getFeeLines(event, { people })
     const discountedLines = this.getFeeLinesDiscounted(event, { people })
@@ -140,7 +142,9 @@ export class EalingFees implements FeeStructure<TEalingFees> {
         <Table withColumnBorders withTableBorder mt={8}>
           <Table.Thead>
             <Table.Tr>
-              <Table.Td><Text fw={700}>Descripion</Text></Table.Td>
+              <Table.Td>
+                <Text fw={700}>Descripion</Text>
+              </Table.Td>
               <Table.Td>
                 <Text fw={700}>Standard</Text>
               </Table.Td>

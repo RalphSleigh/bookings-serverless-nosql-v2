@@ -6,23 +6,24 @@ import { useContext } from 'react'
 
 import { TCreateEventData } from '../../../lambda/endpoints/event/createEvent'
 import { TEvent, TEventWhenCreating } from '../../../shared/schemas/event'
-import { TBookingForType } from '../../../shared/schemas/booking'
+import { TBasicBig, TBookingForType } from '../../../shared/schemas/booking'
 import { TCreateBookingData } from '../../../lambda/endpoints/booking/createBooking'
+import { TCreateSheetForBooking } from '../../../lambda/endpoints/booking/createSheetForBooking'
 
-export const updateBookingMuation = () => {
+export const cancelBooking = (eventId: string, userId:string) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({event, booking}: {event: TEvent, booking:TBookingForType}) => {
-      return await axios.post<TCreateBookingData>(`/api/event/${event.eventId}/booking/update`, { booking })
+    mutationFn: async () => {
+      return await axios.delete(`/api/event/${eventId}/booking/${userId}`)
     },
     onSuccess: (data: AxiosResponse, context) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
       navigate({ to: '/' })
       notifications.show({
-        title: 'Booking Updated',
-        message: `Booking Updated`,
+        title: 'Booking Cancelled',
+        message: `Booking Cancelled`,
         color: 'green',
       })
     },
