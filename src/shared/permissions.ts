@@ -12,7 +12,7 @@ export type EventID = Pick<TEvent, 'eventId'>
 export type Abilities =
   | ['manage', 'all']
   | ['get', 'events' | 'event' | 'currentUser' | 'env' | 'ownBookings' | 'users']
-  | ['update' | 'getSheet', 'eventBooking' | ({ event: TEvent; booking: TBooking } & ForcedSubject<'eventBooking'>)]
+  | ['update', 'eventBooking' | ({ event: TEvent; booking: TBooking } & ForcedSubject<'eventBooking'>)]
   | ['book', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
@@ -20,7 +20,7 @@ export type Abilities =
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
   | ['delete', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
-  | ['createSheet' | 'getSheetData' | 'cancelBooking', 'eventBookingIds' | ({ eventId: string; userId: string } & ForcedSubject<'eventBookingIds'>)]
+  | ['getSheet' | 'createSheet' | 'getSheetData' | 'cancelBooking', 'eventBookingIds' | ({ eventId: string; userId: string } & ForcedSubject<'eventBookingIds'>)]
 
 const lambdaMatcher: ConditionsMatcher<MatchConditions> = (matchConditions) => matchConditions
 
@@ -46,7 +46,7 @@ export const getPermissionsFromUser = (user: ContextUser) => {
   can('cancelBooking', 'eventBookingIds', (ids) => ids.userId === user.userId)
 
   //get the sheet for own bookings
-  can('getSheet', 'eventBooking', ({ booking: b }) => b.userId === user.userId)
+  can('getSheet', 'eventBookingIds', (ids) => ids.userId === user.userId)
   can('createSheet', 'eventBookingIds', (ids) => ids.userId === user.userId)
   can('getSheetData', 'eventBookingIds', (ids) => ids.userId === user.userId)
 

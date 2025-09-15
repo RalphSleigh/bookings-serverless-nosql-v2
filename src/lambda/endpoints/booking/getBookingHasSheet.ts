@@ -10,8 +10,8 @@ export type TBookingHasSheetResponseType = {
   sheet: drive_v3.Schema$File | null
 }
 
-export const getBookingHasSheet = HandlerWrapper<TBookingHasSheetResponseType>(
-  (req, res) => ['getSheet', subject('eventBooking', { event: res.locals.event, booking: res.locals.booking })],
+export const getBookingHasSheet = HandlerWrapper<TBookingHasSheetResponseType, {userId: string}>(
+  (req, res) => ['getSheet', subject('eventBookingIds', { eventId: res.locals.event.eventId, userId: req.params.userId })],
   async (req, res) => {
     const userId = req.params.userId
     let user: TUser | undefined = res.locals.user
