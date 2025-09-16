@@ -79,7 +79,7 @@ const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
     const input = {
       // PublishInput
       TopicArn: process.env.SNS_QUEUE_ARN,
-      Message: serializeError(err), // required
+      Message: JSON.stringify(serializeError(err)), // required
     }
     const command = new PublishCommand(input)
     const response = await client.send(command)
