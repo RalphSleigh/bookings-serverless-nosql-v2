@@ -17,6 +17,36 @@ import { SuspenseLoader, SuspenseWrapper } from './components/suspense'
 import { AbilityContext } from './permissionContext'
 import { userQueryOptions } from './queries/user'
 import { routeTree } from './routeTree.gen'
+import { ReactErrorBoundary } from './components/errorBoundry'
+
+window.addEventListener('error', (message) => {
+            try {
+                const jsonMessage = {
+                    from: "Window Event Listener",
+                    message: message.message,
+                    file: message.filename,
+                    line: message.lineno,
+                    column: message.colno,
+                };
+
+                const jsonString = JSON.stringify(jsonMessage);
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8"
+                    },
+                    credentials: "same-origin" as const,
+                    body: jsonString
+                };
+                console.log("LOGGING FROM WINDOW LISTENER")
+                fetch('/api/error', options)
+                return false
+            } catch (e) {
+                console.error(e)
+                // ah well we tried
+            }
+          })
 
 const queryClient = new QueryClient()
 
@@ -63,15 +93,17 @@ const rootElement = document.getElementById('app')!
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
-    <MantineProvider>
-      <SuspenseWrapper>
-      <DatesProvider settings={{ locale: 'en', firstDayOfWeek: 0 }}>
-        <QueryClientProvider client={queryClient}>
-          <Notifications />
-            <App />
-        </QueryClientProvider>
-      </DatesProvider>
-      </SuspenseWrapper>
-    </MantineProvider>,
+    <ReactErrorBoundary>
+      <MantineProvider>
+        <SuspenseWrapper>
+          <DatesProvider settings={{ locale: 'en', firstDayOfWeek: 0 }}>
+            <QueryClientProvider client={queryClient}>
+              <Notifications />
+              <App />
+            </QueryClientProvider>
+          </DatesProvider>
+        </SuspenseWrapper>
+      </MantineProvider>
+    </ReactErrorBoundary>,
   )
 }

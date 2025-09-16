@@ -1,9 +1,10 @@
 import { AppShell } from '@mantine/core'
-import type { QueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryErrorResetBoundary, type QueryClient, type useSuspenseQuery } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRoute, createRootRouteWithContext, Link, Outlet, useRouteContext, useRouter, useSearch } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import * as React from 'react'
+import { useEffect } from 'react'
 
 import { getPermissionsFromUser } from '../../../shared/permissions'
 import { useAuth } from '../auth'
@@ -12,6 +13,7 @@ import classes from '../css/mainArea.module.css'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
 import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
+import { RouterErrorComponent } from '../components/routerErrorComponent'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -31,6 +33,8 @@ export const Route = createRootRouteWithContext<{
     if (search.redirect) return { redirect: search.redirect as string }
     return {}
   },
+
+  errorComponent: RouterErrorComponent
 })
 
 function RootComponent(): React.JSX.Element {

@@ -12,6 +12,7 @@ export type TUserBookingsResponseType = {
 export const getUserBookings = HandlerWrapper(
   (req, res) => ['get', 'ownBookings'],
   async (req, res) => {
+    throw new Error('Deprecated - use get /bookings endpoint')
     const user = res.locals.user
     if (!user) {
       res.json({ bookings: [] } as TUserBookingsResponseType)

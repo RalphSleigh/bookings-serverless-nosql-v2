@@ -24,9 +24,10 @@ type PartialEventType = PartialDeep<TEventWhenCreating, {recurseIntoArrays: true
 
 export function EventForm({ inputData, mode, mutation }: { inputData: DefaultValues<TEventWhenCreating>, mode: 'create' | 'edit', mutation: UseMutationResult<any, any, any, any> }) {
   const formMethods = useForm<z.input<typeof EventSchemaWhenCreating>>({ resolver: standardSchemaResolver(EventSchemaWhenCreating), mode: 'onBlur', defaultValues: inputData })
-  const { register, watch, control, formState, handleSubmit, getValues  } = formMethods
+  const { register, control, formState, handleSubmit, watch  } = formMethods
 
   const onSubmit: SubmitHandler<PartialEventType> = (data) => mutation.mutate(data)
+
 
   const feeOptions = getFeeTypesForEvent(watch('attendance.attendanceStructure')).map((k) => ({ value: k.typeName, label: k.name }))
   const feeStructure = watch('fee.feeStructure')

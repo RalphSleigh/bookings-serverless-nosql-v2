@@ -8,6 +8,8 @@ import { PartialBookingType } from '../schemas/booking'
 import { TEalingFees, TEvent, TEventWithFees, TFees } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
+import { useDebounce } from '@react-hook/debounce'
+import { useMemo } from 'react'
 
 type EventWithEalingFees = TEvent & { fees: TEalingFees }
 
@@ -69,11 +71,7 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     ]
   }
 
-  BookingFormDisplayElement: BookingFormDisplayElement<TEalingFees> = ({ event }) => {
-    const people = useWatch<PartialBookingType>({ name: 'people', compute: (people) => people || [] }) as TPerson[]
-    //const people = watch('people') || []
-    //const people = []
-
+  BookingFormDisplayElementContents: React.FC<{ people: PartialBookingType["people"], event: TEventWithFees<TEalingFees> }> = ({ people, event }) => {
     const lines = this.getFeeLines(event, { people })
     const discountedLines = this.getFeeLinesDiscounted(event, { people })
 
@@ -128,6 +126,22 @@ export class EalingFees implements FeeStructure<TEalingFees> {
         </Table>
       </>
     )
+  }
+
+  BookingFormDisplayElement: BookingFormDisplayElement<TEalingFees> = ({ event }) => {
+    const people = useWatch<PartialBookingType, "people">({ name: 'people', compute: (people) => people || [] }) as TPerson[]
+    //const people = watch('people') || []
+    //const people = []
+
+      const data = useWatch<PartialBookingType,"people">({name: 'people'})
+      const [debouncedData, setDebouncedData] = useDebounce(() => data, 200)
+      setDebouncedData(data)
+    
+      return useMemo(() => <this.BookingFormDisplayElementContents event={event} people={debouncedData} />, [debouncedData])
+
+
+
+    
   }
 
   EventListDisplayElement: EventListDisplayElement<TEalingFees> = ({ event, booking }) => {

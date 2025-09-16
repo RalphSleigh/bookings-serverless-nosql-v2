@@ -1,19 +1,18 @@
 import { Alert, Box, Grid, Paper, Radio, RadioGroup, Text, TextInput, Title } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import React from 'react'
-import { useController, useFormContext } from 'react-hook-form'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod/v4'
 
 import { organisations } from '../../../../shared/ifm'
-import { BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall } from '../../../../shared/schemas/booking'
+import { BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall, BookingSchemaForType, TBooking, PartialBookingType } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { errorProps } from '../../utils'
 import { CustomSelect } from '../custom-inputs/customSelect'
 
 const PrivateRelayWarning = () => {
-  const { watch } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicSmall>>()
-  const email = watch('basic.email')
-  const isPrivateRelay = email?.includes('privaterelay.appleid.com')
+  const email = useWatch<PartialBookingType, "basic.email">({ name: 'basic.email' })
+  const isPrivateRelay = email && email?.includes('privaterelay.appleid.com')
   if (!isPrivateRelay) return null
   return (
     <Alert
@@ -53,13 +52,13 @@ export const BasicFieldsSmall: React.FC<BasicBookingFieldsProps> = ({ event }) =
 }
 
 export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => {
-  const { register, control, watch, formState } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
+  const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
 
-  const bookingType = watch('basic.type')
+  const bookingType = useWatch<PartialBookingType, "basic.type">({ name: 'basic.type' })
 
   const radioController = useController({ name: 'basic.type' })
 
-  const paperProps = (field: string) => (value: string) => {
+  const paperProps = (field: string) => (value: string | undefined) => {
     const props = { withBorder: true, p: 'md', style: { height: '100%', cursor: 'pointer' } }
     if (field === value) {
       return { bd: '1 solid green', bg: 'green.0', c: 'green.9', ...props }

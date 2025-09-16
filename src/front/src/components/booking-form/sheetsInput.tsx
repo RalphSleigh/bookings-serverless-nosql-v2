@@ -6,9 +6,8 @@ import { MouseEventHandler, useContext, useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import z from 'zod/v4'
 
-import { BookingSchemaForType, BookingSchemaForTypeBasicBig, TBasicBig, TBookingSchemaForTypeBasicBig } from '../../../../shared/schemas/booking'
+import { BookingSchemaForTypeBasicBig, TBookingSchemaForTypeBasicBig } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
-import { TUser } from '../../../../shared/schemas/user'
 import { createSheetForBooking } from '../../mutations/createSheetForBooking'
 import { getCampersFromSheetMutation } from '../../mutations/getCampersFromSheet'
 import { getDoesBookingHaveSpreadsheet } from '../../queries/getDoesBookingHaveSpreadsheet'
@@ -27,14 +26,13 @@ export const SheetsInput: React.FC<{ event: TEvent; userId: string }> = ({ event
 }
 
 const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
-  //const { watch } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
-  const basic = useWatch<TBookingSchemaForTypeBasicBig>({ name: 'basic' }) as TBookingSchemaForTypeBasicBig['basic']
-  const userId = useWatch<TBookingSchemaForTypeBasicBig>({ name: 'userId' }) as string
+  const basic = useWatch<TBookingSchemaForTypeBasicBig, "basic">({ name: 'basic' })
+  const userId = useWatch<TBookingSchemaForTypeBasicBig, "userId">({ name: 'userId' })
   const createSheet = createSheetForBooking(event.eventId)
 
-  if (basic.type !== 'group') return null
+  if (basic?.type !== 'group') return null
 
-  const notGotNeededData = !basic.name || !basic.email || !basic.district
+  const notGotNeededData = !basic?.name || !basic?.email || !basic?.district
 
   return (
     <Paper mt={8} bd="1 solid green" bg="green.0" c="green.9" p={8} style={{ bd: '1 solid green', bg: 'green.0', c: 'green.9' }}>

@@ -11,7 +11,7 @@ export type EventID = Pick<TEvent, 'eventId'>
 
 export type Abilities =
   | ['manage', 'all']
-  | ['get', 'events' | 'event' | 'currentUser' | 'env' | 'ownBookings' | 'users']
+  | ['get', 'events' | 'event' | 'currentUser' | 'env' | 'ownBookings' | 'users' | 'errors']
   | ['update', 'eventBooking' | ({ event: TEvent; booking: TBooking } & ForcedSubject<'eventBooking'>)]
   | ['book', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
@@ -31,6 +31,7 @@ export const getPermissionsFromUser = (user: ContextUser) => {
   //new AbilityBuilder<PureAbility<abilities, MatchConditions>>(createMongoAbility)
 
   cannot('manage', 'all')
+  can('get', 'errors')
   can('get', 'currentUser')
   can('get', 'env')
   can('get', 'events')

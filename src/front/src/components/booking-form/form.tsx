@@ -18,6 +18,7 @@ import { getFeeType } from '../../../../shared/fees/fees.js'
 import { BookingSchema, BookingSchemaForType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
+import { cancelBooking } from '../../mutations/cancelBooking.js'
 import { BasicFieldsBig, BasicFieldsSmall } from './basicFields.js'
 import { ExtraContactsForm } from './extraContacts.js'
 import { OtherQuestionsForm } from './otherQuestions.js'
@@ -25,7 +26,6 @@ import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { ValidationErrors } from './validation.js'
-import { cancelBooking } from '../../mutations/cancelBooking.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -105,12 +105,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               <MemoValidate schema={schema} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
               <Flex gap={8} mt={16}>
-              <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid}>
-                {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
-              </Button>
-              { mode === 'edit' && <Button variant="gradient" gradient={{ from: 'red', to: 'pink', deg: 110 }} loading={cancelBookingMutation.isPending} onClick={cancelOnClick}>
-                Cancel Booking
-              </Button> }
+                <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid}>
+                  {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
+                </Button>
+                {mode === 'edit' && (
+                  <Button variant="gradient" gradient={{ from: 'red', to: 'pink', deg: 110 }} loading={cancelBookingMutation.isPending} onClick={cancelOnClick}>
+                    Cancel Booking
+                  </Button>
+                )}
               </Flex>
             </Paper>
           </Grid.Col>

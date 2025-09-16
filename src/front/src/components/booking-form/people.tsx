@@ -1,14 +1,14 @@
 import { ActionIcon, Anchor, Button, Flex, Grid, Paper, Textarea, TextInput, Title } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
-import React, { useState } from 'react'
-import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState } from 'react-hook-form'
+import React, { useMemo, useState } from 'react'
+import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod/v4'
 
 import { app } from '../../../../lambda/app.js'
 import { KPBasicOptions } from '../../../../shared/kp/kp.js'
-import { BookingSchema, BookingSchemaForType } from '../../../../shared/schemas/booking.js'
+import { BookingSchema, BookingSchemaForType, PartialBookingType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
 import { errorProps } from '../../utils.js'
@@ -30,7 +30,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
 
   const defaultCollapsed = fields.length > 10
 
-  const peopleSchema = PersonSchema(event)
+  const peopleSchema = useMemo(() => PersonSchema(event), [event])
 
   const people = fields.map((f, i) => {
     return <PersonForm event={event} index={i} key={f.id} remove={remove} defaultCollapsed={defaultCollapsed} peopleSchema={peopleSchema} />
@@ -40,8 +40,6 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
     const newPerson = { personId: uuidv4(), eventId: event.eventId, userId: user.userId, cancelled: false }
     append(newPerson as TPerson)
   }
-
-
 
   return (
     <>
@@ -58,24 +56,36 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
     </>
   )
 }
-const PersonForm = ({ event, index, remove, defaultCollapsed, peopleSchema }: { event: TEvent; index: number; remove: UseFieldArrayRemove; defaultCollapsed: boolean; peopleSchema: z.ZodSchema<TPerson> }) => {
+const PersonForm = ({
+  event,
+  index,
+  remove,
+  defaultCollapsed,
+  peopleSchema,
+}: {
+  event: TEvent
+  index: number
+  remove: UseFieldArrayRemove
+  defaultCollapsed: boolean
+  peopleSchema: z.ZodSchema<TPerson>
+}) => {
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   if (collapsed) {
     return <CollapsedPersonForm index={index} setCollapsed={setCollapsed} peopleSchema={peopleSchema} />
   } else {
-    return <ExpandedPersonForm event={event} index={index} remove={remove} setCollapsed={setCollapsed}/>
+    return <ExpandedPersonForm event={event} index={index} remove={remove} setCollapsed={setCollapsed} />
   }
 }
 
 const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: number; setCollapsed: (collapsed: boolean) => void; peopleSchema: z.ZodSchema<TPerson> }) => {
-  const { register, control, formState, watch } = useFormContext<z.infer<typeof BookingSchemaForType>>()
-  const person = watch(`people.${index}`)
+  const person = useWatch<PartialBookingType, `people.${number}`>({ name: `people.${index}` })
   const valid = peopleSchema.safeParse(person).success
+  if (!person) return null
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} id={person.personId} onClick={() => setCollapsed(false)} pl={8}>
       <Flex justify="flex-end" m={8} align="center">
         <Title order={3} size="h4" style={{ cursor: 'pointer', flexGrow: 1 }}>
-          {valid ? '✅' : '❌'} {person.basic.name}
+          {valid ? '✅' : '❌'} {person.basic?.name}
         </Title>
         <ActionIcon variant="default" size="input-sm" onClick={() => setCollapsed(true)} ml={8}>
           <IconChevronDown size={16} stroke={3} />
@@ -85,18 +95,8 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: num
   )
 }
 
-const ExpandedPersonForm = ({
-  event,
-  index,
-  remove,
-  setCollapsed,
-}: {
-  event: TEvent
-  index: number
-  remove: UseFieldArrayRemove
-  setCollapsed: (collapsed: boolean) => void
-}) => {
-  const personId = useFormContext<z.infer<typeof BookingSchemaForType>>().watch(`people.${index}.personId`)
+const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEvent; index: number; remove: UseFieldArrayRemove; setCollapsed: (collapsed: boolean) => void }) => {
+  const personId = useWatch<PartialBookingType, `people.${number}.personId`>({ name: `people.${index}.personId` })
   const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
@@ -127,7 +127,7 @@ const ExpandedPersonForm = ({
   ) : (
     <>
       <Grid.Col span={12}>
-        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`}data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
+        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
       </Grid.Col>
     </>
   )
@@ -147,7 +147,7 @@ const ExpandedPersonForm = ({
           />
         </Grid.Col>
         <Grid.Col span={4}>
-        <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} required />
+          <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} required />
         </Grid.Col>
         {emailAndDiet}
         <Grid.Col span={12}>
