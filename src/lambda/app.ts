@@ -82,7 +82,7 @@ const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
       Message: serializeError(err), // required
     }
     const command = new PublishCommand(input)
-    const response = client.send(command)
+    const response = await client.send(command)
   }
   res.locals.logger.logToSystem('Error handler called')
   res.locals.logger.logToSystem(serializeError(err))
