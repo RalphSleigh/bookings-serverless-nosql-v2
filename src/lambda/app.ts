@@ -1,5 +1,7 @@
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns'
 import cookieParser from 'cookie-parser'
 import express, { type ErrorRequestHandler } from 'express'
+import { serializeError } from 'serialize-error'
 
 import { authCallback } from './endpoints/auth/callback'
 import { logout } from './endpoints/auth/logout'
@@ -30,8 +32,6 @@ import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { userMiddleware } from './middleware/user'
 import { am_in_lambda } from './utils'
-import { PublishCommand, SNSClient } from '@aws-sdk/client-sns'
-import { serializeError } from 'serialize-error'
 
 export const router = express.Router()
 export const app = express()
@@ -73,21 +73,20 @@ router.get('/event/:eventId/manage/users', getUsers)
 router.post('/event/:eventId/manage/role/create', createRole)
 router.delete('/event/:eventId/manage/role/:roleId', deleteRole)
 
-app.use('/', router)
-
 const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   if (am_in_lambda()) {
     const client = new SNSClient({})
     const input = {
       // PublishInput
       TopicArn: process.env.SNS_QUEUE_ARN,
-      Message: JSON.stringify(err), // required
+      Message: serializeError(err), // required
     }
     const command = new PublishCommand(input)
-    const response = await client.send(command)
+    const response = client.send(command)
   }
   res.locals.logger.logToSystem('Error handler called')
   res.locals.logger.logToSystem(serializeError(err))
   next(err)
 }
-app.use(errorHandler)
+router.use(errorHandler)
+app.use('/', router)

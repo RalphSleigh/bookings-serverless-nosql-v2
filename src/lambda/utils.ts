@@ -31,7 +31,7 @@ export const HandlerWrapper: THandlerWrapper =
       if (error instanceof ZodError) {
         return res.status(400).json({ message: "Validation Error, this shouldn't happen" })
       }
-      return res.status(500).json({ error: error.message })
+      throw error
     }
   }
 
