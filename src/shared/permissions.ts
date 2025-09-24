@@ -16,7 +16,7 @@ export type Abilities =
   | ['book', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
-  | ['getBackend', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
+  | ['getBackend' | 'getFees' | 'createFee', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
   | ['delete', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
@@ -70,6 +70,8 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('get', 'users')
     can('create', 'role', (r) => true)
     can('delete', 'role', (r) => true)
+    can('getFees', 'eventId', (e) => true)
+    can('createFee', 'eventId', (e) => true)
   },
   owner: (can) => {},
 }

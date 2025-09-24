@@ -1,10 +1,8 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Attributes, Entity, Service, type EntityItem } from 'electrodb'
-import { v4 as uuidv4 } from 'uuid'
-import { ca } from 'zod/v4/locales'
+import { v4 as uuidv4, v7 as uuidv7 } from 'uuid'
 
 import { KPBasicOptions } from '../shared/kp/kp'
-import { EventSchema } from '../shared/schemas/event'
 import { am_in_lambda } from './utils'
 
 const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' }
@@ -378,7 +376,7 @@ export const DBBooking = new Entity(
         type: 'clustered',
         pk: {
           field: 'gsi1pk',
-          composite: ['userId']
+          composite: ['userId'],
         },
         sk: {
           field: 'gsi1sk',
@@ -648,6 +646,80 @@ export const DBPersonHistory = new Entity(
         sk: {
           field: 'gsi1sk',
           composite: ['eventId', 'personId'],
+        },
+      },
+    },
+  },
+  { client, table },
+)
+
+const FeeAttributes = {
+  feeId: {
+    type: 'string',
+    required: true,
+    default: () => uuidv7(),
+  },
+  type: {
+    type: ['payment', 'adjustment'] as const,
+  },
+  userId: {
+    type: 'string',
+    required: true,
+  },
+  eventId: {
+    type: 'string',
+    required: true,
+  },
+  amount: {
+    type: 'number',
+    required: true,
+  },
+  note: {
+    type: 'string',
+  },
+} as const
+
+export const DBFee = new Entity(
+  {
+    model: {
+      entity: 'fee',
+      version: '1',
+      service: 'bookings',
+    },
+    attributes: {
+      ...FeeAttributes,
+      createdAt: {
+        type: 'number',
+        readOnly: true,
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      }
+    },
+    indexes: {
+      natural: {
+        collection: 'fee',
+        type: 'clustered',
+        pk: {
+          field: 'pk',
+          composite: ['eventId'],
+        },
+        sk: {
+          field: 'sk',
+          composite: ['feeId'],
+        },
+      },
+      byUserId: {
+        collection: 'bookingByUserId',
+        type: 'clustered',
+        index: 'gsi1pk-gsi1sk-index',
+        pk: {
+          field: 'gsi1pk',
+          composite: ['userId'],
+        },
+        sk: {
+          field: 'gsi1sk',
+          composite: ['eventId', 'feeId'],
         },
       },
     },

@@ -32,6 +32,9 @@ import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { userMiddleware } from './middleware/user'
 import { am_in_lambda } from './utils'
+import { getEventFees } from './endpoints/event/manage/getEventFees'
+import { createFeeItem } from './endpoints/event/manage/createFeeItem'
+import { deleteFeeItem } from './endpoints/event/manage/deleteFeeItem'
 
 export const router = express.Router()
 export const app = express()
@@ -72,6 +75,9 @@ router.get('/event/:eventId/manage/roles', getEventRoles)
 router.get('/event/:eventId/manage/users', getUsers)
 router.post('/event/:eventId/manage/role/create', createRole)
 router.delete('/event/:eventId/manage/role/:roleId', deleteRole)
+router.get('/event/:eventId/manage/fees', getEventFees)
+router.post('/event/:eventId/manage/fee/create', createFeeItem)
+router.delete('/event/:eventId/manage/fee/:feeId', deleteFeeItem)
 
 const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   if (am_in_lambda()) {

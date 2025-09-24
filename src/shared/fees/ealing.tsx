@@ -10,6 +10,7 @@ import { TPerson } from '../schemas/person'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
 import { useDebounce } from '@react-hook/debounce'
 import { useMemo } from 'react'
+import { currency } from '../util'
 
 type EventWithEalingFees = TEvent & { fees: TEalingFees }
 
@@ -234,5 +235,3 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     )
   }
 }
-
-const currency = (c: number) => c.toLocaleString(undefined, { style: 'currency', currency: 'GBP' })

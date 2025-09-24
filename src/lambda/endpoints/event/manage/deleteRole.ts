@@ -19,7 +19,9 @@ export const deleteRole = HandlerWrapper<any, { eventId: string; roleId: string 
         return res.status(404).json({ message: 'Role not found' })
       }
 
-      if (res.locals.permissions.can('delete', subject('role', role.data))) {
+      const validatedRole = RoleSchema.parse(role.data)
+
+      if (res.locals.permissions.can('delete', subject('role', validatedRole))) {
         await DBRole.delete({ eventId, roleId }).go()
         return res.status(204).send()
       } 

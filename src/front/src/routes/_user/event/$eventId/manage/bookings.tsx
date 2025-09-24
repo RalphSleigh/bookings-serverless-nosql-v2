@@ -6,6 +6,7 @@ import { createFileRoute, Link, redirect, useRouteContext } from '@tanstack/reac
 import { useEvent } from '../../../../../utils'
 import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
 import { subject } from '@casl/ability'
+import { ManageBookings } from '../../../../../components/manage/bookings'
 
 //import { useSuspenseIfUser } from '../queries/useSuspenseWrapper'
 
@@ -16,15 +17,7 @@ export const Route = createFileRoute('/_user/event/$eventId/manage/bookings')({
         to: '/',
       })
   },
-  component: ManageComponent,
+  component: ManageBookings,
 })
 
-function ManageComponent() {
-  const event = useEvent()
-  const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
-  return (
-    <>
-      <p>BVOOOKINGS</p>
-    </>
-  )
-}
+

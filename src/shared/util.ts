@@ -1,0 +1,1 @@
+export const currency = (c: number) => c.toLocaleString(undefined, { style: 'currency', currency: 'GBP' })
