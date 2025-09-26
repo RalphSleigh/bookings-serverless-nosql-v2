@@ -2,9 +2,9 @@ import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod/v4'
 
 const payment = z.object({
-  feeId: z.uuidv7().default(() => uuidv7()),
-  eventId: z.string().nonempty(),
-  userId: z.string().nonempty(),
+  feeId: z.uuidv7(),
+  eventId: z.uuidv7(),
+  userId: z.uuidv7(),
   type: z.literal('payment'),
   amount: z.number(),
   note: z.string().optional(),
@@ -12,9 +12,9 @@ const payment = z.object({
 })
 
 const adjustment = z.object({
-  feeId: z.uuidv7().default(() => uuidv7()),
-  eventId: z.string().nonempty(),
-  userId: z.string().nonempty(),
+  feeId: z.uuidv7(),
+  eventId: z.uuidv7(),
+  userId: z.uuidv7(),
   type: z.literal('adjustment'),
   amount: z.number(),
   note: z.string().optional(),

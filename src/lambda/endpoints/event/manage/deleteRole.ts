@@ -1,5 +1,4 @@
 import { subject } from '@casl/ability'
-import { v4 as uuidv4 } from 'uuid'
 
 import { TBooking } from '../../../../shared/schemas/booking'
 import { EventRoleSchema, RoleSchema, TRole, TRoleForForm } from '../../../../shared/schemas/role'

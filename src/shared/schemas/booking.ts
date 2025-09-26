@@ -54,8 +54,8 @@ const otherSmall = z.object({
 export const BookingSchema = (event: TEvent) =>
     z
       .object({
-        userId: z.string().nonempty(),
-        eventId: z.string().nonempty(),
+        userId: z.uuidv7(),
+        eventId: z.uuidv7(),
         cancelled: z.boolean().default(false),
         basic: event.bigCampMode ? basicBig : basicSmall,
         extraContacts: z.array(extraContact).optional(),
@@ -70,8 +70,8 @@ export const BookingSchema = (event: TEvent) =>
 
 export const BookingSchemaForType = z
   .object({
-    userId: z.string().nonempty(),
-    eventId: z.string().nonempty(),
+    userId: z.uuidv7(),
+    eventId: z.uuidv7(),
     cancelled: z.boolean().default(false),
     basic: basicSmall.or(basicBig),
     extraContacts: z.array(extraContact).optional(),

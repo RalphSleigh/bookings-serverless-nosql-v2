@@ -4,6 +4,7 @@ import { PartialDeep } from 'type-fest';
 import { AttendanceTypes } from '../attendance/attendance';
 import { TEvent, TEventWithFees, TFees } from '../schemas/event';
 import { PartialBookingType, TBooking, TBookingForType } from '../schemas/booking';
+import { TFee } from '../schemas/fees';
 
 export type FeeStructureConfigData<T extends TFees> = Required<Pick<T, 'feeStructure'>> & PartialDeep<T>;
 export type FeeStructureCondfigurationElement<T extends TFees> = React.FC<{
@@ -18,7 +19,7 @@ export type FeeLine = {
   amount: number;
 }
 
-export type EventListDisplayElement<T  extends TFees> = React.FC<{event: TEventWithFees<T>, booking: TBooking}>
+export type EventListDisplayElement<T  extends TFees> = React.FC<{event: TEventWithFees<T>, booking: TBooking, fees: TFee[]}>
 
 export type GetFeeLineFunction<T extends TFees> = (event: TEventWithFees<T>, booking: PartialBookingType) => FeeLine[];
 

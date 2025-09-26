@@ -35,6 +35,10 @@ import { am_in_lambda } from './utils'
 import { getEventFees } from './endpoints/event/manage/getEventFees'
 import { createFeeItem } from './endpoints/event/manage/createFeeItem'
 import { deleteFeeItem } from './endpoints/event/manage/deleteFeeItem'
+import { createApplicationEndpoint } from './endpoints/application/createApplicationEndpoint'
+import { getEventApplications } from './endpoints/event/manage/getEventApplications'
+import { approveApplicationEndpoint } from './endpoints/event/manage/approveApplication'
+import { declineApplicationEndpoint } from './endpoints/event/manage/declineApplication'
 
 export const router = express.Router()
 export const app = express()
@@ -70,6 +74,8 @@ router.post('/event/:eventId/booking/:userId/sheet', createSheetForBookingEndpoi
 router.get('/event/:eventId/booking/:userId/sheet/data', getDataFromSheetEndpoint)
 router.delete('/event/:eventId/booking/:userId', cancelBooking)
 
+router.post('/event/:eventId/application/create', createApplicationEndpoint)
+
 router.get('/event/:eventId/manage/bookings', getEventBookings)
 router.get('/event/:eventId/manage/roles', getEventRoles)
 router.get('/event/:eventId/manage/users', getUsers)
@@ -78,6 +84,9 @@ router.delete('/event/:eventId/manage/role/:roleId', deleteRole)
 router.get('/event/:eventId/manage/fees', getEventFees)
 router.post('/event/:eventId/manage/fee/create', createFeeItem)
 router.delete('/event/:eventId/manage/fee/:feeId', deleteFeeItem)
+router.get('/event/:eventId/manage/applications', getEventApplications)
+router.post('/event/:eventId/manage/application/:userId/approve', approveApplicationEndpoint)
+router.post('/event/:eventId/manage/application/:userId/decline', declineApplicationEndpoint)
 
 const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   if (am_in_lambda()) {

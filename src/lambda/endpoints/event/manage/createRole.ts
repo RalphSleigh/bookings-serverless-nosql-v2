@@ -1,5 +1,5 @@
 import { subject } from '@casl/ability'
-import { v4 as uuidv4 } from 'uuid'
+import { v7 as uuidv7 } from 'uuid'
 
 import { TBooking } from '../../../../shared/schemas/booking'
 import { EventRoleSchema, RoleSchema, TRole, TRoleForForm } from '../../../../shared/schemas/role'
@@ -15,7 +15,7 @@ export const createRole = HandlerWrapper<TCreateRoleData>(
   (req, res) => ['create', subject('role', req.body.role)],
   async (req, res) => {
     try {
-      const validatedRole = EventRoleSchema.parse({ ...req.body.role, roleId: uuidv4() })
+      const validatedRole = EventRoleSchema.parse({ ...req.body.role, roleId: uuidv7() })
       await DBRole.create(validatedRole).go()
       res.json({ role: validatedRole })
     } catch (error) {

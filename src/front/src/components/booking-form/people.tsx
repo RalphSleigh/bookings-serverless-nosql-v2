@@ -3,7 +3,7 @@ import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import React, { useMemo, useState } from 'react'
 import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
-import { v4 as uuidv4 } from 'uuid'
+import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod/v4'
 
 import { app } from '../../../../lambda/app.js'
@@ -37,7 +37,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
   })
 
   const appendFn = () => {
-    const newPerson = { personId: uuidv4(), eventId: event.eventId, userId: user.userId, cancelled: false }
+    const newPerson = { personId: uuidv7(), eventId: event.eventId, userId: user.userId, cancelled: false }
     append(newPerson as TPerson)
   }
 

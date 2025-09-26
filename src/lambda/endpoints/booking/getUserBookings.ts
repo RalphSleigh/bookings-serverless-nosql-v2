@@ -1,12 +1,13 @@
-import { subject } from '@casl/ability'
-import { ElectroEvent } from 'electrodb'
-
-import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
-import { DB, DBBooking, DBPerson } from '../../dynamo'
+import { TApplication } from '../../../shared/schemas/application'
+import { TBooking } from '../../../shared/schemas/booking'
+import { TFee } from '../../../shared/schemas/fees'
+import { DB } from '../../dynamo'
 import { HandlerWrapper } from '../../utils'
 
 export type TUserBookingsResponseType = {
   bookings: TBooking[]
+  fees: TFee[]
+  applications: TApplication[]
 }
 
 export const getUserBookings = HandlerWrapper(
@@ -14,14 +15,14 @@ export const getUserBookings = HandlerWrapper(
   async (req, res) => {
     const user = res.locals.user
     if (!user) {
-      res.json({ bookings: [] } as TUserBookingsResponseType)
+      res.json({ bookings: [], fees: [], applications: [] } as TUserBookingsResponseType)
     } else {
       const bookingsResult = await DB.collections.bookingByUserId({ userId: user.userId }).go()
       const bookings: TBooking[] = bookingsResult.data.booking.map((b) => {
         const people = bookingsResult.data.person.filter((p) => p.eventId === b.eventId && !p.cancelled).sort((a, b) => a.createdAt - b.createdAt)
         return { ...b, people } as TBooking
       })
-      res.json({ bookings })
+      res.json({ bookings, fees: bookingsResult.data.fee, applications: bookingsResult.data.application } as TUserBookingsResponseType)
     }
   },
 )

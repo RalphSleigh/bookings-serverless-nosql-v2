@@ -35,6 +35,7 @@ export function CustomNumberInput<T extends FieldValues>({
 
   return (
     <$NumberInput
+      defaultValue={value}
       value={value}
       onChange={(e) => {
         fieldOnChange(e);

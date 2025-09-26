@@ -3,11 +3,12 @@ import { Grid, Paper, Tabs } from '@mantine/core'
 import { getRouteApi, Outlet, useLocation, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 
 import { Can } from '../../permissionContext'
-import { CustomLink } from '../../utils'
+import { CustomLink, useEvent } from '../../utils'
 
 export const ManageWrapper = () => {
   const location = useLocation()
-  const { eventId } = useParams({from: '/_user/event/$eventId/manage'})
+  const event = useEvent()
+  const { eventId } = event
 
   const navigate = useNavigate()
 
@@ -20,6 +21,9 @@ export const ManageWrapper = () => {
               <Tabs.List>
                 <Tabs.Tab value="campers">Campers</Tabs.Tab>
                 <Tabs.Tab value="bookings">Bookings</Tabs.Tab>
+                {event.applicationsRequired && <Can I="getApplications" this={subject('eventId', { eventId })}>
+                  <Tabs.Tab value="applications">Applications</Tabs.Tab>
+                </Can>}
                 <Can I="viewRoles" this={subject('eventId', { eventId })}>
                   <Tabs.Tab value="roles">Roles</Tabs.Tab>
                 </Can>

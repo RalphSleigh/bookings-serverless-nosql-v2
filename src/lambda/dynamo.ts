@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Attributes, Entity, Service, type EntityItem } from 'electrodb'
-import { v4 as uuidv4, v7 as uuidv7 } from 'uuid'
+import { application } from 'express'
+import { v7 as uuidv7 } from 'uuid'
 
 import { KPBasicOptions } from '../shared/kp/kp'
 import { am_in_lambda } from './utils'
@@ -21,7 +22,7 @@ export const DBUser = new Entity(
       userId: {
         type: 'string',
         required: true,
-        default: () => uuidv4(),
+        default: () => uuidv7(),
       },
       sub: {
         type: 'string',
@@ -86,7 +87,7 @@ export const DBRole = new Entity(
       roleId: {
         type: 'string',
         required: true,
-        default: () => uuidv4(),
+        default: () => uuidv7(),
       },
       userId: {
         type: 'string',
@@ -141,7 +142,7 @@ export const DBEvent = new Entity(
       eventId: {
         type: 'string',
         required: true,
-        default: () => uuidv4(),
+        default: () => uuidv7(),
       },
       name: {
         type: 'string',
@@ -474,7 +475,7 @@ const PersonAttributes = {
   personId: {
     type: 'string',
     required: true,
-    default: () => uuidv4(),
+    default: () => uuidv7(),
   },
   userId: {
     type: 'string',
@@ -551,8 +552,8 @@ export const DBPerson = new Entity(
       },
       byUserId: {
         collection: 'bookingByUserId',
-        type: 'clustered',
         index: 'gsi1pk-gsi1sk-index',
+        type: 'clustered',
         pk: {
           field: 'gsi1pk',
           composite: ['userId'],
@@ -694,7 +695,7 @@ export const DBFee = new Entity(
         required: true,
         default: () => Date.now(),
         set: () => Date.now(),
-      }
+      },
     },
     indexes: {
       natural: {
@@ -711,8 +712,8 @@ export const DBFee = new Entity(
       },
       byUserId: {
         collection: 'bookingByUserId',
-        type: 'clustered',
         index: 'gsi1pk-gsi1sk-index',
+        type: 'clustered',
         pk: {
           field: 'gsi1pk',
           composite: ['userId'],
@@ -727,6 +728,93 @@ export const DBFee = new Entity(
   { client, table },
 )
 
+export const DBApplication = new Entity(
+  {
+    model: {
+      entity: 'application',
+      version: '1',
+      service: 'bookings',
+    },
+    attributes: {
+      eventId: {
+        type: 'string',
+        required: true,
+      },
+      userId: {
+        type: 'string',
+        required: true,
+      },
+      status: {
+        type: ['pending', 'approved', 'declined'] as const,
+        required: true,
+        default: 'pending',
+      },
+      type: {
+        type: ['individual', 'group'] as const,
+        required: true,
+      },
+      name: {
+        type: 'string',
+        required: true,
+      },
+      email: {
+        type: 'string',
+        required: true,
+      },
+      district: {
+        type: 'string',
+        required: false,
+      },
+      predicted: {
+        type: 'number',
+        required: true,
+      },
+      createdAt: {
+        type: 'number',
+        readOnly: true,
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+      updatedAt: {
+        type: 'number',
+        watch: '*',
+        required: true,
+        default: () => Date.now(),
+        set: () => Date.now(),
+      },
+    },
+    indexes: {
+      natural: {
+        collection: 'application',
+        type: 'clustered',
+        pk: {
+          field: 'pk',
+          composite: ['eventId'],
+        },
+        sk: {
+          field: 'sk',
+          composite: ['userId'],
+        },
+      },
+      byUserId: {
+        collection: 'bookingByUserId',
+        index: 'gsi1pk-gsi1sk-index',
+        type: 'clustered',
+        pk: {
+          field: 'gsi1pk',
+          composite: ['userId'],
+        },
+        sk: {
+          field: 'gsi1sk',
+          composite: ['eventId'],
+        },
+      },
+    },
+  },
+  { client, table },
+)
+
 export const DB = new Service({
   user: DBUser,
   role: DBRole,
@@ -734,4 +822,6 @@ export const DB = new Service({
   bookingHistory: DBBookingHistory,
   person: DBPerson,
   personHistory: DBPersonHistory,
+  fee: DBFee,
+  application: DBApplication,
 })

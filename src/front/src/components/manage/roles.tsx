@@ -6,8 +6,6 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm, useFormContext } from 'react-hook-form'
-import { v4 as uuidv4 } from 'uuid'
-import z from 'zod/v4'
 
 import { RoleForFormSchema, TRole, TRoleForForm } from '../../../../shared/schemas/role'
 import { TUser } from '../../../../shared/schemas/user'
@@ -64,10 +62,9 @@ export const ManageRoles = () => {
 
   return (
     <Container strategy="grid" fluid>
-      <Paper data-breakout shadow="md" radius="md" withBorder m={8} p="md">
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid>
+            <Grid mt={16}>
               <Grid.Col span={5}>
                 <UserSelect />
               </Grid.Col>
@@ -96,7 +93,6 @@ export const ManageRoles = () => {
             </Table>
           </Grid.Col>
         </Grid>
-      </Paper>
     </Container>
   )
 }
@@ -104,7 +100,9 @@ export const ManageRoles = () => {
 const UserItem = ({ user }: { user: TUser }) => {
   return (
     <Group flex={1} gap={8}>
-      <Avatar src={user.avatar} size={32} />
+      <Avatar src={user.avatar} size={32} imageProps={{
+              referrerPolicy: 'no-referrer',
+            }}/>
       <Text>
         {user.name} ({user.email})
       </Text>

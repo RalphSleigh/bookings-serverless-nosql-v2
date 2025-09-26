@@ -16,11 +16,9 @@ export const Route = createFileRoute('/')({
 })
 
 function HomeComponent() {
-  const eventsQuery = useSuspenseQuery(getEventsQueryOptions)
-  const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
   return (
     <>
-      <EventList events={eventsQuery.data.events} bookings={bookingsQuery.data.bookings}/>
+      <EventList />
       <Flex justify="flex-end" p={16}>
       <Can I="create" a="event">
         <Link to="/events/new">

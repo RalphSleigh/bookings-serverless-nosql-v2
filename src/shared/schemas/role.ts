@@ -2,17 +2,17 @@ import { z } from 'zod/v4'
 
 export const EventRoleSchema = z
   .object({
-    roleId: z.uuidv4(),
-    userId: z.uuidv4(),
+    roleId: z.uuidv7(),
+    userId: z.uuidv7(),
     role: z.enum(['owner']),
-    eventId: z.uuidv4(),
+    eventId: z.uuidv7(),
   })
   .strict()
 
 const globalRole = z
   .object({
-    roleId: z.uuidv4(),
-    userId: z.uuidv4(),
+    roleId: z.uuidv7(),
+    userId: z.uuidv7(),
     role: z.enum(['admin']),
     eventId: z.literal('global'),
   })

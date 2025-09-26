@@ -13,10 +13,10 @@ export type Abilities =
   | ['manage', 'all']
   | ['get', 'events' | 'event' | 'currentUser' | 'env' | 'ownBookings' | 'users' | 'errors']
   | ['update', 'eventBooking' | ({ event: TEvent; booking: TBooking } & ForcedSubject<'eventBooking'>)]
-  | ['book', 'event' | (TEvent & ForcedSubject<'event'>)]
+  | ['book' | 'apply', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
-  | ['getBackend' | 'getFees' | 'createFee', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
+  | ['getBackend' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
   | ['delete', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
@@ -53,6 +53,8 @@ export const getPermissionsFromUser = (user: ContextUser) => {
 
   //book into an event
   can('book', 'event', (e) => dayjs(e.bookingDeadline).isAfter(new Date()))
+  //apply to an event
+  can('apply', 'event', (e) => e.applicationsRequired)
 
   for (const role of user.roles) {
     permissionsFunctions[role.role](can)
@@ -72,6 +74,8 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('delete', 'role', (r) => true)
     can('getFees', 'eventId', (e) => true)
     can('createFee', 'eventId', (e) => true)
+    can('getApplications', 'eventId', (e) => true)
+    can('approveApplication', 'eventId', (e) => true)
   },
   owner: (can) => {},
 }

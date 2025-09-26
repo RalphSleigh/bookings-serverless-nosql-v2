@@ -2,7 +2,7 @@ import { z } from "zod/v4";
 import { TRole } from './role';
 
 export const UserSchema = z.object({
-  userId: z.string(),
+  userId: z.uuidv7(),
   sub: z.string(),
   name: z.string(),
   email: z.email(),

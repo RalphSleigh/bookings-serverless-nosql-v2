@@ -1,24 +1,33 @@
 import { subject } from '@casl/ability'
 import { Button, Container, Paper, Table, Text, Title } from '@mantine/core'
-import { useRouteContext } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { LinkProps, useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import AdvancedFormat from 'dayjs/plugin/advancedFormat'
 import Markdown from 'react-markdown'
 
 import { getFeeType } from '../../../shared/fees/fees.js'
+import { TApplication } from '../../../shared/schemas/application.js'
 import { TBooking } from '../../../shared/schemas/booking.js'
 import { TEvent } from '../../../shared/schemas/event.js'
+import { TFee } from '../../../shared/schemas/fees.js'
 import { ageGroupFromPerson } from '../../../shared/woodcraft.js'
 import { Can } from '../permissionContext'
+import { getEventsQueryOptions } from '../queries/getEvents.js'
+import { getUserBookingsQueryOptions } from '../queries/geUserBookings.js'
 import { CustomLink, toLocalDate } from '../utils.js'
 import { CustomButtonLink } from './custom-inputs/customLinkButton.js'
 
 dayjs.extend(AdvancedFormat)
 
-export function EventList({ events, bookings }: { events: TEvent[]; bookings: TBooking[] }) {
-  //const bookingsQuery = useUsersBookings()
-  //const bookings = bookingsQuery.data.bookings
-  //const user = useContext(UserContext)
+export function EventList() {
+  const eventsQuery = useSuspenseQuery(getEventsQueryOptions)
+  const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
+
+  const events = eventsQuery.data.events
+  const bookings = bookingsQuery.data.bookings
+  const fees = bookingsQuery.data.fees
+  const applications = bookingsQuery.data.applications
 
   const { permission } = useRouteContext({ from: '__root__' })
 
@@ -27,10 +36,26 @@ export function EventList({ events, bookings }: { events: TEvent[]; bookings: TB
 
   const cards = futureEvents
     .sort((a, b) => (a.startDate < b.startDate ? -1 : a.startDate > b.startDate ? 1 : 0))
-    .map((e) => <EventCard event={e} key={e.eventId} booking={bookings.find((b) => b.eventId === e.eventId)} />)
+    .map((e) => (
+      <EventCard
+        event={e}
+        key={e.eventId}
+        booking={bookings.find((b) => b.eventId === e.eventId)}
+        fees={fees.filter((f) => f.eventId === e.eventId)}
+        application={applications.find((a) => a.eventId === e.eventId)}
+      />
+    ))
   const manageCards = pastEventsCanManage
     .sort((a, b) => (a.startDate < b.startDate ? -1 : a.startDate > b.startDate ? 1 : 0))
-    .map((e) => <EventCard event={e} key={e.eventId} booking={bookings.find((b) => b.eventId === e.eventId)} />)
+    .map((e) => (
+      <EventCard
+        event={e}
+        key={e.eventId}
+        booking={bookings.find((b) => b.eventId === e.eventId)}
+        fees={fees.filter((f) => f.eventId === e.eventId)}
+        application={applications.find((a) => a.eventId === e.eventId)}
+      />
+    ))
 
   return (
     <>
@@ -47,7 +72,7 @@ export function EventList({ events, bookings }: { events: TEvent[]; bookings: TB
   )
 }
 
-function EventCard({ event, booking }: { event: TEvent; booking?: TBooking }) {
+function EventCard({ event, booking, fees, application }: { event: TEvent; booking?: TBooking; fees: TFee[]; application: TApplication | undefined }) {
   const startDate = toLocalDate(event.startDate)!
   const endDate = toLocalDate(event.endDate)!
 
@@ -55,7 +80,7 @@ function EventCard({ event, booking }: { event: TEvent; booking?: TBooking }) {
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} p="md">
-      <BookingButton event={event} booking={booking} />
+      <BookingButton event={event} booking={booking} application={application} />
       <Title order={1} size="h2">
         {event.name}
       </Title>
@@ -63,7 +88,7 @@ function EventCard({ event, booking }: { event: TEvent; booking?: TBooking }) {
         {dayjs(startDate).format(startDataFormat)} - {dayjs(endDate).format('Do MMMM YYYY')}
       </Title>
       {event.description ? <Markdown>{event.description}</Markdown> : null}
-      {booking ? <YourBooking event={event} booking={booking} /> : null}
+      {booking ? <YourBooking event={event} booking={booking} fees={fees} /> : null}
       <Text ta="right" mt={8}>
         <Can I="edit" a="event">
           <CustomLink to={`/event/$eventId/edit`} params={{ eventId: event.eventId }}>
@@ -80,7 +105,7 @@ function EventCard({ event, booking }: { event: TEvent; booking?: TBooking }) {
   )
 }
 
-function BookingButton({ event, booking }: { event: TEvent; booking?: TBooking }) {
+function BookingButton({ event, booking, application }: { event: TEvent; booking?: TBooking; application?: TApplication }) {
   const { auth, permission } = useRouteContext({ from: '__root__' })
   const user = auth.loggedIn ? auth.user : undefined
   if (!user)
@@ -89,6 +114,56 @@ function BookingButton({ event, booking }: { event: TEvent; booking?: TBooking }
         Login to Book
       </Button>
     )
+
+  const LoginButton = ({ to, gradFrom, gradTo, children, disabled = false }: LinkProps & { gradFrom: string; gradTo: string; disabled?: boolean; children: React.ReactNode }) => (
+    <CustomButtonLink variant="gradient" gradient={{ from: gradFrom, to: gradTo, deg: 110 }} to={to as `/event/$eventId`} params={{ eventId: event.eventId }} style={{ float: 'right' }} disabled={disabled}>
+      {children}
+    </CustomButtonLink>
+  )
+
+  if (event.applicationsRequired) {
+    if (application) {
+      if (application.status === 'approved') {
+        if (booking && !booking.cancelled) {
+          return (
+            <LoginButton to={`/event/$eventId/own/update`} gradFrom="blue" gradTo="violet">
+              Update Booking
+            </LoginButton>
+          )
+        } else if (booking && booking.cancelled) {
+          return (
+            <LoginButton to={`/event/$eventId/own/update`} gradFrom="blue" gradTo="violet">
+              Book
+            </LoginButton>
+          )
+        } else {
+          return (
+            <LoginButton to={`/event/$eventId/own/book`} gradFrom="blue" gradTo="violet">
+              Book
+            </LoginButton>
+          )
+        }
+      } else if (application.status === 'pending') {
+        return (
+          <LoginButton to={`/event/$eventId/own/book`} gradFrom="yellow" gradTo="red" disabled>
+            Application Pending
+          </LoginButton>
+        )
+      } else if (application.status === 'declined') {
+        return (
+          <LoginButton to={`/event/$eventId/own/book`} gradFrom="yellow" gradTo="red" disabled>
+            Application Declined
+          </LoginButton>
+        )
+      }
+    } else {
+      return (
+        <LoginButton to={`/event/$eventId/own/apply`} gradFrom="yellow" gradTo="red">
+          Apply to Book
+        </LoginButton>
+      )
+    }
+  }
 
   if (booking && booking.cancelled && permission.can('update', subject('eventBooking', { event, booking })))
     return (
@@ -140,8 +215,8 @@ function BookingButton({ event, booking }: { event: TEvent; booking?: TBooking }
  */
 }
 
-const YourBooking = ({ event, booking }: { event: TEvent; booking: TBooking }) => {
-  const fees = getFeeType(event)
+const YourBooking = ({ event, booking, fees }: { event: TEvent; booking: TBooking; fees: TFee[] }) => {
+  const feeStructure = getFeeType(event)
 
   const ageGroupFilter = ageGroupFromPerson(event)
 
@@ -176,7 +251,7 @@ const YourBooking = ({ event, booking }: { event: TEvent; booking: TBooking }) =
       <Title order={5} mt={8}>
         Money
       </Title>
-      <fees.EventListDisplayElement event={event} booking={booking} />
+      <feeStructure.EventListDisplayElement event={event} booking={booking} fees={fees} />
     </>
   )
 }

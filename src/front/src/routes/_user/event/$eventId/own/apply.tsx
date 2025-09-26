@@ -11,8 +11,9 @@ import { EventForm } from '../../../../../components/event-form/form'
 import { createBookingMuation } from '../../../../../mutations/createBooking'
 import { getEventsQueryOptions } from '../../../../../queries/getEvents'
 import { useEvent } from '../../../../../utils'
+import { ApplicationForm } from '../../../../../components/application-form/appplicationForm'
 
-export const Route = createFileRoute('/_user/event/$eventId/own/book')({
+export const Route = createFileRoute('/_user/event/$eventId/own/apply')({
   // Can't check this as we need the event object to check permissions
   /*   beforeLoad: async ({ location, context }) => {
     if (context.permission.can('edit', 'event') === false)
@@ -20,27 +21,22 @@ export const Route = createFileRoute('/_user/event/$eventId/own/book')({
         to: '/',
       })
   }, */
-  component: BookEventComponent,
+  component: ApplyToEventComponent,
 })
 
-function BookEventComponent() {
+function ApplyToEventComponent() {
   const event = useEvent()
   const { permission, user } = Route.useRouteContext()
 
-  if (!event || !permission.can('book', subject('event', event))) {
+  if (!event || !permission.can('apply', subject('event', event))) {
     notifications.show({
       title: 'Error',
-      message: `Event not found, or you don't have permission to book it`,
+      message: `Event not found, or you don't have permission to apply for it`,
       color: 'red',
     })
     return <Navigate to="/" />
   }
   return (
-    <BookingForm
-      mode="create"
-      event={event}
-      inputData={{ userId: user.userId, eventId: event.eventId, cancelled: false, basic: {}, people: [{ personId: uuidv7(), eventId: event.eventId, userId: user.userId, cancelled: false }] }}
-      mutation={createBookingMuation()}
-    />
+    <ApplicationForm/>
   )
 }

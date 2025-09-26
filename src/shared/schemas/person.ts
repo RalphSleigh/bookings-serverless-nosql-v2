@@ -20,9 +20,9 @@ export const PersonSchema = (event: TEvent) => {
       })
   return z
     .object({
-      personId: z.string().nonempty(),
-      userId: z.string().nonempty(),
-      eventId: z.string().nonempty(),
+      personId: z.uuidv7(),
+      userId: z.uuidv7(),
+      eventId: z.uuidv7(),
       cancelled: z.boolean().default(false),
       basic: basic.strict(),
       kp: event.kp.kpStructure === 'basic' ? KPBasic : KPLarge,
@@ -35,13 +35,13 @@ export const PersonSchema = (event: TEvent) => {
       updatedAt: z.number().optional(),
     })
     .strict()
-}
+  }
 
 export const PersonSchemaForType = z
   .object({
-    personId: z.string().nonempty(),
-    userId: z.string().nonempty(),
-    eventId: z.string().nonempty(),
+    personId: z.uuidv7().optional(),
+    userId: z.uuidv7(),
+    eventId: z.uuidv7(),
     cancelled: z.boolean().default(false),
     basic: z
       .object({

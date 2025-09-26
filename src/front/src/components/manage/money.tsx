@@ -33,6 +33,7 @@ export const ManageMoney = () => {
   const fees = useMemo(() => feesQuery.data.fees, [feesQuery.data])
 
   let totalFees = 0
+  let totalsPaid = 0
 
   const tablesRows = bookings.map((b) => {
     const fees = feesQuery.data.fees.filter((f) => f.userId === b.userId)
@@ -41,24 +42,29 @@ export const ManageMoney = () => {
     const totalWithAdjustments = fees.filter((f) => f.type === 'adjustment').reduce((acc, f) => acc + f.amount, total)
     const totalPaid = fees.filter((f) => f.type === 'payment').reduce((acc, f) => acc + f.amount, 0)
     totalFees += totalWithAdjustments
+    totalsPaid += totalPaid
 
     return (
       <Table.Tr key={b.userId} style={{ cursor: 'pointer' }} onClick={() => setSelected(b.userId)}>
         <Table.Td>{b.basic.name}</Table.Td>
         <Table.Td>{currency(totalWithAdjustments)}</Table.Td>
         <Table.Td>{currency(totalPaid)}</Table.Td>
+        <Table.Td>
+          {currency(totalWithAdjustments - totalPaid)} {totalWithAdjustments - totalPaid <= 0 ? '✅' : ''}
+        </Table.Td>
       </Table.Tr>
     )
   })
 
   const selectedBooking = bookings.find((b) => b.userId === selected)
+  const feesForSelectedBooking = useMemo(() => fees.filter((f) => f.userId === selected), [fees, selected])
 
   return (
     <>
       {' '}
       <Modal opened={selectedBooking !== undefined} onClose={() => setSelected(undefined)} size="auto" withCloseButton={false}>
         <Modal.CloseButton style={{ float: 'right' }} />
-        {selectedBooking !== undefined && <MoneyDetails feeStructure={feeStructure} event={event} booking={selectedBooking!} fees={fees} />}
+        {selectedBooking !== undefined && <MoneyDetails feeStructure={feeStructure} event={event} booking={selectedBooking!} fees={feesForSelectedBooking} />}
       </Modal>
       <Table striped highlightOnHover withColumnBorders mt={8}>
         <Table.Thead>
@@ -66,6 +72,7 @@ export const ManageMoney = () => {
             <Table.Th>Booking</Table.Th>
             <Table.Th>Fee</Table.Th>
             <Table.Th>Paid</Table.Th>
+            <Table.Th>Outstanding</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -77,6 +84,8 @@ export const ManageMoney = () => {
             <Table.Td>
               <b>{currency(totalFees)}</b>
             </Table.Td>
+            <Table.Td>{currency(totalsPaid)}</Table.Td>
+            <Table.Td>{currency(totalFees - totalsPaid)}</Table.Td>
           </Table.Tr>
         </Table.Tbody>
       </Table>
@@ -134,10 +143,15 @@ const MoneyDetails = ({ feeStructure, event, booking, fees }: { feeStructure: Fe
 
   const paymentRows = fees.filter((f) => f.type === 'payment').map((f, index) => <PaymentRow key={'payment-' + index} fee={f} index={index} />)
 
+  const feesTotal = feeRows.reduce((acc, line) => acc + (line.amount || 0), 0) + fees.filter((f) => f.type === 'adjustment').reduce((acc, f) => acc + f.amount, 0)
+  const paymentsTotal = fees.filter((f) => f.type === 'payment').reduce((acc, f) => acc + f.amount, 0)
+
+  console.log('Fees total', feesTotal, paymentsTotal)
+
   const form = useForm<TFeeForForm>({
     resolver: zodResolver(FeeSchemaForForm),
     mode: 'onChange',
-    defaultValues: { eventId: event.eventId, userId: booking.userId, type: undefined },
+    defaultValues: { eventId: event.eventId, userId: booking.userId, type: undefined, amount: feesTotal - paymentsTotal, note: '' },
   })
 
   const formState = form.formState
@@ -154,11 +168,9 @@ const MoneyDetails = ({ feeStructure, event, booking, fees }: { feeStructure: Fe
   }
 
   useEffect(() => {
-    form.reset({ eventId: event.eventId, userId: booking.userId, type: undefined, amount: 0, note: '' })
-  }, [createMutation.isSuccess])
+    form.reset({ eventId: event.eventId, userId: booking.userId, type: undefined, amount: feesTotal - paymentsTotal, note: '' })
+  }, [createMutation.isSuccess, feesTotal - paymentsTotal])
 
-  const feesTotal = feeRows.reduce((acc, line) => acc + (line.amount || 0), 0) + fees.filter((f) => f.type === 'adjustment').reduce((acc, f) => acc + f.amount, 0)
-  const paymentsTotal = fees.filter((f) => f.type === 'payment').reduce((acc, f) => acc + f.amount, 0)
   return (
     <>
       <Table striped highlightOnHover withColumnBorders mt={8}>

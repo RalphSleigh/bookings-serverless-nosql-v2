@@ -3,8 +3,6 @@ import { notifications } from '@mantine/notifications'
 import { IconArrowGuide } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Navigate, redirect, useRouteContext } from '@tanstack/react-router'
-import { useContext } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 
 import { BookingForm } from '../../../../../components/booking-form/form'
 import { updateBookingMuation } from '../../../../../mutations/updateBooking'
