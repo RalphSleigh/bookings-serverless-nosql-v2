@@ -39,7 +39,7 @@ export const PersonSchema = (event: TEvent) => {
 
 export const PersonSchemaForType = z
   .object({
-    personId: z.uuidv7().optional(),
+    personId: z.uuidv7(),
     userId: z.uuidv7(),
     eventId: z.uuidv7(),
     cancelled: z.boolean().default(false),

@@ -2,7 +2,7 @@ import { subject } from '@casl/ability'
 import { CreateEntityItem, EntityIdentifiers, UpdateEntityItem } from 'electrodb'
 
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
-import { DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
+import { DB, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
 import { HandlerWrapper } from '../../utils'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
 
@@ -15,13 +15,18 @@ export const updateBooking = HandlerWrapper(
   async (req, res) => {
     const user = res.locals.user
     const event = res.locals.event
-    const existingBooking = res.locals.booking
     const booking = req.body.booking as TBooking
 
+    if(!user) throw new Error('No user in context')
     if (booking.eventId !== event.eventId) throw new Error('Event ID in path and body do not match')
-    if (!user || booking.userId !== user.userId) throw new Error('User ID in booking does not match authenticated user')
+    const own = user.userId === booking.userId
 
     const bookingSchema = BookingSchema(event)
+
+    const existingBookingQuery = await DBBooking.find({userId: booking.userId, eventId: event.eventId}).go()
+    const existingPeopleQuery = await DBPerson.find({userId: booking.userId, eventId: event.eventId}).go()
+
+    const existingBooking = bookingSchema.parse({...existingBookingQuery.data[0], people: existingPeopleQuery.data})
 
     const { people, ...validatedBooking } = bookingSchema.parse(booking)
 
@@ -29,8 +34,8 @@ export const updateBooking = HandlerWrapper(
 
     const updatedBooking = await DBBooking.patch(validatedBooking).set({...bookingUpdateData, cancelled: false }).go({ response: 'all_new' })
     const bookingHistoryItem: EntityIdentifiers<typeof DBBookingHistory> = {
-      eventId: event.eventId,
-      userId: user.userId,
+      eventId,
+      userId
     }
 
     await DBBookingHistory.update(bookingHistoryItem)
@@ -46,8 +51,8 @@ export const updateBooking = HandlerWrapper(
         const { personId, userId, eventId, createdAt, updatedAt, ...personUpdateData } = person
         const newPerson = await DBPerson.patch(person).set({...personUpdateData, cancelled: false}).go({ response: 'all_new' })
         const personHistoryItem: EntityIdentifiers<typeof DBPersonHistory> = {
-          eventId: event.eventId,
-          userId: user.userId,
+          eventId,
+          userId,
           personId: newPerson.data.personId,
         }
         await DBPersonHistory.update(personHistoryItem)
@@ -57,12 +62,12 @@ export const updateBooking = HandlerWrapper(
         // Create new person
         const createdPerson = await DBPerson.create({
           ...person,
-          userId: user.userId,
-          eventId: event.eventId,
+          userId,
+          eventId
         }).go()
         const personHistoryItem: CreateEntityItem<typeof DBPersonHistory> = {
-          eventId: event.eventId,
-          userId: user.userId,
+          eventId,
+          userId,
           personId: createdPerson.data.personId,
           versions: [createdPerson.data],
         }

@@ -76,6 +76,11 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('createFee', 'eventId', (e) => true)
     can('getApplications', 'eventId', (e) => true)
     can('approveApplication', 'eventId', (e) => true)
+    can('update', 'eventBooking', (b) => true)
+
+    can('getSheet', 'eventBookingIds', (ids) => true)
+    can('createSheet', 'eventBookingIds', (ids) => true)
+    can('getSheetData', 'eventBookingIds', (ids) => true)
   },
   owner: (can) => {},
 }

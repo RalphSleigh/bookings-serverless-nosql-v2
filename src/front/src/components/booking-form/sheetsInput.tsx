@@ -6,16 +6,20 @@ import { MouseEventHandler, useContext, useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import z from 'zod/v4'
 
-import { BookingSchemaForTypeBasicBig, TBookingSchemaForTypeBasicBig } from '../../../../shared/schemas/booking'
+import { BookingSchemaForTypeBasicBig, TBookingSchemaForTypeBasicBig, TBookingSchemaForTypeBasicBigGroup } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { createSheetForBooking } from '../../mutations/createSheetForBooking'
 import { getCampersFromSheetMutation } from '../../mutations/getCampersFromSheet'
 import { getDoesBookingHaveSpreadsheet } from '../../queries/getDoesBookingHaveSpreadsheet'
 
 export const SheetsInput: React.FC<{ event: TEvent; userId: string }> = ({ event, userId }) => {
+  const basic = useWatch<TBookingSchemaForTypeBasicBig, 'basic'>({ name: 'basic' })
+  if (basic?.type !== 'group') return null
   if (!event.bigCampMode) return null
+  return <SheetsDecider event={event} userId={userId} />
+}
 
-  const { permission, user } = useRouteContext({ from: '/_user' })
+const SheetsDecider: React.FC<{ event: TEvent; userId: string }> = ({ event, userId }) => {
   const hasSheetsQuery = useSuspenseQuery(getDoesBookingHaveSpreadsheet(event.eventId, userId))
 
   if (hasSheetsQuery.data.sheet) {
@@ -26,11 +30,10 @@ export const SheetsInput: React.FC<{ event: TEvent; userId: string }> = ({ event
 }
 
 const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
-  const basic = useWatch<TBookingSchemaForTypeBasicBig, "basic">({ name: 'basic' })
-  const userId = useWatch<TBookingSchemaForTypeBasicBig, "userId">({ name: 'userId' })
+  const userId = useWatch<TBookingSchemaForTypeBasicBigGroup, 'userId'>({ name: 'userId' })
   const createSheet = createSheetForBooking(event.eventId)
 
-  if (basic?.type !== 'group') return null
+  const basic = useWatch<TBookingSchemaForTypeBasicBigGroup, 'basic'>({ name: 'basic' })
 
   const notGotNeededData = !basic?.name || !basic?.email || !basic?.district
 
@@ -51,7 +54,14 @@ const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
         </Text>
       ) : (
         <Flex mt={8} justify="flex-end">
-          <Button loading={createSheet.isPending} gradient={{ from: 'cyan', to: 'green', deg: 110 }} variant='gradient' onClick={() => createSheet.mutate({ userId, name: basic.name, email: basic.email, district: basic.district })}>Create Sheet</Button>
+          <Button
+            loading={createSheet.isPending}
+            gradient={{ from: 'cyan', to: 'green', deg: 110 }}
+            variant="gradient"
+            onClick={() => createSheet.mutate({ userId, name: basic.name, email: basic.email, district: basic.district })}
+          >
+            Create Sheet
+          </Button>
         </Flex>
       )}
     </Paper>
@@ -95,7 +105,9 @@ const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; 
         </Text>
       )}
       <Flex mt={8} justify="flex-end">
-        <Button gradient={{ from: 'cyan', to: 'green', deg: 110 }} loading={getPeopleMutation.isPending} variant='gradient' onClick={updatePeopleFromSheet}>Import Campers to Form</Button>
+        <Button gradient={{ from: 'cyan', to: 'green', deg: 110 }} loading={getPeopleMutation.isPending} variant="gradient" onClick={updatePeopleFromSheet}>
+          Import Campers to Form
+        </Button>
       </Flex>
     </Paper>
   )

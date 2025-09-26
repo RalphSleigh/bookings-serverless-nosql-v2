@@ -28,6 +28,7 @@ import { Route as UserEventEventIdManageMoneyImport } from './routes/_user/event
 import { Route as UserEventEventIdManageCampersImport } from './routes/_user/event/$eventId/manage/campers'
 import { Route as UserEventEventIdManageBookingsImport } from './routes/_user/event/$eventId/manage/bookings'
 import { Route as UserEventEventIdManageApplicationsImport } from './routes/_user/event/$eventId/manage/applications'
+import { Route as UserEventEventIdBookingUserIdUpdateImport } from './routes/_user/event/$eventId/booking/$userId/update'
 
 // Create/Update Routes
 
@@ -136,6 +137,13 @@ const UserEventEventIdManageApplicationsRoute =
     id: '/applications',
     path: '/applications',
     getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
+
+const UserEventEventIdBookingUserIdUpdateRoute =
+  UserEventEventIdBookingUserIdUpdateImport.update({
+    id: '/booking/$userId/update',
+    path: '/booking/$userId/update',
+    getParentRoute: () => UserEventEventIdRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -261,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserEventEventIdManageIndexImport
       parentRoute: typeof UserEventEventIdManageImport
     }
+    '/_user/event/$eventId/booking/$userId/update': {
+      id: '/_user/event/$eventId/booking/$userId/update'
+      path: '/booking/$userId/update'
+      fullPath: '/event/$eventId/booking/$userId/update'
+      preLoaderRoute: typeof UserEventEventIdBookingUserIdUpdateImport
+      parentRoute: typeof UserEventEventIdImport
+    }
   }
 }
 
@@ -297,6 +312,7 @@ interface UserEventEventIdRouteChildren {
   UserEventEventIdOwnApplyRoute: typeof UserEventEventIdOwnApplyRoute
   UserEventEventIdOwnBookRoute: typeof UserEventEventIdOwnBookRoute
   UserEventEventIdOwnUpdateRoute: typeof UserEventEventIdOwnUpdateRoute
+  UserEventEventIdBookingUserIdUpdateRoute: typeof UserEventEventIdBookingUserIdUpdateRoute
 }
 
 const UserEventEventIdRouteChildren: UserEventEventIdRouteChildren = {
@@ -305,6 +321,8 @@ const UserEventEventIdRouteChildren: UserEventEventIdRouteChildren = {
   UserEventEventIdOwnApplyRoute: UserEventEventIdOwnApplyRoute,
   UserEventEventIdOwnBookRoute: UserEventEventIdOwnBookRoute,
   UserEventEventIdOwnUpdateRoute: UserEventEventIdOwnUpdateRoute,
+  UserEventEventIdBookingUserIdUpdateRoute:
+    UserEventEventIdBookingUserIdUpdateRoute,
 }
 
 const UserEventEventIdRouteWithChildren =
@@ -344,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
   '/event/$eventId/manage/': typeof UserEventEventIdManageIndexRoute
+  '/event/$eventId/booking/$userId/update': typeof UserEventEventIdBookingUserIdUpdateRoute
 }
 
 export interface FileRoutesByTo {
@@ -363,6 +382,7 @@ export interface FileRoutesByTo {
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
   '/event/$eventId/manage': typeof UserEventEventIdManageIndexRoute
+  '/event/$eventId/booking/$userId/update': typeof UserEventEventIdBookingUserIdUpdateRoute
 }
 
 export interface FileRoutesById {
@@ -384,6 +404,7 @@ export interface FileRoutesById {
   '/_user/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/_user/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
   '/_user/event/$eventId/manage/': typeof UserEventEventIdManageIndexRoute
+  '/_user/event/$eventId/booking/$userId/update': typeof UserEventEventIdBookingUserIdUpdateRoute
 }
 
 export interface FileRouteTypes {
@@ -406,6 +427,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
     | '/event/$eventId/manage/'
+    | '/event/$eventId/booking/$userId/update'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -424,6 +446,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
     | '/event/$eventId/manage'
+    | '/event/$eventId/booking/$userId/update'
   id:
     | '__root__'
     | '/'
@@ -443,6 +466,7 @@ export interface FileRouteTypes {
     | '/_user/event/$eventId/own/book'
     | '/_user/event/$eventId/own/update'
     | '/_user/event/$eventId/manage/'
+    | '/_user/event/$eventId/booking/$userId/update'
   fileRoutesById: FileRoutesById
 }
 
@@ -498,7 +522,8 @@ export const routeTree = rootRoute
         "/_user/event/$eventId/manage",
         "/_user/event/$eventId/own/apply",
         "/_user/event/$eventId/own/book",
-        "/_user/event/$eventId/own/update"
+        "/_user/event/$eventId/own/update",
+        "/_user/event/$eventId/booking/$userId/update"
       ]
     },
     "/_user/events/new": {
@@ -556,6 +581,10 @@ export const routeTree = rootRoute
     "/_user/event/$eventId/manage/": {
       "filePath": "_user/event/$eventId/manage/index.tsx",
       "parent": "/_user/event/$eventId/manage"
+    },
+    "/_user/event/$eventId/booking/$userId/update": {
+      "filePath": "_user/event/$eventId/booking/$userId/update.tsx",
+      "parent": "/_user/event/$eventId"
     }
   }
 }

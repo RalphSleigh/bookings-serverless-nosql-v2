@@ -64,7 +64,14 @@ class PeopleCount extends BookingField {
   accessor = (b: TBooking) => b.people.length.toString()
 }
 
+class EditLink extends BookingField {
+    name = 'Edit'
+    accessor = (b: TBooking) => `/event/${b.eventId}/booking/${b.userId}/update`
+    Cell: CellType = ({ cell }) => <a href={cell.getValue<string>()}>Edit</a>
+}
+
+
 
 export const bookingFields: (event: TEvent) => BookingField[] = (event) => {
-  return [new Name(event), new Email(event), new Phone(event), new PeopleCount(event)]
+  return [new Name(event), new Email(event), new Phone(event), new PeopleCount(event), new EditLink(event)]
 }
