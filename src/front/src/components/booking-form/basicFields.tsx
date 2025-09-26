@@ -10,6 +10,9 @@ import { TEvent } from '../../../../shared/schemas/event'
 import { errorProps } from '../../utils'
 import { CustomSelect } from '../custom-inputs/customSelect'
 
+
+import classes from '../../css/typeChooser.module.css'
+
 const PrivateRelayWarning = () => {
   const email = useWatch<PartialBookingType, "basic.email">({ name: 'basic.email' })
   const isPrivateRelay = email && email?.includes('privaterelay.appleid.com')
@@ -61,9 +64,9 @@ export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => 
   const paperProps = (field: string) => (value: string | undefined) => {
     const props = { withBorder: true, p: 'md', style: { height: '100%', cursor: 'pointer' } }
     if (field === value) {
-      return { bd: '1 solid green', bg: 'green.0', c: 'green.9', ...props }
+      return { className: classes.chooserSelected, ...props }
     } else {
-      return { bd: '1 solid gray', bg: 'gray.0', c: 'gray.9', ...props }
+      return { className: classes.chooserUnselected, ...props }
     }
   }
 
