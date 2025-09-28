@@ -1,7 +1,7 @@
 import { subject } from '@casl/ability'
 import { v7 as uuidv7 } from 'uuid'
 
-import { ApplicationSchemaForInsert, TApplicationForForm } from '../../../shared/schemas/application'
+import { ApplicationSchemaForForm, TApplicationForForm } from '../../../shared/schemas/application'
 import { HandlerWrapper } from '../../utils'
 import { DBApplication } from '../../dynamo'
 
@@ -17,7 +17,7 @@ export const createApplicationEndpoint = HandlerWrapper<TCreateApplicationData>(
       const user = res.locals.user
       if (!user) throw new Error('User must be logged in to apply')
 
-      const validatedApplication = ApplicationSchemaForInsert.parse({ ...req.body.application, status: 'pending', userId: user.userId, eventId: res.locals.event.eventId })
+      const validatedApplication = ApplicationSchemaForForm.parse({ ...req.body.application, status: 'pending', userId: user.userId, eventId: res.locals.event.eventId })
       await DBApplication.create(validatedApplication).go()
       res.json({ application: validatedApplication })
     } catch (error) {

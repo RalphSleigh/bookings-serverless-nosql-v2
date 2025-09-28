@@ -11,7 +11,6 @@ const GroupApplication = z.object({
 })
 
 const CommonFields = z.object({
-    applicationId: z.uuidv7(),
     eventId: z.uuidv7(),
     userId: z.uuidv7(),
     status: z.enum(['pending', 'approved', 'declined']).default('pending'),
@@ -23,8 +22,7 @@ const CommonFields = z.object({
 })
 
 export const ApplicationSchema = z.discriminatedUnion('type', [z.object({...CommonFields.shape, ...IndividualApplication.shape}), z.object({...CommonFields.shape, ...GroupApplication.shape})])
-export const ApplicationSchemaForForm = z.discriminatedUnion('type', [z.object({...CommonFields.omit({applicationId:true, createdAt:true, updatedAt:true}).shape, ...IndividualApplication.shape}), z.object({...CommonFields.omit({applicationId:true, createdAt:true, updatedAt:true}).shape, ...GroupApplication.shape})])
-export const ApplicationSchemaForInsert = z.discriminatedUnion('type', [z.object({...CommonFields.omit({createdAt:true, updatedAt:true}).shape, ...IndividualApplication.shape}), z.object({...CommonFields.omit({createdAt:true, updatedAt:true}).shape, ...GroupApplication.shape})])
+export const ApplicationSchemaForForm = z.discriminatedUnion('type', [z.object({...CommonFields.omit({createdAt:true, updatedAt:true}).shape, ...IndividualApplication.shape}), z.object({...CommonFields.omit({createdAt:true, updatedAt:true}).shape, ...GroupApplication.shape})])
 
 export type TApplication = z.infer<typeof ApplicationSchema>
 export type TApplicationForForm = z.infer<typeof ApplicationSchemaForForm>
