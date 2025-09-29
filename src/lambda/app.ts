@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser'
 import express, { type ErrorRequestHandler } from 'express'
 import { serializeError } from 'serialize-error'
 
+import { createApplicationEndpoint } from './endpoints/application/createApplicationEndpoint'
 import { authCallback } from './endpoints/auth/callback'
 import { logout } from './endpoints/auth/logout'
 import { authRedirect } from './endpoints/auth/redirect'
@@ -18,27 +19,27 @@ import { logClientErrors } from './endpoints/errors'
 import { createEvent } from './endpoints/event/createEvent'
 import { editEvent } from './endpoints/event/editEvent'
 import { getEvents } from './endpoints/event/getEvents'
+import { approveApplicationEndpoint } from './endpoints/event/manage/approveApplication'
+import { createFeeItem } from './endpoints/event/manage/createFeeItem'
 import { createRole } from './endpoints/event/manage/createRole'
+import { declineApplicationEndpoint } from './endpoints/event/manage/declineApplication'
+import { deleteFeeItem } from './endpoints/event/manage/deleteFeeItem'
 import { deleteRole } from './endpoints/event/manage/deleteRole'
+import { getEventApplications } from './endpoints/event/manage/getEventApplications'
 import { getEventBookings } from './endpoints/event/manage/getEventBookings'
+import { getEventFees } from './endpoints/event/manage/getEventFees'
 import { getEventRoles } from './endpoints/event/manage/getEventRoles'
 import { getUsers } from './endpoints/event/manage/getUsers'
 import { testCreateRole } from './endpoints/test/addAdminRole'
 import { testLoggedIn } from './endpoints/test/testLoggedIn'
 import { getUser } from './endpoints/user/getUser'
+import { updateUserEmailNopeList } from './endpoints/user/updateUserNopeList'
 import { configMiddleware } from './middleware/config'
 import { eventMiddleware } from './middleware/event'
 import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { userMiddleware } from './middleware/user'
 import { am_in_lambda } from './utils'
-import { getEventFees } from './endpoints/event/manage/getEventFees'
-import { createFeeItem } from './endpoints/event/manage/createFeeItem'
-import { deleteFeeItem } from './endpoints/event/manage/deleteFeeItem'
-import { createApplicationEndpoint } from './endpoints/application/createApplicationEndpoint'
-import { getEventApplications } from './endpoints/event/manage/getEventApplications'
-import { approveApplicationEndpoint } from './endpoints/event/manage/approveApplication'
-import { declineApplicationEndpoint } from './endpoints/event/manage/declineApplication'
 
 export const router = express.Router()
 export const app = express()
@@ -58,6 +59,7 @@ router.get('/auth/callback', authCallback)
 router.get('/user/current', getUser)
 router.get('/user/logout', logout)
 router.get('/user/bookings', getUserBookings)
+router.post('/user/updateNopeList', updateUserEmailNopeList)
 //app.get('/test/loggedIn', testLoggedIn)
 //
 router.get('/test/createRole', testCreateRole)

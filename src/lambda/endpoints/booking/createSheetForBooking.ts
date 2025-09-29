@@ -6,6 +6,7 @@ import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { DBBooking, DBBookingHistory, DBPerson, DBPersonHistory, DBUser } from '../../dynamo'
 import { createSheetForBooking } from '../../sheetsInput'
 import { HandlerWrapper } from '../../utils'
+import { UserSchema } from '../../../shared/schemas/user'
 
 export type TCreateSheetForBooking = {
   userId: string
@@ -15,7 +16,7 @@ export type TCreateSheetForBooking = {
   district: string
 }
 
-export const createSheetForBookingEndpoint = HandlerWrapper<TCreateSheetForBooking, { userId: string }>(
+export const createSheetForBookingEndpoint = HandlerWrapper< { userId: string }, TCreateSheetForBooking>(
   (req, res) => ['createSheet', subject('eventBookingIds', { eventId: res.locals.event.eventId, userId: req.params.userId })],
   async (req, res) => {
     const userQuery = await DBUser.find({ userId: req.params.userId }).go()
@@ -24,7 +25,7 @@ export const createSheetForBookingEndpoint = HandlerWrapper<TCreateSheetForBooki
     }
 
     const event = res.locals.event
-    const user = userQuery.data[0]
+    const user = UserSchema.parse(userQuery.data[0])
 
     const locales = parseAcceptLanguage(req.headers['accept-language'], {
       validate: Intl.DateTimeFormat.supportedLocalesOf,

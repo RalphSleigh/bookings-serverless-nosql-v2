@@ -9,7 +9,7 @@ export type TCreateApplicationData = {
   application: TApplicationForForm
 }
 
-export const createApplicationEndpoint = HandlerWrapper<TCreateApplicationData>(
+export const createApplicationEndpoint = HandlerWrapper<{}, TCreateApplicationData>(
   (req, res) => ['apply', subject('event', res.locals.event)],
   async (req, res) => {
     try {

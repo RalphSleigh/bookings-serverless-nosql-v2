@@ -11,7 +11,7 @@ export type TCreateRoleData = {
   role: TRoleForForm
 }
 
-export const createRole = HandlerWrapper<TCreateRoleData>(
+export const createRole = HandlerWrapper<{}, TCreateRoleData>(
   (req, res) => ['create', subject('role', req.body.role)],
   async (req, res) => {
     try {

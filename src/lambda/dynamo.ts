@@ -47,6 +47,23 @@ export const DBUser = new Entity(
         type: 'boolean',
         required: true,
       },
+      preferences: {
+        type: 'map',
+        properties: {
+          emailNopeList: {
+            type: 'list',
+            items: {
+              type: 'string',
+            },
+          },
+          driveSyncList: {
+            type: 'list',
+            items: {
+              type: 'string',
+            },
+          },
+        },
+      },
     },
     indexes: {
       bySub: {

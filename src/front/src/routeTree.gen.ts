@@ -23,6 +23,7 @@ import { Route as UserEventEventIdManageIndexImport } from './routes/_user/event
 import { Route as UserEventEventIdOwnUpdateImport } from './routes/_user/event/$eventId/own/update'
 import { Route as UserEventEventIdOwnBookImport } from './routes/_user/event/$eventId/own/book'
 import { Route as UserEventEventIdOwnApplyImport } from './routes/_user/event/$eventId/own/apply'
+import { Route as UserEventEventIdManageSettingsImport } from './routes/_user/event/$eventId/manage/settings'
 import { Route as UserEventEventIdManageRolesImport } from './routes/_user/event/$eventId/manage/roles'
 import { Route as UserEventEventIdManageMoneyImport } from './routes/_user/event/$eventId/manage/money'
 import { Route as UserEventEventIdManageCampersImport } from './routes/_user/event/$eventId/manage/campers'
@@ -103,6 +104,13 @@ const UserEventEventIdOwnApplyRoute = UserEventEventIdOwnApplyImport.update({
   path: '/own/apply',
   getParentRoute: () => UserEventEventIdRoute,
 } as any)
+
+const UserEventEventIdManageSettingsRoute =
+  UserEventEventIdManageSettingsImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
 
 const UserEventEventIdManageRolesRoute =
   UserEventEventIdManageRolesImport.update({
@@ -241,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserEventEventIdManageRolesImport
       parentRoute: typeof UserEventEventIdManageImport
     }
+    '/_user/event/$eventId/manage/settings': {
+      id: '/_user/event/$eventId/manage/settings'
+      path: '/settings'
+      fullPath: '/event/$eventId/manage/settings'
+      preLoaderRoute: typeof UserEventEventIdManageSettingsImport
+      parentRoute: typeof UserEventEventIdManageImport
+    }
     '/_user/event/$eventId/own/apply': {
       id: '/_user/event/$eventId/own/apply'
       path: '/own/apply'
@@ -287,6 +302,7 @@ interface UserEventEventIdManageRouteChildren {
   UserEventEventIdManageCampersRoute: typeof UserEventEventIdManageCampersRoute
   UserEventEventIdManageMoneyRoute: typeof UserEventEventIdManageMoneyRoute
   UserEventEventIdManageRolesRoute: typeof UserEventEventIdManageRolesRoute
+  UserEventEventIdManageSettingsRoute: typeof UserEventEventIdManageSettingsRoute
   UserEventEventIdManageIndexRoute: typeof UserEventEventIdManageIndexRoute
 }
 
@@ -298,6 +314,7 @@ const UserEventEventIdManageRouteChildren: UserEventEventIdManageRouteChildren =
     UserEventEventIdManageCampersRoute: UserEventEventIdManageCampersRoute,
     UserEventEventIdManageMoneyRoute: UserEventEventIdManageMoneyRoute,
     UserEventEventIdManageRolesRoute: UserEventEventIdManageRolesRoute,
+    UserEventEventIdManageSettingsRoute: UserEventEventIdManageSettingsRoute,
     UserEventEventIdManageIndexRoute: UserEventEventIdManageIndexRoute,
   }
 
@@ -358,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
   '/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
+  '/event/$eventId/manage/settings': typeof UserEventEventIdManageSettingsRoute
   '/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
@@ -378,6 +396,7 @@ export interface FileRoutesByTo {
   '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
   '/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
+  '/event/$eventId/manage/settings': typeof UserEventEventIdManageSettingsRoute
   '/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
@@ -400,6 +419,7 @@ export interface FileRoutesById {
   '/_user/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
   '/_user/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/_user/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
+  '/_user/event/$eventId/manage/settings': typeof UserEventEventIdManageSettingsRoute
   '/_user/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/_user/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/_user/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
@@ -423,6 +443,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/manage/campers'
     | '/event/$eventId/manage/money'
     | '/event/$eventId/manage/roles'
+    | '/event/$eventId/manage/settings'
     | '/event/$eventId/own/apply'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
@@ -442,6 +463,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/manage/campers'
     | '/event/$eventId/manage/money'
     | '/event/$eventId/manage/roles'
+    | '/event/$eventId/manage/settings'
     | '/event/$eventId/own/apply'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
@@ -462,6 +484,7 @@ export interface FileRouteTypes {
     | '/_user/event/$eventId/manage/campers'
     | '/_user/event/$eventId/manage/money'
     | '/_user/event/$eventId/manage/roles'
+    | '/_user/event/$eventId/manage/settings'
     | '/_user/event/$eventId/own/apply'
     | '/_user/event/$eventId/own/book'
     | '/_user/event/$eventId/own/update'
@@ -543,6 +566,7 @@ export const routeTree = rootRoute
         "/_user/event/$eventId/manage/campers",
         "/_user/event/$eventId/manage/money",
         "/_user/event/$eventId/manage/roles",
+        "/_user/event/$eventId/manage/settings",
         "/_user/event/$eventId/manage/"
       ]
     },
@@ -564,6 +588,10 @@ export const routeTree = rootRoute
     },
     "/_user/event/$eventId/manage/roles": {
       "filePath": "_user/event/$eventId/manage/roles.tsx",
+      "parent": "/_user/event/$eventId/manage"
+    },
+    "/_user/event/$eventId/manage/settings": {
+      "filePath": "_user/event/$eventId/manage/settings.tsx",
       "parent": "/_user/event/$eventId/manage"
     },
     "/_user/event/$eventId/own/apply": {

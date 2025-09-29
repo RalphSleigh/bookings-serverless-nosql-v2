@@ -11,7 +11,7 @@ export type TCreateFeeItemData = {
   fee: TFee
 }
 
-export const createFeeItem = HandlerWrapper<TCreateFeeItemData>(
+export const createFeeItem = HandlerWrapper<{}, TCreateFeeItemData>(
   (req, res) => ['createFee', subject('eventId', { eventId: req.body.fee.eventId })],
   async (req, res) => {
     try {

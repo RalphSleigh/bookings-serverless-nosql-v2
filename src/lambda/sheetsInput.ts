@@ -7,6 +7,7 @@ import { TPerson } from '../shared/schemas/person'
 import { TUser } from '../shared/schemas/user'
 import { ConfigType } from './getConfig'
 import { getAuthClientForScope } from './googleAuthClientHack'
+import { TCreateSheetForBooking } from './endpoints/booking/createSheetForBooking'
 
 const HEADER_ROW_INDEX = 6
 
@@ -36,7 +37,7 @@ export const getEventHasSheet = async (config: ConfigType, event: TEvent, user: 
   }
 }
 
-export async function createSheetForBooking(config: ConfigType, event: TEvent, user: TUser, basic: TBasicBig, locales: string[]) {
+export async function createSheetForBooking(config: ConfigType, event: TEvent, user: TUser, basic: TCreateSheetForBooking, locales: string[]) {
   if (!basic.email || !basic.name || !basic.district) throw new Error('Need basic infomation')
 
   const auth = await getAuthClientForScope(config, ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive.readonly'])

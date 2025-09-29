@@ -9,6 +9,10 @@ export const UserSchema = z.object({
   avatar: z.string().optional(),
   isWoodcraft: z.boolean(),
   isGroupAccount: z.boolean(),
+  preferences: z.object({
+    emailNopeList: z.array(z.uuidv7()).default([]),
+    driveSyncList: z.array(z.uuidv7()).default([]),
+  }).default({ emailNopeList: [], driveSyncList: [] }),
 });
 
 export type TUser = z.infer<typeof UserSchema>;

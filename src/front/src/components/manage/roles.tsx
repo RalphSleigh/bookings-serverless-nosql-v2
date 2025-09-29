@@ -11,10 +11,10 @@ import { RoleForFormSchema, TRole, TRoleForForm } from '../../../../shared/schem
 import { TUser } from '../../../../shared/schemas/user'
 import classes from '../../css/userSelect.module.css'
 import { createRoleMuation } from '../../mutations/createRole'
+import { deleteRoleMuation } from '../../mutations/deleteRole'
 import { getEventRolesQueryOptions } from '../../queries/getEventRoles'
 import { getUsersQueryOptions } from '../../queries/getUsers'
 import { CustomSelect } from '../custom-inputs/customSelect'
-import { deleteRoleMuation } from '../../mutations/deleteRole'
 
 export const ManageRoles = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -49,7 +49,9 @@ export const ManageRoles = () => {
     if (!user) return null
     return (
       <Table.Tr key={role.roleId}>
-        <Table.Td><UserItem user={user} /></Table.Td>
+        <Table.Td>
+          <UserItem user={user} />
+        </Table.Td>
         <Table.Td>{role.role}</Table.Td>
         <Table.Td>
           <Button variant="outline" color="red" onClick={() => deleteMutation.mutate(role.roleId)}>
@@ -62,48 +64,52 @@ export const ManageRoles = () => {
 
   return (
     <Container strategy="grid" fluid>
-        <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid mt={16}>
-              <Grid.Col span={5}>
-                <UserSelect />
-              </Grid.Col>
-              <Grid.Col span={5}>
-                <CustomSelect styles={{ input: { height: 50 } }} data={rolesData} name="role" control={control} placeholder="Choose role" />
-              </Grid.Col>
-              <Grid.Col span={2}>
-                <Button h={50} type="submit" fullWidth disabled={!isValid}>
-                  Add Role
-                </Button>
-              </Grid.Col>
-            </Grid>
-          </form>
-        </FormProvider>
-        <Grid>
-          <Grid.Col>
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>User</Table.Th>
-                  <Table.Th>Role</Table.Th>
-                  <Table.Th>Actions</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{roleRows}</Table.Tbody>
-            </Table>
-          </Grid.Col>
-        </Grid>
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid mt={16}>
+            <Grid.Col span={5}>
+              <UserSelect />
+            </Grid.Col>
+            <Grid.Col span={5}>
+              <CustomSelect styles={{ input: { height: 50 } }} data={rolesData} name="role" control={control} placeholder="Choose role" />
+            </Grid.Col>
+            <Grid.Col span={2}>
+              <Button h={50} type="submit" fullWidth disabled={!isValid}>
+                Add Role
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </form>
+      </FormProvider>
+      <Grid>
+        <Grid.Col>
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>User</Table.Th>
+                <Table.Th>Role</Table.Th>
+                <Table.Th>Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{roleRows}</Table.Tbody>
+          </Table>
+        </Grid.Col>
+      </Grid>
     </Container>
   )
 }
 
 const UserItem = ({ user }: { user: TUser }) => {
   return (
-    <Group flex={1} gap={8}>
-      <Avatar src={user.avatar} size={32} imageProps={{
-              referrerPolicy: 'no-referrer',
-            }}/>
-      <Text>
+    <Group flex={1} gap={8} wrap="nowrap">
+      <Avatar
+        src={user.avatar}
+        size={32}
+        imageProps={{
+          referrerPolicy: 'no-referrer',
+        }}
+      />
+      <Text style={{ textOverflow: 'ellipsis', overflow: 'hidden' }} size='sm'>
         {user.name} ({user.email})
       </Text>
     </Group>

@@ -12,7 +12,7 @@ export type EventID = Pick<TEvent, 'eventId'>
 export type Abilities =
   | ['manage', 'all']
   | ['get', 'events' | 'event' | 'currentUser' | 'env' | 'ownBookings' | 'users' | 'errors']
-  | ['update', 'eventBooking' | ({ event: TEvent; booking: TBooking } & ForcedSubject<'eventBooking'>)]
+  | ['update', 'userPreferences' | 'eventBooking' | ({ event: TEvent; booking: TBooking } & ForcedSubject<'eventBooking'>)]
   | ['book' | 'apply', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
@@ -41,6 +41,8 @@ export const getPermissionsFromUser = (user: ContextUser) => {
     return build()
     //return build({conditionsMatcher: lambdaMatcher})
   }
+
+  can('update', 'userPreferences')
 
   //edit own bookings
   can('update', 'eventBooking', ({ booking: b }) => b.userId === user.userId)

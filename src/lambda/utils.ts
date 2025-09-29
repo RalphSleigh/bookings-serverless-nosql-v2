@@ -1,39 +1,76 @@
-import { RequestHandler, Request, Response } from 'express'
-import { ZodError } from "zod/v4";
-import { Abilities } from '../shared/permissions';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { DB } from './dynamo';
-import { TBooking } from '../shared/schemas/booking';
-import { TPerson } from '../shared/schemas/person';
+import { Request, RequestHandler, Response } from 'express'
+import { ParamsDictionary } from 'express-serve-static-core'
+import { ZodError } from 'zod/v4'
+
+import { Abilities, getPermissionsFromUser } from '../shared/permissions'
+import { TBooking } from '../shared/schemas/booking'
+import { TEvent } from '../shared/schemas/event'
+import { TPerson } from '../shared/schemas/person'
+import { ContextUser, TUser } from '../shared/schemas/user'
+import { DB } from './dynamo'
+import { ConfigType } from './getConfig'
+import { Logger } from './middleware/logger'
 
 export function am_in_lambda(): boolean {
   return process.env.LOCAL_SERVER !== 'true'
 }
 
-type PermissionFn<B, P> = (req: TypedRequest<B, P>, res: Response) => Abilities
-type TypedRequest<B, P> = Request<P, any, B>
+type PermissionFn<Params, ReqBody, Locals extends Record<string, any>> = (req: TypedRequest<Params, ReqBody, Locals>, res: Response<any, Locals>) => Abilities
+type TypedRequest<Params, ReqBody, Locals extends Record<string, any>> = Request<Params, any, ReqBody, any, Locals>
 
-export type THandlerWrapper = <B = any, P extends ParamsDictionary = {}>(permissionFn: PermissionFn<B, P>, fn: RequestHandler) => RequestHandler<P, any, B>
+export type THandlerWrapper<RouteLocals extends Record<string, any>> = <Params extends ParamsDictionary = {}, Body = any>(
+  permissionFn: PermissionFn<Params, Body, RouteLocals>,
+  fn: RequestHandler<Params, any, Body, any, RouteLocals>,
+) => RequestHandler<Params, any, Body, any, RouteLocals>
 
-export const HandlerWrapper: THandlerWrapper =
-  (permissionFn, fn) =>
-  async (req, res, next) => {
-    const permission = res.locals.permissions
+interface BasicLocals {
+  config: ConfigType
+  user: ContextUser
+  permissions: ReturnType<typeof getPermissionsFromUser>
+  event: TEvent
+  booking: TBooking
+  logger: Logger
+}
 
-    if (!permission.can(...permissionFn(req, res))) {
-      return res.status(401).json({ message: 'Unauthorized' })
-    }
+export const HandlerWrapper: THandlerWrapper<BasicLocals> = (permissionFn, fn) => async (req, res, next) => {
+  const permission = res.locals.permissions
 
-    try {
-      await fn(req, res, next)
-    } catch (error: any) {
-      console.error('Error in handler:', error)
-      if (error instanceof ZodError) {
-        return res.status(400).json({ message: "Validation Error, this shouldn't happen" })
-      }
-      throw error
-    }
+  if (!permission.can(...permissionFn(req, res))) {
+    return res.status(401).json({ message: 'Unauthorized' })
   }
+
+  try {
+    await fn(req, res, next)
+  } catch (error: any) {
+    console.error('Error in handler:', error)
+    if (error instanceof ZodError) {
+      return res.status(400).json({ message: "Validation Error, this shouldn't happen" })
+    }
+    throw error
+  }
+}
+
+export const HandlerWrapperLoggedIn: THandlerWrapper<BasicLocals & { user: TUser }> = (permissionFn, fn) => async (req, res, next) => {
+  const permission = res.locals.permissions
+
+  if (res.locals.user === undefined) {
+    return res.status(401).json({ message: 'Unauthorized' })
+  }
+
+  if (!permission.can(...permissionFn(req, res))) {
+    return res.status(401).json({ message: 'Unauthorized' })
+  }
+
+  try {
+    await fn(req, res, next)
+  } catch (error: any) {
+    console.error('Error in handler:', error)
+    if (error instanceof ZodError) {
+      return res.status(400).json({ message: "Validation Error, this shouldn't happen" })
+    }
+    throw error
+  }
+}
 
 /* 
 export type HandlerFunction<TPost, TResult> = (event: Omit<APIGatewayProxyEvent, 'body'> & { body: TPost }, context: ContextWithUser) => Promise<TResult>;
@@ -73,11 +110,10 @@ export const HandlerWrapper: HandlerWrapperType = <TPost, TResult>([action, subj
   });
 }; */
 
-
 export const getBookingByIDs: (eventId: string, userId: string) => Promise<TBooking> = async (eventId, userId) => {
   const bookingsResult = await DB.collections.booking({ eventId, userId }).go()
-  if(!bookingsResult.data.booking[0]) throw new Error('Booking not found')
+  if (!bookingsResult.data.booking[0]) throw new Error('Booking not found')
   const booking = bookingsResult.data.booking[0] as TBooking
-  booking.people = bookingsResult.data.person.filter((p) => !p.cancelled).sort((a,b) => a.createdAt - b.createdAt) as TPerson[]
+  booking.people = bookingsResult.data.person.filter((p) => !p.cancelled).sort((a, b) => a.createdAt - b.createdAt) as TPerson[]
   return booking
 }
