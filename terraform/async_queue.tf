@@ -1,15 +1,17 @@
 resource "aws_sqs_queue" "async_task_queue" {
-  name                       = "async-task-queue.fifo"
-  visibility_timeout_seconds = 900
-  fifo_queue = true
+  name                        = "async-task-queue.fifo"
+  visibility_timeout_seconds  = 900
+  fifo_queue                  = true
   content_based_deduplication = true
 }
 
 resource "aws_sqs_queue" "async_task_dead_letter_queue" {
-  name = "async-task-dead-letter-queue"
+  name = "async-task-dead-letter-queue.fifo"
   redrive_allow_policy = jsonencode({
-    redrivePermission = "byQueue",
-    sourceQueueArns   = [aws_sqs_queue.async_task_queue.arn]
+    redrivePermission           = "byQueue",
+    sourceQueueArns             = [aws_sqs_queue.async_task_queue.arn]
+    fifo_queue                  = true
+    content_based_deduplication = true
   })
 }
 
@@ -46,15 +48,15 @@ resource "aws_lambda_function" "async_task_lambda" {
   s3_bucket = aws_s3_bucket.lambda_code.id
   s3_key    = resource.aws_s3_object.async_task_lambda_code.key
 
-  architectures = ["arm64"]
-  memory_size   = 1024
-  timeout       = 900
+  architectures                  = ["arm64"]
+  memory_size                    = 1024
+  timeout                        = 900
   reserved_concurrent_executions = 1
 
   environment {
     variables = {
-      workspace = terraform.workspace
-      log_arm   = resource.aws_cloudwatch_log_stream.booking_system_logs.arn
+      workspace            = terraform.workspace
+      log_arm              = resource.aws_cloudwatch_log_stream.booking_system_logs.arn
       ASYNC_TASK_QUEUE_URL = aws_sqs_queue.async_task_queue.id
     }
   }
@@ -67,10 +69,10 @@ resource "aws_lambda_function" "async_task_lambda" {
 }
 
 resource "aws_lambda_event_source_mapping" "async_task_event_source_mapping" {
-  event_source_arn = aws_sqs_queue.async_task_queue.arn
-  enabled          = true
-  function_name    = aws_lambda_function.async_task_lambda.arn
-  function_response_types = [ "ReportBatchItemFailures" ]
+  event_source_arn        = aws_sqs_queue.async_task_queue.arn
+  enabled                 = true
+  function_name           = aws_lambda_function.async_task_lambda.arn
+  function_response_types = ["ReportBatchItemFailures"]
 }
 
 data "aws_iam_policy_document" "async_task_lambda_role_iam_policy" {
@@ -119,7 +121,7 @@ data "aws_iam_policy_document" "lambda_async_exec_role_policy" {
     ]
 
     resources = [aws_dynamodb_table.bookings_table.arn, "${aws_dynamodb_table.bookings_table.arn}/index/*", aws_dynamodb_table.config_table.arn]
-    effect = "Allow"
+    effect    = "Allow"
   }
 }
 
