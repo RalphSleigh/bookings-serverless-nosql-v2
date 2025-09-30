@@ -101,6 +101,13 @@ export const updateBooking = HandlerWrapper(
       },
     })
 
+    enqueueAsyncTask({
+      type: "driveSync",
+      data: {
+        eventId: event.eventId,
+      },
+    })
+
     res.json({ ok: 'ok' })
   },
 )

@@ -59,14 +59,14 @@ export const getPermissionsFromUser = (user: ContextUser) => {
   can('apply', 'event', (e) => e.applicationsRequired)
 
   for (const role of user.roles) {
-    permissionsFunctions[role.role](can)
+    permissionsFunctions[role.role](can, role)
   }
 
   return build({ conditionsMatcher: lambdaMatcher })
 }
 
-const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbility<Abilities, MatchConditions>>['can']) => void> = {
-  admin: (can) => {
+const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbility<Abilities, MatchConditions>>['can'], role: TRole) => void> = {
+  admin: (can, role) => {
     can('create', 'event')
     can('edit', 'event')
     can('getBackend', 'eventId', (e) => true)
@@ -84,5 +84,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('createSheet', 'eventBookingIds', (ids) => true)
     can('getSheetData', 'eventBookingIds', (ids) => true)
   },
-  owner: (can) => {},
+  owner: (can, role) => {
+    can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+  },
 }

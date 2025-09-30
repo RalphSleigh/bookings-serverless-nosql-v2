@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
-import { MantineReactTable, MRT_ColumnDef, useMantineReactTable } from 'mantine-react-table'
+import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
 import { TPerson } from '../../../../shared/schemas/person'
@@ -8,8 +8,10 @@ import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
 import 'mantine-react-table/styles.css'
 
-import { Box, Container, Modal, Paper, Text, Title } from '@mantine/core'
+import { ActionIcon, Box, Button, Container, Flex, Modal, Paper, Text, Title } from '@mantine/core'
+import { IconDownload } from '@tabler/icons-react'
 import dayjs from 'dayjs'
+import { download, generateCsv, mkConfig } from 'export-to-csv'
 import useLocalStorageState from 'use-local-storage-state'
 
 import { personFields } from '../../../../shared/personFields'
@@ -53,6 +55,31 @@ export const ManageCampers = () => {
 
   const [selected, setSelected] = useState<string | undefined>(undefined)
 
+  const handleExportRows = (rows: MRT_Row<TPerson>[]) => {
+    const rowData = rows.map((row) => row.original)
+    const fields = personFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
+    const columnNames = fields.map((f) => f.titleForDrive())
+    let data = rowData.map((row) => {
+      return fields.reduce(
+        (acc, f) => {
+          acc[f.name] = f.valueForDrive(row)
+          return acc
+        },
+        {} as Record<string, string>,
+      )
+    })
+
+    const csvConfig = mkConfig({
+      fieldSeparator: ',',
+      decimalSeparator: '.',
+      useKeysAsHeaders: true,
+      filename: `campers-${event.name}-${dayjs().format('YYYY-MM-DD')}`,
+    })
+
+    const csv = generateCsv(csvConfig)(data)
+    download(csvConfig)(csv)
+  }
+
   const table = useMantineReactTable({
     columns,
     data: campers, //must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
@@ -66,6 +93,17 @@ export const ManageCampers = () => {
         setSelected(row.original.personId)
       },
     }),
+    renderToolbarInternalActions: ({ table }) => (
+      <Flex gap="xs" align="center">
+        {/* add custom button to print table  */}
+        <ActionIcon variant="subtle" color="gray" onClick={() => handleExportRows(table.getPrePaginationRowModel().rows)}>
+          <IconDownload />
+        </ActionIcon>
+        {/* along-side built-in buttons in whatever order you want them */}
+        <MRT_ToggleDensePaddingButton table={table} />
+        <MRT_ToggleFullScreenButton table={table} />
+      </Flex>
+    ),
   })
 
   const selectedPerson = campers.find((c) => c.personId === selected)

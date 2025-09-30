@@ -111,7 +111,7 @@ async function generateDomainWideDelegationAccessToken(signedJwt: string): Promi
 let awsAuthClient: GoogleAuth<AwsClient> | null = null
 const authScopeMap: Record<string, OAuth2Client> = {}
 
-export const getAuthClientForScope = async (config: ConfigType, scopes: string[]): Promise<OAuth2Client> => {
+export const getAuthClientForScope = async (config: ConfigType, scopes: string[], user = config.GOOGLE_WORKSPACE_EMAIL): Promise<OAuth2Client> => {
   if (awsAuthClient === null) {
     const googlePoolConf = {
       universe_domain: 'googleapis.com',
@@ -133,11 +133,11 @@ export const getAuthClientForScope = async (config: ConfigType, scopes: string[]
 
   const scope = scopes.join(',')
 
-  if (!authScopeMap[scope]) {
+  if (!authScopeMap[scope + user]) {
     const accessToken = await (
       await getDomainWideDelegationAccessToken(awsAuthClient)
     )(
-      config.GOOGLE_WORKSPACE_EMAIL, // The email of the user to impersonate
+      user, // The email of the user to impersonate
       config.GOOGLE_SERVICE_ACCOUNT_EMAIL, // The service account email
       scopes,
       15 * 60, // Lifetime of the access token, it cannot be greater than 1h
@@ -145,7 +145,7 @@ export const getAuthClientForScope = async (config: ConfigType, scopes: string[]
 
     const oauth2Client = new OAuth2Client()
     oauth2Client.setCredentials({ access_token: accessToken })
-    authScopeMap[scope] = oauth2Client
+    authScopeMap[scope + user] = oauth2Client
   }
-  return authScopeMap[scope]
+  return authScopeMap[scope + user]
 }

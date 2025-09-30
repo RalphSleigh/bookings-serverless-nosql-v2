@@ -101,6 +101,7 @@ export type TBookingSchemaForTypeBasicBig = z.infer<typeof BookingSchemaForTypeB
 export type TBookingSchemaForTypeBasicBigGroup = z.infer<typeof BookingSchemaForTypeBasicBigGroup>
 
 export type TBooking = z.infer<typeof BookingSchemaForType>
+
 export type PartialBookingType = PartialDeep<TBookingForType, { recurseIntoArrays: true }>
 
 export type TBasicBig = z.infer<typeof basicBig>

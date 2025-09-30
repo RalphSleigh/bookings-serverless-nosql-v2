@@ -1,27 +1,23 @@
 import { notifications } from '@mantine/notifications'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { useContext } from 'react'
 
-import { TCreateEventData } from '../../../lambda/endpoints/event/createEvent'
-import { TEventWhenCreating } from '../../../shared/schemas/event'
-import { TRole, TRoleForForm } from '../../../shared/schemas/role'
-import { TUserNopeListUpdate } from '../../../lambda/endpoints/user/updateUserNopeList'
+import { TUserPreferenceUpdate } from '../../../lambda/endpoints/user/updateUserPreference'
 
-export const updateUserNopeList = (eventId: string) => {
+export const updateUserPreference = (preference: 'emailNopeList' | 'driveSync', eventId: string) => {
 
   const queryClient = useQueryClient()
 
   return useMutation({
         mutationFn: async (state: boolean) => {
-        return await axios.post<TUserNopeListUpdate>(`/api/user/updateNopeList`, { eventId, state })
+        return await axios.post<TUserPreferenceUpdate>(`/api/user/updateUserPreference`, { eventId, state, preference })
     },
-    onSuccess: (data: AxiosResponse, context) => {
+    onSuccess: (data: AxiosResponse<TUserPreferenceUpdate>, context) => {
       queryClient.invalidateQueries({ queryKey: ['user'] })
       notifications.show({
         title: 'User Preferences Updated',
-        message: `User preferences updated`,
+        message: `${data.data.preference}: ${data.data.state ? 'Enabled' : 'Disabled'}`,
         color: 'green',
       })
     },

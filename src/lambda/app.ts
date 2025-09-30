@@ -33,7 +33,7 @@ import { getUsers } from './endpoints/event/manage/getUsers'
 import { testCreateRole } from './endpoints/test/addAdminRole'
 import { testLoggedIn } from './endpoints/test/testLoggedIn'
 import { getUser } from './endpoints/user/getUser'
-import { updateUserEmailNopeList } from './endpoints/user/updateUserNopeList'
+import { updateUserPreference } from './endpoints/user/updateUserPreference'
 import { configMiddleware } from './middleware/config'
 import { eventMiddleware } from './middleware/event'
 import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
@@ -59,7 +59,7 @@ router.get('/auth/callback', authCallback)
 router.get('/user/current', getUser)
 router.get('/user/logout', logout)
 router.get('/user/bookings', getUserBookings)
-router.post('/user/updateNopeList', updateUserEmailNopeList)
+router.post('/user/updateUserPreference', updateUserPreference)
 //app.get('/test/loggedIn', testLoggedIn)
 //
 router.get('/test/createRole', testCreateRole)

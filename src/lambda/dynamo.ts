@@ -183,6 +183,7 @@ export const DBEvent = new Entity(
       },
       fee: {
         type: 'map',
+        required: true,
         properties: {
           feeStructure: {
             type: ['free', 'ealing'] as const,

@@ -1,3 +1,4 @@
+import { syncDriveForEvent } from "../driveSync/driveSyncer";
 import { sendBookingUpdatedEmails } from "../emails/sendBookingUpdatedEmails";
 import { getConfig } from "../getConfig";
 import { AsyncTask } from "./asyncTaskQueuer";
@@ -12,5 +13,8 @@ export const asyncTasksExecutor = async (task: AsyncTask) => {
             console.log("Handling emailBookingUpdated");
             await sendBookingUpdatedEmails(task, config);
             break;
+        case "driveSync":
+            console.log("Handling driveSync");
+            await syncDriveForEvent(task.data.eventId, config);
     }
 }

@@ -2,14 +2,15 @@ import { subject } from '@casl/ability'
 import { CreateEntityItem } from 'electrodb'
 
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
+import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
 import { DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
-import { HandlerWrapper } from '../../utils'
+import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../utils'
 
 export type TCreateBookingData = {
   booking: TBooking
 }
 
-export const createBooking = HandlerWrapper(
+export const createBooking = HandlerWrapperLoggedIn(
   (req, res) => ['book', subject('event', res.locals.event)],
   async (req, res) => {
     const user = res.locals.user
@@ -17,7 +18,7 @@ export const createBooking = HandlerWrapper(
     const booking = req.body.booking as TBooking
 
     if (booking.eventId !== event.eventId) throw new Error('Event ID in path and body do not match')
-    if (!user || booking.userId !== user.userId) throw new Error('User ID in booking does not match authenticated user')
+    if (booking.userId !== user.userId) throw new Error('User ID in booking does not match authenticated user')
 
     const bookingSchema = BookingSchema(event)
 
@@ -45,6 +46,13 @@ export const createBooking = HandlerWrapper(
       }
       await DBPersonHistory.create(personHistoryItem).go()
     }
+
+    enqueueAsyncTask({
+      type: 'driveSync',
+      data: {
+        eventId: event.eventId,
+      },
+    })
 
     res.json({ ok: 'ok' })
   },
