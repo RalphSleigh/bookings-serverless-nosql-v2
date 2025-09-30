@@ -51,12 +51,14 @@ export const ManageBookingHistory = () => {
           value={startDate.toString()}
           onChange={(v) => setStartDate(Number(v))}
           data={versionDates.map((d) => ({ value: d.toString(), label: new Date(d).toLocaleString(), disabled: d >= endDate }))}
+          allowDeselect={false}
         />
         <Select
           label="To"
           value={endDate.toString()}
           onChange={(v) => setEndDate(Number(v))}
           data={versionDates.map((d) => ({ value: d.toString(), label: new Date(d).toLocaleString(), disabled: d <= startDate }))}
+          allowDeselect={false}
         />
       </Flex>
       <Viewer
