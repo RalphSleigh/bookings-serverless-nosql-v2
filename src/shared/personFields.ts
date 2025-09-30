@@ -6,7 +6,8 @@ import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { ageGroupFromPerson } from './woodcraft'
-import relativeTime from 'dayjs/plugin/relativeTime'
+
+import relativeTime from 'dayjs/plugin/relativeTime.js'
 dayjs.extend(relativeTime);
 
 type CellType = MRT_ColumnDef<TPerson>['Cell']
