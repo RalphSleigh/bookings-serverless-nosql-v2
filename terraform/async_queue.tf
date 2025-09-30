@@ -1,5 +1,5 @@
 resource "aws_sqs_queue" "async_task_queue" {
-  name                       = "async-task-queue"
+  name                       = "async-task-queue.fifo"
   visibility_timeout_seconds = 900
   fifo_queue = true
   content_based_deduplication = true
