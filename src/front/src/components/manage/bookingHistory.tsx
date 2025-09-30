@@ -27,6 +27,10 @@ export const ManageBookingHistory = () => {
   const [startDate, setStartDate] = useState<number>(versionDates[versionDates.length - 2])
   const [endDate, setEndDate] = useState<number>(versionDates[versionDates.length - 1])
 
+  if(versionDates.length < 2) {
+    return <div>No history available</div>
+  }
+
   const diffData = useMemo(() => {
     const v1 = bookingsQuery.data.data.bookingHistory[0].versions.find((v) => v.updatedAt === startDate)
     const v1people = bookingsQuery.data.data.personHistory.map((p) => p.versions.filter((v) => v.updatedAt <= startDate + 5000).pop()).filter((p) => p !== undefined)
