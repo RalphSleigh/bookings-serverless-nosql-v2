@@ -6,13 +6,13 @@ resource "aws_sqs_queue" "async_task_queue" {
 }
 
 resource "aws_sqs_queue" "async_task_dead_letter_queue" {
-  name = "async-task-dead-letter-queue"
+  name = "async-task-dead-letter-queue.fifo"
   redrive_allow_policy = jsonencode({
-    redrivePermission           = "byQueue",
-    sourceQueueArns             = [aws_sqs_queue.async_task_queue.arn]
-    fifo_queue                  = true
-    content_based_deduplication = true
+    redrivePermission = "byQueue",
+    sourceQueueArns   = [aws_sqs_queue.async_task_queue.arn]
   })
+  fifo_queue                  = true
+  content_based_deduplication = true
 }
 
 resource "aws_sqs_queue_redrive_policy" "q" {
