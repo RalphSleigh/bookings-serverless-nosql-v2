@@ -6,7 +6,7 @@ resource "aws_sqs_queue" "async_task_queue" {
 }
 
 resource "aws_sqs_queue" "async_task_dead_letter_queue" {
-  name = "async-task-dead-letter-queue.fifo"
+  name = "async-task-dead-letter-queue"
   redrive_allow_policy = jsonencode({
     redrivePermission           = "byQueue",
     sourceQueueArns             = [aws_sqs_queue.async_task_queue.arn]
