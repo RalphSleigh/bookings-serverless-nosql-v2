@@ -6,7 +6,7 @@ import { UseMutationResult } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
 import React, { useCallback, useContext, useState } from 'react'
 import { DefaultValues, FormProvider, useForm } from 'react-hook-form'
-import { z } from 'zod/v4'
+import z4, { z } from 'zod/v4'
 
 import { getFeeType } from '../../../../shared/fees/fees.js'
 //import { getAttendance } from "../../../shared/attendance/attendance.js";
@@ -14,7 +14,7 @@ import { getFeeType } from '../../../../shared/fees/fees.js'
 //import { MemoBookingExtraContactFields } from "./extraContacts.js";
 //import { MemoCampingFields } from "./camping.js";
 //import { consent } from "../../../shared/consents/consent.js";
-import { BookingSchema, BookingSchemaForType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
+import { BookingSchema, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
 import { cancelBooking } from '../../mutations/cancelBooking.js'
@@ -25,6 +25,7 @@ import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { ValidationErrors } from './validation.js'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -43,7 +44,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
 
   const schema = BookingSchema(event)
   type BookingFormValues = z.infer<typeof schema>
-  const formMethods = useForm<BookingFormValues>({ resolver: standardSchemaResolver(schema), mode: 'onTouched', defaultValues: inputData as BookingFormValues })
+  const formMethods = useForm({ resolver: zodResolver(schema), mode: 'onTouched', defaultValues: inputData as BookingFormValues })
   const { formState, handleSubmit } = formMethods
   const { isValid } = formState
 

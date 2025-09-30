@@ -10,14 +10,16 @@ import { useFieldArray, UseFieldArrayAppend, UseFieldArrayRemove, useFormContext
 import { z } from 'zod/v4'
 
 import { BookingSchemaForType } from '../../../../shared/schemas/booking'
-import { errorProps } from '../../utils'
+import { errorProps, useEvent } from '../../utils'
 import { CustomRadioGroup } from '../custom-inputs/customRadioGroup'
 
 export function OtherQuestionsForm() {
-  const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
   const e = errorProps(errors)
+
+  const event = useEvent()
 
   return (
     <Grid>
@@ -25,12 +27,15 @@ export function OtherQuestionsForm() {
         <Title order={2} size="h5" mt={16}>
           Other Stuff
         </Title>
-        <CustomRadioGroup name="other.whatsApp" control={control} label="Do you want to be added to camp Whatsapp group?">
-          <Group mt={8}>
-            <Radio value={'yes'} label="Yes" />
-            <Radio value={'no'} label="No" />
-          </Group>
-        </CustomRadioGroup>
+        {!event.bigCampMode && (
+          <CustomRadioGroup name="other.whatsApp" label="Do you want to be added to camp Whatsapp group?">
+            <Group mt={8}>
+              <Radio value={'yes'} label="Yes" />
+              <Radio value={'no'} label="No" />
+            </Group>
+          </CustomRadioGroup>
+        )}
+
         <Textarea
           mt={8}
           label="Anything else"
