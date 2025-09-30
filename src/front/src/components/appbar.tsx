@@ -1,7 +1,7 @@
 import { ActionIcon, AppShell, Avatar, Box, Button, Flex, Text, ThemeIcon, Title, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
 import { IconBug, IconLogout, IconMoon, IconSun } from '@tabler/icons-react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { useRouteContext } from '@tanstack/react-router'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useRouteContext, useSearch } from '@tanstack/react-router'
 import React, { useContext } from 'react'
 
 import { envQueryOptions } from '../queries/env'
@@ -94,8 +94,10 @@ const UserStatus = () => {
       </>
     )
   } else {
+    const query = useSearch({ from: '__root__' })
+
     return (
-      <Button component="a" variant="default" href="/api/auth/redirect">
+      <Button component="a" variant="default" href={query.redirect ? `/api/auth/redirect?redirect=${query.redirect}` : '/api/auth/redirect'}>
         Login
       </Button>
     )

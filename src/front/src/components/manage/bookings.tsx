@@ -16,7 +16,7 @@ import { bookingFields } from '../../../../shared/bookingFields'
 import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
-import { useEvent } from '../../utils'
+import { CustomLink, useEvent } from '../../utils'
 import { TBooking } from '../../../../shared/schemas/booking'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import { IconDownload } from '@tabler/icons-react'
@@ -117,6 +117,9 @@ export const ManageBookings = () => {
 const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBooking }) => {
   return (
     <>
+    <CustomLink to={`/event/$eventId/manage/booking/$userId/history`} params={{ eventId: event.eventId, userId: booking.userId }} style={{ float: 'right', marginTop: 10, marginRight: 10 }}>
+                History
+              </CustomLink>
       {/*
       { <Title order={3}>{person.basic.name}</Title>
       <Text>

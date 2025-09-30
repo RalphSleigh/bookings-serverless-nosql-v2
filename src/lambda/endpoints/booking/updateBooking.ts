@@ -26,7 +26,7 @@ export const updateBooking = HandlerWrapper(
     const existingBookingQuery = await DBBooking.find({userId: booking.userId, eventId: event.eventId}).go()
     const existingPeopleQuery = await DBPerson.find({userId: booking.userId, eventId: event.eventId}).go()
 
-    const existingBooking = bookingSchema.parse({...existingBookingQuery.data[0], people: existingPeopleQuery.data})
+    const existingBooking = bookingSchema.parse({...existingBookingQuery.data[0], people: existingPeopleQuery.data.filter(p => !p.cancelled)})
 
     const { people, ...validatedBooking } = bookingSchema.parse(booking)
 

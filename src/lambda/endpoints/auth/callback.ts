@@ -124,6 +124,12 @@ export const authCallback: RequestHandler = async (req, res) => {
       sameSite: true,
     })
 
+    if(req.cookies.redirect) {
+      res.clearCookie('redirect', { path: '/' })
+      res.redirect(req.cookies.redirect as string)
+      return
+    }
+
     res.redirect(config.BASE_URL)
   } catch (error) {
     res.locals.logger.logToPath('Error in auth callback')

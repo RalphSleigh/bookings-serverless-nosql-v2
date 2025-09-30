@@ -1,3 +1,4 @@
+import { postDiscordMessage } from "../discord/discordMessagePoster";
 import { syncDriveForEvent } from "../driveSync/driveSyncer";
 import { sendBookingUpdatedEmails } from "../emails/sendBookingUpdatedEmails";
 import { getConfig } from "../getConfig";
@@ -16,5 +17,10 @@ export const asyncTasksExecutor = async (task: AsyncTask) => {
         case "driveSync":
             console.log("Handling driveSync");
             await syncDriveForEvent(task.data.eventId, config);
+            break;
+        case "discordMessage":
+            console.log("Handling discordMessage");
+            await postDiscordMessage(task, config);
+            break;
     }
 }

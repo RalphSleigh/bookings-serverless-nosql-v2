@@ -70,6 +70,7 @@
     "express": "^5.1.0",
     "google-auth-library": "^10.3.0",
     "intl-parse-accept-language": "^1.0.0",
+    "json-diff-kit": "^1.0.33",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.2.0",
     "lodash": "^4.17.21",

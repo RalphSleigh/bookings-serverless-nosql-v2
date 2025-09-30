@@ -15,7 +15,9 @@ export type ConfigType = {
   ENV: 'dev' | 'prod'
   COOKIE_EXPIRY: number
   BASE_URL: string,
-  EMAIL_ENABLED: boolean
+  EMAIL_ENABLED: boolean,
+  DISCORD_ENABLED: boolean,
+  DISCORD_WEBHOOK_URL: string,
 }
 
 let configData: ConfigType
