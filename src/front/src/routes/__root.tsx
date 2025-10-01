@@ -1,4 +1,4 @@
-import { AppShell } from '@mantine/core'
+import { AppShell, Box, Text } from '@mantine/core'
 import { useQueryErrorResetBoundary, type QueryClient, type useSuspenseQuery } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRoute, createRootRouteWithContext, Link, Outlet, useRouteContext, useRouter, useSearch } from '@tanstack/react-router'
@@ -9,11 +9,11 @@ import { useEffect } from 'react'
 import { getPermissionsFromUser } from '../../../shared/permissions'
 import { useAuth } from '../auth'
 import { AppToolbar } from '../components/appbar'
+import { RouterErrorComponent } from '../components/routerErrorComponent'
 import classes from '../css/mainArea.module.css'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
 import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
-import { RouterErrorComponent } from '../components/routerErrorComponent'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -34,7 +34,7 @@ export const Route = createRootRouteWithContext<{
     return {}
   },
 
-  errorComponent: RouterErrorComponent
+  errorComponent: RouterErrorComponent,
 })
 
 function RootComponent(): React.JSX.Element {
@@ -53,7 +53,16 @@ function RootComponent(): React.JSX.Element {
       <AppShell header={{ height: 48 }}>
         <AppToolbar />
         <AppShell.Main className={classes.root}>
-          <Outlet />
+          <Box style={{ minHeight: 'calc(100vh - 48px)', display: 'flex', flexDirection: 'column' }}>
+            <Box flex={1}>
+              <Outlet />
+            </Box>
+            <Box>
+              <Text size="xs" ta="center" c="dimmed" mt={16} mb={8}>
+                &copy; {new Date().getFullYear()} Woodcraft Folk. Source on <a href="https://github.com/RalphSleigh/bookings-serverless-nosql-v2">GitHub</a>. <a href="/api/auth/redirect?switch=true">Switch User</a>.
+              </Text>
+            </Box>
+          </Box>
         </AppShell.Main>
       </AppShell>
       <ReactQueryDevtools buttonPosition="bottom-right" />
