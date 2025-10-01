@@ -2,9 +2,10 @@ import { Grid, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { Markdown as EmailMarkdown } from '@react-email/markdown'
 import { useDebounce } from '@react-hook/debounce'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { WatchDebounce } from '../../front/src/utils'
 import { AttendanceTypes } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
 import { TEalingFees, TEvent, TEventWithFees, TFees } from '../schemas/event'
@@ -130,15 +131,13 @@ export class EalingFees implements FeeStructure<TEalingFees> {
   }
 
   BookingFormDisplayElement: BookingFormDisplayElement<TEalingFees> = ({ event }) => {
-    const people = useWatch<PartialBookingType, 'people'>({ name: 'people', compute: (people) => people || [] }) as TPerson[]
-    //const people = watch('people') || []
-    //const people = []
-
-    const data = useWatch<PartialBookingType, 'people'>({ name: 'people' })
-    const [debouncedData, setDebouncedData] = useDebounce(() => data, 200)
-    setDebouncedData(data)
-
-    return useMemo(() => <this.BookingFormDisplayElementContents event={event} people={debouncedData} />, [debouncedData])
+    const [people, setPeople] = useState<PartialBookingType['people']>([])
+    return (
+      <>
+        <WatchDebounce value={people} set={setPeople} name="people" duration={500} />
+        <this.BookingFormDisplayElementContents event={event} people={people} />
+      </>
+    )
   }
 
   EventListDisplayElement: EventListDisplayElement<TEalingFees> = ({ event, booking, fees }) => {

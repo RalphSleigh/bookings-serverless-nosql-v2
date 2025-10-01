@@ -1,11 +1,12 @@
 import { Anchor, AnchorProps } from '@mantine/core'
 import { createLink, getRouteApi, LinkComponent, Route } from '@tanstack/react-router'
 import get from 'lodash/get'
-import React, { Dispatch, SetStateAction } from 'react'
+import React, { Dispatch, ReactElement, SetStateAction, useEffect } from 'react'
 import { TEvent } from '../../shared/schemas/event'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getEventsQueryOptions } from './queries/getEvents'
 import dayjs from 'dayjs'
+import { Control, useWatch } from 'react-hook-form'
 
 export function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [value, setValue] = React.useState<T>(() => {
@@ -156,3 +157,32 @@ export const useEvent: () => TEvent = () => {
     }
     return event
   }
+
+
+
+// https://github.com/orgs/react-hook-form/discussions/3078
+
+  interface DebounceProps {
+  value: any
+  set: (n: any) => void
+  name: string | undefined
+  duration?: number
+}
+
+export const WatchDebounce = ({ value, set, name, duration }: DebounceProps): ReactElement => {
+  const internal = name === undefined ? useWatch() : useWatch({name})
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (value !== internal) {
+        set(internal)
+      }
+    }, duration ?? 500)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [value, set, internal, duration])
+
+  return <React.Fragment />
+}
