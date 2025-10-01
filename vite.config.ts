@@ -36,4 +36,8 @@ export default defineConfig({
     outDir: '../../dist',
     emptyOutDir: true
   },
+  define: {
+    BUILD_DATE: JSON.stringify(new Date().valueOf()),
+  },
+
 })

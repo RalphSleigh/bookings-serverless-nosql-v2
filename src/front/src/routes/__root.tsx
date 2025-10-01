@@ -14,6 +14,7 @@ import classes from '../css/mainArea.module.css'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
 import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
+import dayjs from 'dayjs'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -59,7 +60,7 @@ function RootComponent(): React.JSX.Element {
             </Box>
             <Box>
               <Text size="xs" ta="center" c="dimmed" mt={16} mb={8}>
-                &copy; {new Date().getFullYear()} Woodcraft Folk. Source on <a href="https://github.com/RalphSleigh/bookings-serverless-nosql-v2">GitHub</a>. <a href="/api/auth/redirect?switch=true">Switch User</a>.
+                &copy; {new Date().getFullYear()} Woodcraft Folk. Source on <a href="https://github.com/RalphSleigh/bookings-serverless-nosql-v2">GitHub</a>. - Built {dayjs(BUILD_DATE).format('MMMM D, YYYY HH:mm')} - <a href="/api/auth/redirect?switch=true">Switch User</a>.
               </Text>
             </Box>
           </Box>
