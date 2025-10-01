@@ -23,8 +23,8 @@ export const createApplicationMuation = (event: TEvent) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
       navigate({ to: '/' })
       notifications.show({
-        title: 'Application Created',
-        message: `Application Created`,
+        title: 'Application Submitted',
+        message: `The Camp Team will approve this or get in touch.`,
         color: 'green',
       })
     },

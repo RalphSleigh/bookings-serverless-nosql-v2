@@ -50,7 +50,9 @@ export const ManageApplications = () => {
     return (
       <Table.Tr key={app.userId}>
         <Table.Td>{Avatars(app.type)}</Table.Td>
-        <Table.Td>{app.name}</Table.Td>
+        <Table.Td>
+          <a href={`mailto:${app.email}`}>{app.email}</a>
+        </Table.Td>
         <Table.Td>{app.email}</Table.Td>
         <Table.Td>{app.district}</Table.Td>
         <Table.Td>{app.predicted}</Table.Td>
@@ -64,7 +66,7 @@ export const ManageApplications = () => {
     )
   })
 
-  const totalApproved = approved.reduce((a,c) =>{
+  const totalApproved = approved.reduce((a, c) => {
     const booking = bookings.find((b) => b.userId === c.userId)
     return booking && booking.people.length > c.predicted ? a + booking.people.length : a + c.predicted
   }, 0)
@@ -75,7 +77,9 @@ export const ManageApplications = () => {
       <Table.Td>{Avatars(app.type)}</Table.Td>
       <Table.Td>{app.name}</Table.Td>
 
-      <Table.Td>{app.email}</Table.Td>
+      <Table.Td>
+        <a href={`mailto:${app.email}`}>{app.email}</a>
+      </Table.Td>
       <Table.Td>{app.district}</Table.Td>
       <Table.Td>{app.predicted}</Table.Td>
       <Table.Td>{dayjs(app.createdAt).format('DD/MM/YYYY')}</Table.Td>

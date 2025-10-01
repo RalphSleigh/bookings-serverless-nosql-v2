@@ -147,7 +147,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           />
         </Grid.Col>
         <Grid.Col span={4}>
-          <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} required />
+          <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
         </Grid.Col>
         {emailAndDiet}
         <Grid.Col span={12}>
