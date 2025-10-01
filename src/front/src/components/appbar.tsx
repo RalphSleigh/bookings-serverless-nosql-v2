@@ -71,6 +71,7 @@ export const AppToolbar = () => {
 
 const UserStatus = () => {
   const { auth } = useRouteContext({ from: '__root__' })
+  const query = useSearch({ from: '__root__' })
   const user = auth.loggedIn ? auth.user : undefined
   if (user) {
     return (
@@ -94,8 +95,6 @@ const UserStatus = () => {
       </>
     )
   } else {
-    const query = useSearch({ from: '__root__' })
-
     return (
       <Button component="a" variant="default" href={query.redirect ? `/api/auth/redirect?redirect=${query.redirect}` : '/api/auth/redirect'}>
         Login
