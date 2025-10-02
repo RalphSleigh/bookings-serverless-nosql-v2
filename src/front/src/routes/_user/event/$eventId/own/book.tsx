@@ -10,7 +10,10 @@ import { BookingForm } from '../../../../../components/booking-form/form'
 import { EventForm } from '../../../../../components/event-form/form'
 import { createBookingMuation } from '../../../../../mutations/createBooking'
 import { getEventsQueryOptions } from '../../../../../queries/getEvents'
+import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
 import { useEvent } from '../../../../../utils'
+import { PartialBookingType, TBooking } from '../../../../../../../shared/schemas/booking'
+import { DefaultValues } from 'react-hook-form'
 
 export const Route = createFileRoute('/_user/event/$eventId/own/book')({
   // Can't check this as we need the event object to check permissions
@@ -27,6 +30,8 @@ function BookEventComponent() {
   const event = useEvent()
   const { permission, user } = Route.useRouteContext()
 
+  const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
+
   if (!event || !permission.can('book', subject('event', event))) {
     notifications.show({
       title: 'Error',
@@ -35,12 +40,18 @@ function BookEventComponent() {
     })
     return <Navigate to="/" />
   }
-  return (
-    <BookingForm
-      mode="create"
-      event={event}
-      inputData={{ userId: user.userId, eventId: event.eventId, cancelled: false, basic: {}, people: [{ personId: uuidv7(), eventId: event.eventId, userId: user.userId, cancelled: false }] }}
-      mutation={createBookingMuation()}
-    />
-  )
+
+  const inputData: DefaultValues<TBooking> & { userId: string; eventId: string } = { userId: user.userId, eventId: event.eventId, cancelled: false, basic: {}, people: [{ personId: uuidv7(), eventId: event.eventId, userId: user.userId, cancelled: false }] }
+
+  const application = bookingsQuery.data?.applications.find((a) => a.eventId === event.eventId && a.userId === user.userId)
+  if (event.applicationsRequired && application) {
+    inputData.basic = { name: application.name, email: application.email, type: application.type }
+    if(application.type === 'group' && application.district) {
+      inputData.basic = {...inputData.basic, district: application.district}
+    }
+  } else {
+    inputData.basic = { name: user.name, email: user.email }
+  }
+
+  return <BookingForm mode="create" event={event} inputData={inputData} mutation={createBookingMuation()} />
 }

@@ -9,7 +9,7 @@ export const PermissionForm = ({ event, checked, setChecked }: { event: TEvent; 
       <Title order={3} mt={8}>
         Permission
       </Title>
-      <Grid>
+      <Grid onClick={() => setChecked(!checked)} style={{ cursor: 'pointer' }}>
         <Grid.Col span={11}>
           <Text m={8} ml={16}>I give permission for the people named above to attend {event.name}.</Text>
           <Text m={8} ml={16}>I acknowledge it is my responsibility to ensure everyone over 16 attending has up-to-date Woodcraft Folk membership and completed a DBS check.</Text>

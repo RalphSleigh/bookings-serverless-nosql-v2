@@ -73,7 +73,7 @@ const MessageCalculator = ({ schema, formstate }: { schema: ReturnType<typeof Bo
 
 const MemoMessageCalculator = React.memo(MessageCalculator)
 
-export const ValidationErrors: React.FC<ValidationErrorsProps> = ({ schema }) => {
+const ValidationErrors: React.FC<ValidationErrorsProps> = ({ schema }) => {
   const [data, setData] = useState<z.input<typeof BookingSchemaForType>>()
 
   return (
@@ -83,3 +83,5 @@ export const ValidationErrors: React.FC<ValidationErrorsProps> = ({ schema }) =>
     </>
   )
 }
+
+export const MemoValidationErrors = React.memo(ValidationErrors)

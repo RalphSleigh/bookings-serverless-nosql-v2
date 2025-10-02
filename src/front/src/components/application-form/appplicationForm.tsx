@@ -14,7 +14,7 @@ export const ApplicationForm = () => {
   const { user } = useRouteContext({ from: '/_user' })
   const event = useEvent()
 
-  const form = useForm({ resolver: zodResolver(ApplicationSchemaForForm), mode: 'onBlur', defaultValues: { userId: user.userId, eventId: event.eventId, name: user.name, email: user.email } })
+  const form = useForm({ resolver: zodResolver(ApplicationSchemaForForm), mode: 'onBlur', defaultValues: { userId: user.userId, eventId: event.eventId, name: user.isGroupAccount ? '' : user.name, email: user.email } })
 
   const { errors, isValid } = form.formState
   const { register } = form

@@ -4,7 +4,7 @@ import { Button, Container, Flex, Grid, Paper, Text, Textarea, Title } from '@ma
 import { useMediaQuery } from '@mantine/hooks'
 import { UseMutationResult } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { DefaultValues, FormProvider, useForm } from 'react-hook-form'
 import z4, { z } from 'zod/v4'
 
@@ -24,7 +24,7 @@ import { OtherQuestionsForm } from './otherQuestions.js'
 import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
-import { ValidationErrors } from './validation.js'
+import { MemoValidationErrors } from './validation.js'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
@@ -80,11 +80,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
     const diff = validationResults.length == 0 ? generateDiscordDiff(originalData, data) : []
  */
 
-  const MemoValidate = React.memo(ValidationErrors)
-
   const matches = useMediaQuery('(min-width: 62em)')
 
-  const fees = getFeeType(event)
+  const fees = useMemo(() => getFeeType(event), [event])
 
   const [checked, setChecked] = React.useState(false)
 
@@ -102,7 +100,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
                 Pricing
               </Title>
               <fees.BookingFormDisplayElement event={event} />
-              <MemoValidate schema={schema} />
+              <MemoValidationErrors schema={schema} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
               <Flex gap={8} mt={16}>
                 <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid}>

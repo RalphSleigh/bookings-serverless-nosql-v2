@@ -1,12 +1,17 @@
 import { Grid, Paper, Radio, RadioGroup, Text } from '@mantine/core'
-import { useController, useWatch } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import { TApplication } from '../../../../shared/schemas/application'
-
 import classes from '../../css/typeChooser.module.css'
 
 export const TypeSelector = () => {
-  const radioController = useController({ name: 'type' })
+  const { register, setValue } = useFormContext()
+  const selectValue = useWatch<TApplication, 'type'>({ name: 'type' })
+
+  useEffect(() => {
+    register('type')
+  }, [register])
 
   const paperProps = (field: string) => (value: string | undefined) => {
     const props = { withBorder: true, p: 'md', style: { height: '100%', cursor: 'pointer' } }
@@ -21,10 +26,10 @@ export const TypeSelector = () => {
 
   return (
     <RadioGroup
-      value={radioController.field.value}
-      onChange={(value) => {
+      value={selectValue}
+      /*       onChange={(value) => {
         radioController.field.onChange(value)
-      }}
+      }} */
       name="bookingType"
       required
     >
@@ -33,7 +38,7 @@ export const TypeSelector = () => {
           <Paper
             {...paperProps('group')(applicationType)}
             onClick={() => {
-              radioController.field.onChange('group')
+              setValue('type', 'group', { shouldValidate: true })
             }}
           >
             <Radio value="group" style={{ float: 'right' }} />
@@ -45,7 +50,7 @@ export const TypeSelector = () => {
           <Paper
             {...paperProps('individual')(applicationType)}
             onClick={() => {
-              radioController.field.onChange('individual')
+              setValue('type', 'individual', { shouldValidate: true })
             }}
           >
             <Radio value="individual" style={{ float: 'right' }} />
