@@ -113,7 +113,7 @@ export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => 
           </Grid.Col>
         </Grid>
       </RadioGroup>
-      <CustomSelect name="basic.organisation" label="Organisation" control={control} data={organisations.map((o) => o[0])} required mt={16} {...e('basic.organisation')} />
+      {event.organisations && <CustomSelect name="basic.organisation" label="Organisation" control={control} data={organisations.map((o) => o[0])} required mt={16} {...e('basic.organisation')} />}
       <TextInput autoComplete="district" id="district" data-form-type="other" required={bookingType === 'group'} label="District" {...register('basic.district')} {...e('basic.district')} />
       <Title size="h4" order={2} mt={16}>{`Your details`}</Title>
       <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')} />

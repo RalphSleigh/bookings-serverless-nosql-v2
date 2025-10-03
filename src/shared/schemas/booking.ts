@@ -15,20 +15,19 @@ const basicSmall = z
   .strict()
 
 const basicBigIndividual = basicSmall.extend({
-    organisation: z.string().nonempty(),
     district: z.string().optional(),
   })
 
 const basicBigGroup = basicSmall
   .extend({
-    organisation: z.string().nonempty(),
     district: z.string().nonempty(),
   })
   .strict()
 
 const basicBig = z.discriminatedUnion('type', [
-  basicBigIndividual.extend({ type: z.literal('individual')}),
-  basicBigGroup.extend({ type: z.literal('group') })])
+  basicBigIndividual.extend({ type: z.literal('individual')}).strict(),
+  basicBigGroup.extend({ type: z.literal('group') }).strict()
+])
 
 // Extra Contacts
 
@@ -57,7 +56,7 @@ export const BookingSchema = (event: TEvent) =>
         userId: z.uuidv7(),
         eventId: z.uuidv7(),
         cancelled: z.boolean().default(false),
-        basic: event.bigCampMode ? basicBig : basicSmall,
+        basic: event.bigCampMode ? event.organisations ? basicBig.and(z.object({ organisation: z.string().nonempty() })) : basicBig : basicSmall,
         extraContacts: z.array(extraContact).optional(),
         people: z.array(PersonSchema(event)).min(1),
         other: event.bigCampMode ? otherBig : otherSmall,
@@ -73,7 +72,7 @@ export const BookingSchemaForType = z
     userId: z.uuidv7(),
     eventId: z.uuidv7(),
     cancelled: z.boolean().default(false),
-    basic: basicSmall.or(basicBig),
+    basic: basicSmall.or(basicBig).or(basicBig.and(z.object({ organisation: z.string().nonempty() }))),
     extraContacts: z.array(extraContact).optional(),
     people: z.array(PersonSchemaForType).min(1),
     other: otherBig.or(otherSmall),
@@ -89,11 +88,11 @@ export const BookingSchemaForTypeBasicSmall = BookingSchemaForType.extend({
 })
 
 export const BookingSchemaForTypeBasicBig = BookingSchemaForType.extend({
-  basic: basicBig,
+  basic: basicBig.and(z.object({ organisation: z.string().optional() })),
 })
 
 export const BookingSchemaForTypeBasicBigGroup = BookingSchemaForType.extend({
-  basic: basicBigGroup,
+  basic: basicBigGroup.and(z.object({ organisation: z.string().optional() })),
 })
 
 export type TBookingSchemaForTypeBasicSmall = z.infer<typeof BookingSchemaForTypeBasicSmall>

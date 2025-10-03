@@ -255,6 +255,11 @@ export const DBEvent = new Entity(
         type: 'boolean',
         required: true,
       },
+      organisations: {
+        type: 'boolean',
+        required: true,
+        default: false,
+      },
       applicationsRequired: {
         type: 'boolean',
         required: true,

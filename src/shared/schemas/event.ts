@@ -53,6 +53,7 @@ export const EventSchema = z
       emailSubjectTag: z.string().nonempty(),
       replyTo: z.string().nonempty(),
       bigCampMode: z.boolean().default(false),
+      organisations: z.boolean().default(false),
       applicationsRequired: z.boolean().default(false),
       allParticipantEmails: z.boolean().default(false),
       howDidYouHear: z.boolean().default(false),

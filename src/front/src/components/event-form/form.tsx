@@ -74,6 +74,7 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
             <TextInput label="Email Subject Tag" {...register('emailSubjectTag')} mt={16} />
             <TextInput label="Reply-to" {...register('replyTo')} mt={16} />
             <CustomSwitch label="Big Camp Mode" name='bigCampMode' control={control} mt={16} />
+            <CustomSwitch label="Organisations" name='organisations' control={control} mt={16} />
             <CustomSwitch label="Applications required?" name='applicationsRequired' control={control} mt={16} />
             <CustomSwitch label="All participant emails" name='allParticipantEmails' control={control} mt={16} />
             <CustomSwitch label="How did you hear question" name='howDidYouHear'  control={control} mt={16} />
