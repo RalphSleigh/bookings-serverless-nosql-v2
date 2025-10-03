@@ -2,12 +2,7 @@ import { notifications } from '@mantine/notifications'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { useContext } from 'react'
 
-import { TCreateEventData } from '../../../lambda/endpoints/event/createEvent'
-import { TEvent, TEventWhenCreating } from '../../../shared/schemas/event'
-import { TBasicBig, TBookingForType } from '../../../shared/schemas/booking'
-import { TCreateBookingData } from '../../../lambda/endpoints/booking/createBooking'
 import { TCreateSheetForBooking } from '../../../lambda/endpoints/booking/createSheetForBooking'
 
 export const createSheetForBooking = (eventId: string) => {

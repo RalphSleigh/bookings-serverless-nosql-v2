@@ -1,7 +1,6 @@
 import { drive, drive_v3 } from '@googleapis/drive'
 import { auth, sheets, sheets_v4 } from '@googleapis/sheets'
 
-import { TBasicBig } from '../shared/schemas/booking'
 import { TEvent } from '../shared/schemas/event'
 import { TPerson } from '../shared/schemas/person'
 import { TUser } from '../shared/schemas/user'
