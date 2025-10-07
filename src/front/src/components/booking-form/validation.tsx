@@ -29,10 +29,15 @@ const mapValidationError = (data: PartialBookingType | undefined) => (issue: z.c
     if (name) {
       if (issue.path[2] === 'basic' && issue.path[3] === 'email') return `Please enter an email address for ${name}`
       if (issue.path[2] === 'basic' && issue.path[3] === 'dob') return `Please enter a DoB for ${name}`
+      if (issue.path[2] === 'kp' && issue.path[3] === 'diet') return `Please select a diet for ${name}`
     } else {
       if (issue.path[2] === 'basic' && issue.path[3] === 'name') return `Please enter a name for person ${personIndex + 1}`
       return null
     }
+  }
+
+  if(issue.path[0] === 'other') {
+    if(issue.path[1] === 'whatsApp') return `Please answer the WhatsApp question`
   }
 
   return `${issue.path.join('.')} - ${issue.message}`
