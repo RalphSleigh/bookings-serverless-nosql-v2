@@ -1,14 +1,27 @@
 import { z } from "zod/v4";
 
 const basicKP = z.object({ kpStructure: z.literal('basic') })
+const largeKP = z.object({ kpStructure: z.literal('large') })
+const kpOptions = z.discriminatedUnion('kpStructure', [basicKP, largeKP])
 
-const kpOptions = z.discriminatedUnion('kpStructure', [basicKP, z.object({ kpStructure: z.literal('large') })])
+export type TEventKPUnion = z.infer<typeof kpOptions>
+export type TEventBasicKP = z.infer<typeof basicKP>
+export type TEventLargeKP = z.infer<typeof largeKP>
 
-export type TBasicKP = z.infer<typeof basicKP>
+const noneConsents = z.object({ consentsStructure: z.literal('none') })
+const largeConsents = z.object({ consentsStructure: z.literal('large') })
+const consentsOptions = z.discriminatedUnion('consentsStructure', [noneConsents, largeConsents])
 
-const consentsOptions = z.discriminatedUnion('consentsStructure', [z.object({ consentsStructure: z.literal('none') }), z.object({ consentsStructure: z.literal('large') })])
+export type TEventConsentsUnion = z.infer<typeof consentsOptions>
+export type TEventNoneConsents = z.infer<typeof noneConsents>
+export type TEventLargeConsents = z.infer<typeof largeConsents>
 
-const attendanceOptions = z.discriminatedUnion('attendanceStructure', [z.object({ attendanceStructure: z.literal('whole') })])
+
+const wholeAttendance = z.object({ attendanceStructure: z.literal('whole') })
+const attendanceOptions = z.discriminatedUnion('attendanceStructure', [wholeAttendance])
+
+export type TEventAttendanceUnion = z.infer<typeof attendanceOptions>
+export type TEventWholeAttendance = z.infer<typeof wholeAttendance>
 
 const ealingFee = z.object({
   feeStructure: z.literal('ealing'),
@@ -20,14 +33,13 @@ const ealingFee = z.object({
     paymentInstructions: z.string().nonempty(),
   }),
 })
-
 const freeFee = z.object({ feeStructure: z.literal('free') })
-
 const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee])
 
-export type TEalingFees = z.infer<typeof ealingFee>
-export type TFreeFees = z.infer<typeof freeFee>
-export type TFees = z.infer<typeof feeOptions>
+export type TEventFeesUnion = z.infer<typeof feeOptions>
+export type TEventEalingFees = z.infer<typeof ealingFee>
+export type TEventFreeFees = z.infer<typeof freeFee>
+
 
 const customQuestion = z.object({
   questionType: z.enum(['yesnochoice', 'text', 'longtext']),
@@ -64,6 +76,6 @@ export const EventSchema = z
 
 export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true }).strict()
 
-export type TEvent = z.infer<typeof EventSchema>
-export type TEventWithFees<F> = TEvent & { fee: F }
+export type TEvent<KP extends TEventKPUnion = TEventKPUnion, C extends TEventConsentsUnion = TEventConsentsUnion, A extends TEventAttendanceUnion = TEventAttendanceUnion, F extends TEventFeesUnion = TEventFeesUnion> = z.infer<typeof EventSchema> & { kp: KP, consents: C, attendance: A, fee: F }
+
 export type TEventWhenCreating = z.infer<typeof EventSchemaWhenCreating>

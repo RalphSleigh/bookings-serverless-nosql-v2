@@ -1,6 +1,6 @@
 import { PartialDeep } from "type-fest";
 import { AttendanceTypes } from "../attendance/attendance";
-import { EventSchema, TEvent, TFees } from "../schemas/event";
+import { EventSchema, TEvent } from "../schemas/event";
 import { EalingFees } from "./ealing";
 import { FreeFees } from "./free";
 import { FeeStructure } from "./feeStructure";

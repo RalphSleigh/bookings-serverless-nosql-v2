@@ -8,19 +8,19 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { WatchDebounce } from '../../front/src/utils'
 import { AttendanceTypes } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
-import { TEalingFees, TEvent, TEventWithFees, TFees } from '../schemas/event'
+import { TEvent, TEventEalingFees,} from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
 
-type EventWithEalingFees = TEvent & { fees: TEalingFees }
+type EventWithEalingFees = TEvent & { fees: TEventEalingFees }
 
-export class EalingFees implements FeeStructure<TEalingFees> {
+export class EalingFees implements FeeStructure<TEventEalingFees> {
   typeName: 'ealing' = 'ealing'
   name = 'Ealing Fees'
   supportedAttendance: AttendanceTypes[] = ['whole']
-  ConfigurationElement: FeeStructureCondfigurationElement<TEalingFees> = () => {
-    const { register } = useFormContext<{ fee: TEalingFees }>()
+  ConfigurationElement: FeeStructureCondfigurationElement<TEventEalingFees> = () => {
+    const { register } = useFormContext<{ fee: TEventEalingFees }>()
     //const { updateNumber, updateField } = getMemoObjectUpdateFunctions(getSubUpdate(update, 'ealingData'))
     const pound = <Text>£</Text>
     return (
@@ -47,7 +47,7 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     )
   }
 
-  getFeeLines: GetFeeLineFunction<TEalingFees> = (event: TEventWithFees<TEalingFees>, booking: PartialBookingType) => {
+  getFeeLines: GetFeeLineFunction<TEventEalingFees> = (event: TEvent<any, any, any, TEventEalingFees>, booking: PartialBookingType) => {
     const people = booking.people || []
     const accompanied = people.find((p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(18, 'years')))
     const amount = (accompanied ? event.fee.ealingData.accompanied : event.fee.ealingData.unaccompanied) * people.length
@@ -60,7 +60,7 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     ]
   }
 
-  getFeeLinesDiscounted: GetFeeLineFunction<TEalingFees> = (event: TEventWithFees<TEalingFees>, booking: PartialBookingType) => {
+  getFeeLinesDiscounted: GetFeeLineFunction<TEventEalingFees> = (event: TEvent<any, any, any, TEventEalingFees>, booking: PartialBookingType) => {
     const people = booking.people || []
     const accompanied = people.find((p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(18, 'years')))
     const amount = (accompanied ? event.fee.ealingData.accompaniedDiscount : event.fee.ealingData.unaccompaniedDiscount) * people.length
@@ -73,7 +73,7 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     ]
   }
 
-  BookingFormDisplayElementContents: React.FC<{ people: PartialBookingType['people']; event: TEventWithFees<TEalingFees> }> = ({ people, event }) => {
+  BookingFormDisplayElementContents: React.FC<{ people: PartialBookingType['people']; event: TEvent<any, any, any, TEventEalingFees> }> = ({ people, event }) => {
     const lines = this.getFeeLines(event, { people })
     const discountedLines = this.getFeeLinesDiscounted(event, { people })
 
@@ -130,7 +130,7 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     )
   }
 
-  BookingFormDisplayElement: BookingFormDisplayElement<TEalingFees> = ({ event }) => {
+  BookingFormDisplayElement: BookingFormDisplayElement<TEventEalingFees> = ({ event }) => {
     const [people, setPeople] = useState<PartialBookingType['people']>([])
     return (
       <>
@@ -140,7 +140,7 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     )
   }
 
-  EventListDisplayElement: EventListDisplayElement<TEalingFees> = ({ event, booking, fees }) => {
+  EventListDisplayElement: EventListDisplayElement<TEventEalingFees> = ({ event, booking, fees }) => {
     const lines = this.getFeeLines(event, booking)
     const discountedLines = this.getFeeLinesDiscounted(event, booking)
 
@@ -211,7 +211,7 @@ export class EalingFees implements FeeStructure<TEalingFees> {
     )
   }
 
-  EmailElement: EmailElement<TEalingFees> = ({ event, booking }) => {
+  EmailElement: EmailElement<TEventEalingFees> = ({ event, booking }) => {
     const lines = this.getFeeLines(event, booking)
     const discountedLines = this.getFeeLinesDiscounted(event, booking)
 

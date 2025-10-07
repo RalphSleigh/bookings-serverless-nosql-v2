@@ -4,15 +4,15 @@ import { PartialDeep } from 'type-fest'
 
 import { AttendanceTypes } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
-import { TEvent, TEventWithFees, TFreeFees } from '../schemas/event'
-import { BookingFormDisplayElement, EmailElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
+import { TEvent, TEventFeesUnion, TEventFreeFees } from '../schemas/event'
+import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
 
-export class FreeFees implements FeeStructure<TFreeFees> {
+export class FreeFees implements FeeStructure<TEventFreeFees> {
   typeName: 'free' = 'free'
   name: string = 'Free Fees'
   supportedAttendance: AttendanceTypes[] = []
 
-  ConfigurationElement: FeeStructureCondfigurationElement<TFreeFees> = () => {
+  ConfigurationElement: FeeStructureCondfigurationElement<TEventFreeFees> = () => {
     return (
       <div>
         <p>Free</p>
@@ -20,7 +20,7 @@ export class FreeFees implements FeeStructure<TFreeFees> {
     )
   }
 
-  getFeeLines: GetFeeLineFunction<TFreeFees> = (event: TEventWithFees<TFreeFees>, booking: PartialBookingType) => {
+  getFeeLines: GetFeeLineFunction<TEventFreeFees> = (event: TEvent<any, any, any, TEventFreeFees>, booking: PartialBookingType) => {
     return [
       {
         label: `Free`,
@@ -29,7 +29,7 @@ export class FreeFees implements FeeStructure<TFreeFees> {
     ]
   }
 
-  BookingFormDisplayElement: BookingFormDisplayElement<TFreeFees> = ({ event }) => {
+  BookingFormDisplayElement: BookingFormDisplayElement<TEventFreeFees> = ({ event }) => {
     const { watch } = useFormContext<PartialBookingType>()
     const people = watch('people') || []
 
@@ -46,7 +46,14 @@ export class FreeFees implements FeeStructure<TFreeFees> {
     )
   }
 
-  EmailElement: EmailElement<TFreeFees> = ({ event, booking }) => {
+  EventListDisplayElement: EventListDisplayElement<TEventFreeFees> = ({ event, booking, fees }) => {
+      return (
+        <>
+        </>
+      )
+    }
+
+  EmailElement: EmailElement<TEventFreeFees> = ({ event, booking }) => {
     return <></>
   }
 }

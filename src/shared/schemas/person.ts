@@ -7,6 +7,10 @@ import { TEvent } from './event'
 const KPBasic = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional() }).strict()
 const KPLarge = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional() }).strict()
 
+export type TPersonBasicKPData = z.infer<typeof KPBasic>
+export type TPersonLargeKPData = z.infer<typeof KPLarge>
+export type TPersonKPData = TPersonBasicKPData | TPersonLargeKPData
+
 export const PersonSchema = (event: TEvent) => {
   const basic = event.allParticipantEmails
     ? z.object({
@@ -35,7 +39,7 @@ export const PersonSchema = (event: TEvent) => {
       updatedAt: z.number().optional(),
     })
     .strict()
-  }
+}
 
 export const PersonSchemaForType = z
   .object({
@@ -61,4 +65,13 @@ export const PersonSchemaForType = z
   })
   .strict()
 
-export type TPerson = z.infer<typeof PersonSchemaForType>
+type MapEventKPToPersonKP<Event extends TEvent> = Event['kp'] extends { kpStructure: 'basic' }
+  ? TPersonBasicKPData
+  : Event['kp'] extends { kpStructure: 'large' }
+    ? TPersonLargeKPData
+    : TPersonKPData
+
+export type TPerson<Event extends TEvent = TEvent> = z.infer<typeof PersonSchemaForType> & { kp: MapEventKPToPersonKP<Event> }
+/* export type TPersonWithBasicKP = TPerson & { kp: z.infer<typeof KPBasic> }
+export type TPersonWithOptions<KP extends TPersonBasicKPData | TPersonLargeKPData> = TPerson & { kp: KP }
+ */

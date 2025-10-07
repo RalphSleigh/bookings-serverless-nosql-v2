@@ -2,7 +2,7 @@ import { PartialDeep } from 'type-fest'
 import { z, ZodType } from 'zod/v4'
 
 import { TEvent } from './event'
-import { PersonSchema, PersonSchemaForType } from './person'
+import { PersonSchema, PersonSchemaForType, TPerson, TPersonKPData } from './person'
 
 //Basic Information/Contact Details
 
@@ -111,6 +111,6 @@ export type TBookingSchemaForTypeBasicSmall = z.infer<typeof BookingSchemaForTyp
 export type TBookingSchemaForTypeBasicBig = z.infer<typeof BookingSchemaForTypeBasicBig>
 export type TBookingSchemaForTypeBasicBigGroup = z.infer<typeof BookingSchemaForTypeBasicBigGroup>
 
-export type TBooking = z.infer<typeof BookingSchemaForType>
+export type TBooking<Event extends TEvent = TEvent> = z.infer<typeof BookingSchemaForType> & { people: TPerson<Event>[] }
 
 export type PartialBookingType = PartialDeep<TBookingForType, { recurseIntoArrays: true }>
