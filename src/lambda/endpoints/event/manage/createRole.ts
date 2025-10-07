@@ -1,6 +1,5 @@
 import { subject } from '@casl/ability'
 import { admin } from '@googleapis/admin'
-import { get } from 'lodash'
 import { v7 as uuidv7 } from 'uuid'
 
 import { TBooking } from '../../../../shared/schemas/booking'

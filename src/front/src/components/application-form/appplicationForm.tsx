@@ -47,8 +47,10 @@ export const ApplicationForm = () => {
             <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('email')} {...e('email')} />
             <PrivateRelayWarning />
             <TextInput required={type === 'group'} label="Group/District" id="district" data-form-type="other" {...register('district')} {...e('district')} />
-            <CustomNumberInput mt={8} name="predicted" label="How many people do you expect to book?" required />
-            <Button variant="gradient" mt={16} gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" disabled={!isValid}>
+            <Text>These numbers can be the same if you know exactly who you are bringing already]</Text>
+            <CustomNumberInput mt={8} name="minPredicted" label="Minimum people you expect to book?" required />
+            <CustomNumberInput mt={8} name="maxPredicted" label="Maximum people you expect to book?" required />
+            <Button variant="gradient" mt={16} gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" disabled={!isValid || mutation.isPending} loading={mutation.isPending}>
               Submit
             </Button>
           </Paper>

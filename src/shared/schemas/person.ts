@@ -20,7 +20,7 @@ export const PersonSchema = (event: TEvent) => {
       })
   return z
     .object({
-      personId: z.uuidv7(),
+      personId: z.string(),
       userId: z.uuidv7(),
       eventId: z.uuidv7(),
       cancelled: z.boolean().default(false),
@@ -39,7 +39,7 @@ export const PersonSchema = (event: TEvent) => {
 
 export const PersonSchemaForType = z
   .object({
-    personId: z.uuidv7(),
+    personId: z.string(),
     userId: z.uuidv7(),
     eventId: z.uuidv7(),
     cancelled: z.boolean().default(false),

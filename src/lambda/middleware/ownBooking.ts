@@ -15,7 +15,8 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
     const event = res.locals.event
     const user = res.locals.user
     if (!event || !user) {
-      throw new Error('Event not Found or User not authenticated')
+      res.status(401).send('Event not Found or User not authenticated')
+      //throw new Error('Event not Found or User not authenticated')
     }
 
     const bookingResult = await DB.collections.bookingByUserId({ userId: user.userId, eventId: event.eventId }).go()

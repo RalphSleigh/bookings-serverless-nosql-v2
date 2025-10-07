@@ -788,7 +788,11 @@ export const DBApplication = new Entity(
         type: 'string',
         required: false,
       },
-      predicted: {
+      minPredicted: {
+        type: 'number',
+        required: true,
+      },
+      maxPredicted: {
         type: 'number',
         required: true,
       },

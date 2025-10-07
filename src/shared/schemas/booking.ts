@@ -42,7 +42,6 @@ const basicBigNoOrg = z.discriminatedUnion('type', [basicBigIndividual.extend({ 
 const basicBigWithOrg = z.discriminatedUnion('type', [basicBigIndividualWithOrg.extend({ type: z.literal('individual') }).strict(), basicBigGroupWithOrg.extend({ type: z.literal('group') }).strict()])
 
 const basicBigForType = basicBigWithOrg.or(basicBigNoOrg)
-
 // Extra Contacts
 
 const extraContact = z.object({
@@ -100,7 +99,9 @@ export const BookingSchemaForTypeBasicSmall = BookingSchemaForType.extend({
   basic: basicSmall,
 })
 
-export const BookingSchemaForTypeBasicBig = basicBigForType
+export const BookingSchemaForTypeBasicBig = BookingSchemaForType.extend({
+  basic: basicBigForType,
+})
 
 export const BookingSchemaForTypeBasicBigGroup = BookingSchemaForType.extend({
   basic: basicBigGroup.and(z.object({ organisation: z.string().optional() })),

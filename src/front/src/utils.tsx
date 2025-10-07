@@ -1,12 +1,13 @@
 import { Anchor, AnchorProps } from '@mantine/core'
-import { createLink, getRouteApi, LinkComponent, Route } from '@tanstack/react-router'
-import get from 'lodash/get'
-import React, { Dispatch, ReactElement, SetStateAction, useEffect } from 'react'
-import { TEvent } from '../../shared/schemas/event'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { getEventsQueryOptions } from './queries/getEvents'
+import { createLink, getRouteApi, LinkComponent, Route } from '@tanstack/react-router'
 import dayjs from 'dayjs'
+import { get } from 'lodash-es'
+import React, { Dispatch, ReactElement, SetStateAction, useEffect } from 'react'
 import { Control, useWatch } from 'react-hook-form'
+
+import { TEvent } from '../../shared/schemas/event'
+import { getEventsQueryOptions } from './queries/getEvents'
 
 export function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [value, setValue] = React.useState<T>(() => {
@@ -148,21 +149,19 @@ export const errorProps = (errors: any) => (path: string) => {
 const route = getRouteApi('/_user/event/$eventId')
 
 export const useEvent: () => TEvent = () => {
-    const { eventId } = route.useParams()
-    const { data } = useSuspenseQuery(getEventsQueryOptions)
-  
-    const event = data.events.find((event) => event.eventId === eventId)
-    if (!event) {
-      throw new Error(`Event with ID ${eventId} not found`)
-    }
-    return event
+  const { eventId } = route.useParams()
+  const { data } = useSuspenseQuery(getEventsQueryOptions)
+
+  const event = data.events.find((event) => event.eventId === eventId)
+  if (!event) {
+    throw new Error(`Event with ID ${eventId} not found`)
   }
-
-
+  return event
+}
 
 // https://github.com/orgs/react-hook-form/discussions/3078
 
-  interface DebounceProps {
+interface DebounceProps {
   value: any
   set: (n: any) => void
   name: string | undefined
@@ -170,7 +169,7 @@ export const useEvent: () => TEvent = () => {
 }
 
 export const WatchDebounce = ({ value, set, name, duration }: DebounceProps): ReactElement => {
-  const internal = name === undefined ? useWatch() : useWatch({name})
+  const internal = name === undefined ? useWatch() : useWatch({ name })
 
   useEffect(() => {
     const timeout = setTimeout(() => {
