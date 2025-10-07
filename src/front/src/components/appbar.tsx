@@ -1,4 +1,5 @@
 import { ActionIcon, AppShell, Avatar, Box, Button, Flex, Text, ThemeIcon, Title, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import { IconBug, IconLogout, IconMoon, IconSun } from '@tabler/icons-react'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useRouteContext, useSearch } from '@tanstack/react-router'
@@ -20,18 +21,26 @@ export const AppToolbar = () => {
 
   if (error) throw 'BOOM (render)'
 
+  const matches = useMediaQuery('(min-width: 32em)')
+
   return (
     <AppShell.Header>
       <Flex gap="xs" justify="flex-start" align="center" direction="row" wrap="wrap">
         <Box>
-          <img src="/logoonly.png" alt="Logo" style={{ display: 'block', height: '3em' }} />
+          <CustomLink underline="hover" to="/">
+            <img src="/logoonly.png" alt="Logo" style={{ display: 'block', height: '3em' }} />
+          </CustomLink>
         </Box>
-        <CustomLink underline="hover" to="/">
-          <Text c="var(--mantine-color-text)" size="xl" fw={700}>
-            {window.location.hostname}
-          </Text>
-        </CustomLink>
-        <Box component="div" flex={1} />
+
+        {matches && (
+          <>
+            <Text c="var(--mantine-color-text)" size="xl" fw={700}>
+              {window.location.hostname}
+            </Text>
+            <Box component="div" flex={1} />
+          </>
+        )}
+
         <UserStatus />
         <ActionIcon variant="default" size="input-sm" aria-label="Settings" onClick={toggleColorScheme}>
           {colorScheme === 'dark' ? <IconSun stroke={1.5} /> : <IconMoon stroke={1.5} />}
