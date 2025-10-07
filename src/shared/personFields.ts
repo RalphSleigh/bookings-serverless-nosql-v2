@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime.js'
 import { getProperty } from 'dot-prop'
 import { MRT_ColumnDef } from 'mantine-react-table'
 
@@ -7,8 +8,7 @@ import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { ageGroupFromPerson } from './woodcraft'
 
-import relativeTime from 'dayjs/plugin/relativeTime.js'
-dayjs.extend(relativeTime);
+dayjs.extend(relativeTime)
 
 type CellType = MRT_ColumnDef<TPerson>['Cell']
 
@@ -88,7 +88,7 @@ class Age extends PersonField {
   accessor = (p: TPerson) => {
     const age = dayjs(this.event.endDate).diff(dayjs(p.basic.dob), 'year')
     const group = ageGroupFromPerson(this.event)(p)
-    return age < 21 ? `${group.singular} (${age})` : `${group.singular}`
+    return group.toAgeGroupString()
   }
 }
 
@@ -100,12 +100,12 @@ class Diet extends PersonField {
 
 class DietDetails extends PersonField {
   name = 'Diet Details'
-  accessor = 'kp.details'
+  accessor = (p: TPerson) => p.kp?.details || ''
 }
 
 class Medical extends PersonField {
   name = 'Medical'
-  accessor = 'health.medical'
+  accessor = (p: TPerson) => p.health?.medical || ''
 }
 
 class Created extends PersonField {

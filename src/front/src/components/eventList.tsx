@@ -223,7 +223,7 @@ const YourBooking = ({ event, booking, fees }: { event: TEvent; booking: TBookin
   const people = booking.people.map((p, i) => (
     <Table.Tr key={i}>
       <Table.Td>{p.basic.name}</Table.Td>
-      <Table.Td>{ageGroupFilter(p).singular}</Table.Td>
+      <Table.Td>{ageGroupFilter(p).toAgeGroupString()}</Table.Td>
     </Table.Tr>
   ))
 
