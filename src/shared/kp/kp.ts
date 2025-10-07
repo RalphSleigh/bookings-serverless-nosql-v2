@@ -1,13 +1,13 @@
 import { TBooking } from '../schemas/booking'
 import { EventSchema, TEvent, TEventKPUnion } from '../schemas/event'
-import { TPersonBasicKPData, TPersonLargeKPData } from '../schemas/person'
+import { TPerson, TPersonBasicKPData, TPersonLargeKPData } from '../schemas/person'
 import { BasicKP } from './basic'
 import { LargeKP } from './large'
 
 export type KPTypes = TEvent['kp']['kpStructure']
 export interface KPStructure<T extends TEventKPUnion = TEventKPUnion> {
   typeName: T['kpStructure']
-  ManageKPPageList: React.FC<{ event: TEvent<T>; bookings: TBooking<TEvent<T>>[] }>
+  ManageKPPageList: React.FC<{ event: TEvent<T>; campers: TPerson<TEvent<T>>[] }>
 }
 
 export const KPBasicOptions = ['omnivore', 'pescatarian', 'vegetarian', 'vegan'] as const

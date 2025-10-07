@@ -41,6 +41,7 @@ export const ManageWrapper = () => {
             <Tabs.List>
               <Tabs.Tab value="campers">Campers</Tabs.Tab>
               <Tabs.Tab value="bookings">Bookings</Tabs.Tab>
+              <Tabs.Tab value="kp">KP</Tabs.Tab>
               {event.applicationsRequired && (
                 <Can I="getApplications" this={subject('eventId', { eventId })}>
                   <Tabs.Tab value="applications">Applications</Tabs.Tab>
