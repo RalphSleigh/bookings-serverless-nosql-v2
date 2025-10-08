@@ -53,7 +53,7 @@ export const updateUserPreference = HandlerWrapperLoggedIn<{}, TUserPreferenceUp
             .set({ preferences: { driveSyncList: validatedUser.preferences.driveSyncList } })
             .go()
 
-          enqueueAsyncTask({
+          await enqueueAsyncTask({
             type: 'driveSync',
             data: {
               eventId: eventId,

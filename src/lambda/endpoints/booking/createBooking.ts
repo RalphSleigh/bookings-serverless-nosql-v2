@@ -47,7 +47,7 @@ export const createBooking = HandlerWrapperLoggedIn(
       await DBPersonHistory.create(personHistoryItem).go()
     }
 
-    enqueueAsyncTask({
+    await enqueueAsyncTask({
       type: 'emailBookingCreated',
       data: {
         eventId: event.eventId,
@@ -55,7 +55,7 @@ export const createBooking = HandlerWrapperLoggedIn(
       },
     })
 
-    enqueueAsyncTask({
+    await enqueueAsyncTask({
       type: 'driveSync',
       data: {
         eventId: event.eventId,

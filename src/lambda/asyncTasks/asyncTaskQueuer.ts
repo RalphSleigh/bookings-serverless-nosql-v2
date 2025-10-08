@@ -19,6 +19,14 @@ export type EmailBookingUpdatedTask = {
   }
 }
 
+export type EmailManagerDataAccessTask = {
+  type: 'emailManagerDataAccess'
+  data: {
+    eventId: string
+    userId: string
+  }
+}
+
 export type DriveSyncTask = {
   type: 'driveSync'
   data: {
@@ -33,7 +41,7 @@ export type DiscordMessageTask = {
   }
 }
 
-export type AsyncTask = EmailBookingCreatedTask | EmailBookingUpdatedTask | DriveSyncTask | DiscordMessageTask
+export type AsyncTask = EmailBookingCreatedTask | EmailBookingUpdatedTask | EmailManagerDataAccessTask | DriveSyncTask | DiscordMessageTask
 
 export const enqueueAsyncTask = async (task: AsyncTask) => {
   if (am_in_lambda()) {

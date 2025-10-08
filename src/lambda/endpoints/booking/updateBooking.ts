@@ -109,7 +109,7 @@ export const updateBooking = HandlerWrapper(
     }
 
     res.locals.logger.logToPath('Enqueuing async email task')
-    enqueueAsyncTask({
+    await enqueueAsyncTask({
       type: 'emailBookingUpdated',
       data: {
         eventId: event.eventId,
@@ -117,7 +117,7 @@ export const updateBooking = HandlerWrapper(
       },
     })
 
-    enqueueAsyncTask({
+    await enqueueAsyncTask({
       type: 'driveSync',
       data: {
         eventId: event.eventId,

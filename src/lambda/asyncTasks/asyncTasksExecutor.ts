@@ -1,6 +1,7 @@
 import { postDiscordMessage } from "../discord/discordMessagePoster";
 import { syncDriveForEvent } from "../driveSync/driveSyncer";
 import { sendBookingUpdatedEmails } from "../emails/sendBookingUpdatedEmails";
+import { sendManagerDataAccessEmail } from "../emails/ssendManagerDataAccessEmail";
 import { getConfig } from "../getConfig";
 import { AsyncTask } from "./asyncTaskQueuer";
 
@@ -13,6 +14,10 @@ export const asyncTasksExecutor = async (task: AsyncTask) => {
         case "emailBookingUpdated":
             console.log("Handling emailBookingUpdated");
             await sendBookingUpdatedEmails(task, config);
+            break;
+        case "emailManagerDataAccess":
+            console.log("Handling emailManagerDataAccess");
+            await sendManagerDataAccessEmail(task, config);
             break;
         case "driveSync":
             console.log("Handling driveSync");

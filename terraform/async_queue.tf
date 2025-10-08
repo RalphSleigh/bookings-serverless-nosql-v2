@@ -58,6 +58,7 @@ resource "aws_lambda_function" "async_task_lambda" {
       workspace            = terraform.workspace
       log_arm              = resource.aws_cloudwatch_log_stream.booking_system_logs.arn
       ASYNC_TASK_QUEUE_URL = aws_sqs_queue.async_task_queue.id
+      SNS_QUEUE_ARN        = aws_sns_topic.lambda-errors.arn
     }
   }
 
