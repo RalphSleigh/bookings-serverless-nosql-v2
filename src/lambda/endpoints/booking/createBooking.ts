@@ -48,6 +48,14 @@ export const createBooking = HandlerWrapperLoggedIn(
     }
 
     enqueueAsyncTask({
+      type: 'emailBookingCreated',
+      data: {
+        eventId: event.eventId,
+        userId: user.userId,
+      },
+    })
+
+    enqueueAsyncTask({
       type: 'driveSync',
       data: {
         eventId: event.eventId,

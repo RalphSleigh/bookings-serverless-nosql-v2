@@ -1,5 +1,6 @@
 import { EmailData } from '../sendEmail'
 import { BookingConfirmationEmail } from './default/confirmation'
+import { ManagerConfirmationEmail } from './default/managerBookingCreated'
 import { ManagerBookingUpdatedEmail } from './default/managerUpdated'
 import { BookingUpdatedEmail } from './default/updated'
 import { EmailTemplate } from './template'
@@ -11,6 +12,9 @@ const templates: Record<EmailData['template'], Record<string, EmailTemplate> & {
   },
   updated: {
     default: new BookingUpdatedEmail(),
+  },
+  managerConfirmation: {
+    default: new ManagerConfirmationEmail(),
   },
   managerBookingUpdated: {
     default: new ManagerBookingUpdatedEmail(),
