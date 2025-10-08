@@ -48,6 +48,8 @@ export const enqueueAsyncTask = async (task: AsyncTask) => {
     const command = new SendMessageCommand({
       QueueUrl: process.env.ASYNC_TASK_QUEUE_URL,
       MessageBody: JSON.stringify(task),
+      MessageGroupId: 'asyncTasks',
+      MessageDeduplicationId: 'asyncTasks' + Date.now(),
     })
     const client = new SQSClient()
     await client.send(command)
