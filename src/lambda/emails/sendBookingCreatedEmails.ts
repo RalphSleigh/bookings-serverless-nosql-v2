@@ -1,12 +1,12 @@
 import { EventSchema } from '../../shared/schemas/event'
 import { TUser, UserSchema } from '../../shared/schemas/user'
-import { EmailBookingUpdatedTask } from '../asyncTasks/asyncTaskQueuer'
+import { EmailBookingCreatedTask, EmailBookingUpdatedTask } from '../asyncTasks/asyncTaskQueuer'
 import { DB, DBBooking, DBEvent, DBRole, DBUser } from '../dynamo'
 import { ConfigType } from '../getConfig'
 import { getBookingByIDs } from '../utils'
 import { sendEmail } from './sendEmail'
 
-export const sendBookingCreatedEmails = async (task: EmailBookingUpdatedTask, config: ConfigType) => {
+export const sendBookingCreatedEmails = async (task: EmailBookingCreatedTask, config: ConfigType) => {
   const eventFromDB = await DBEvent.get({ eventId: task.data.eventId }).go()
   const event = EventSchema.parse(eventFromDB.data)
   const booking = await getBookingByIDs(task.data.eventId, task.data.userId)

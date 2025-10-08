@@ -1,5 +1,6 @@
 import { postDiscordMessage } from "../discord/discordMessagePoster";
 import { syncDriveForEvent } from "../driveSync/driveSyncer";
+import { sendBookingCreatedEmails } from "../emails/sendBookingCreatedEmails";
 import { sendBookingUpdatedEmails } from "../emails/sendBookingUpdatedEmails";
 import { sendManagerDataAccessEmail } from "../emails/ssendManagerDataAccessEmail";
 import { getConfig } from "../getConfig";
@@ -10,6 +11,7 @@ export const asyncTasksExecutor = async (task: AsyncTask) => {
     switch (task.type) {
         case "emailBookingCreated":
             console.log("Handling emailBookingCreated");
+            await sendBookingCreatedEmails(task, config);
             break;
         case "emailBookingUpdated":
             console.log("Handling emailBookingUpdated");
