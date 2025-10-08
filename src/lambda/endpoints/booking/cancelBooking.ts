@@ -44,7 +44,7 @@ export const cancelBooking = HandlerWrapper<any, { eventId: string; userId: stri
     } */
 
     /*     res.locals.logger.logToPath("Enqueuing async email task")
-    enqueueAsyncTask({
+    await enqueueAsyncTask({
       type: "emailBookingUpdated",
       data: {
         eventId: event.eventId,

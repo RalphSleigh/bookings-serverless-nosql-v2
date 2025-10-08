@@ -61,6 +61,14 @@ export const createRole = HandlerWrapperLoggedIn<{}, TCreateRoleData>(
         },
       })
 
+      await enqueueAsyncTask({
+            type: 'emailManagerDataAccess',
+            data: {
+              eventId: event.eventId,
+              userId: targetUser.userId,
+            },
+          })
+
       res.json({ role: validatedRole })
     } catch (error) {
       res.locals.logger.logToPath('Create Role Failed')
