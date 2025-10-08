@@ -7,7 +7,7 @@ import { EmailTemplate } from '../template'
 
 export class ManagerBookingUpdatedEmail extends EmailTemplate {
   subject(data: BookingEmailData) {
-    return `Booking updated for ${data.event.name}`
+    return `[${data.event.emailSubjectTag}] Booking updated for ${data.event.name}`
   }
 
   HTMLBody(data: BookingEmailData, config: ConfigType) {
@@ -23,7 +23,7 @@ export class ManagerBookingUpdatedEmail extends EmailTemplate {
       <Html lang="en">
         <Text>Hi {data.recipient.name}</Text>
         <Text>
-          ${data.bookingOwner.name } has updated their booking for {data.event.name}, They have booked {data.booking.people.length} {data.booking.people.length === 1 ? 'person' : 'people'}:
+          {data.bookingOwner.name} has updated their booking for {data.event.name}, They have booked {data.booking.people.length} {data.booking.people.length === 1 ? 'person' : 'people'}:
         </Text>
         <ul>{participantsList}</ul>
         <Text>
