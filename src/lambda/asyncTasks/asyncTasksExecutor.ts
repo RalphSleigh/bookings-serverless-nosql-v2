@@ -2,7 +2,7 @@ import { postDiscordMessage } from "../discord/discordMessagePoster";
 import { syncDriveForEvent } from "../driveSync/driveSyncer";
 import { sendBookingCreatedEmails } from "../emails/sendBookingCreatedEmails";
 import { sendBookingUpdatedEmails } from "../emails/sendBookingUpdatedEmails";
-import { sendManagerDataAccessEmail } from "../emails/ssendManagerDataAccessEmail";
+import { sendManagerDataAccessEmail } from "../emails/sendManagerDataAccessEmail";
 import { getConfig } from "../getConfig";
 import { AsyncTask } from "./asyncTaskQueuer";
 
