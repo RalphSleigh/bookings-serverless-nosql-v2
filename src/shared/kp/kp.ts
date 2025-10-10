@@ -8,6 +8,7 @@ export type KPTypes = TEvent['kp']['kpStructure']
 export interface KPStructure<T extends TEventKPUnion = TEventKPUnion> {
   typeName: T['kpStructure']
   ManageKPPageList: React.FC<{ event: TEvent<T>; campers: TPerson<TEvent<T>>[] }>
+  PersonCardSection: React.FC<{ person: TPerson<TEvent<T>>}>
 }
 
 export const KPBasicOptions = ['omnivore', 'pescatarian', 'vegetarian', 'vegan'] as const

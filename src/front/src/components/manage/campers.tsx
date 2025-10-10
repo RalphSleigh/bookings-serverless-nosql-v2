@@ -19,6 +19,7 @@ import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { useEvent } from '../../utils'
+import { getKPType } from '../../../../shared/kp/kp'
 
 export const ManageCampers = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -128,6 +129,7 @@ export const ManageCampers = () => {
 const PersonDetails = ({ event, person }: { event: TEvent; person: TPerson }) => {
   const age = dayjs(event.endDate).diff(dayjs(person.basic.dob), 'year')
   const group = ageGroupFromPerson(event)(person)
+  const kp = getKPType(event)
   return (
     <>
       <Title order={3}>{person.basic.name}</Title>
@@ -139,8 +141,7 @@ const PersonDetails = ({ event, person }: { event: TEvent; person: TPerson }) =>
           <a href={`mailto:${person.basic.email}`}>{person.basic.email}</a>
         </Text>
       )}
-      <Text>{person.kp.diet}</Text>
-      <Text>{person.kp.details}</Text>
+      <kp.PersonCardSection person={person} />
       <Text>{person.health.medical}</Text>
     </>
   )
