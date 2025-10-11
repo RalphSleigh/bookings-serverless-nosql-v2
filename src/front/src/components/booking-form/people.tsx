@@ -7,6 +7,7 @@ import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod/v4'
 
 import { app } from '../../../../lambda/app.js'
+import { getAttendanceType } from '../../../../shared/attendance/attendance.js'
 import { KPBasicOptions } from '../../../../shared/kp/kp.js'
 import { BookingSchema, BookingSchemaForType, PartialBookingType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
@@ -15,6 +16,7 @@ import { errorProps } from '../../utils.js'
 import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
 import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
+import { defaultPersonData } from './defaults.js'
 import { SheetsInput } from './sheetsInput.js'
 
 type PeopleFormProps = {
@@ -37,7 +39,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
   })
 
   const appendFn = () => {
-    const newPerson = { personId: uuidv7(), eventId: event.eventId, userId: user.userId, cancelled: false }
+    const newPerson = defaultPersonData(user, event)
     append(newPerson as TPerson)
   }
 
@@ -132,6 +134,8 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
     </>
   )
 
+  const attendance = getAttendanceType(event)
+
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={personId}>
       <Grid p={6} gutter={8}>
@@ -173,6 +177,9 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
             autosize
             minRows={2}
           />
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <attendance.BookingFormDisplayElement event={event} index={index} />
         </Grid.Col>
         <Grid.Col span={12}>
           <Flex justify="flex-end">

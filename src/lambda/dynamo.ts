@@ -238,7 +238,7 @@ export const DBEvent = new Entity(
         type: 'map',
         properties: {
           attendanceStructure: {
-            type: ['whole'] as const,
+            type: ['whole', 'freechoice'] as const,
             required: true,
           },
         },
@@ -519,6 +519,13 @@ const PersonAttributes = {
       name: { type: 'string', required: true },
       dob: { type: 'string', required: true },
       email: { type: 'string' },
+    },
+  },
+  attendance: {
+    type: 'map',
+    properties: {
+      bitMask: { type: 'number' },
+      // No properties for whole attendance
     },
   },
   kp: {

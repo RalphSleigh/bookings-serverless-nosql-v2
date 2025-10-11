@@ -2,7 +2,7 @@ import { Grid, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { useFormContext } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 
-import { AttendanceTypes } from '../attendance/attendance'
+import { AttendanceStructureValues, AttendanceTypes } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
 import { TEvent, TEventFeesUnion, TEventFreeFees } from '../schemas/event'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
@@ -10,7 +10,7 @@ import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeSt
 export class FreeFees implements FeeStructure<TEventFreeFees> {
   typeName: 'free' = 'free'
   name: string = 'Free Fees'
-  supportedAttendance: AttendanceTypes[] = []
+  supportedAttendance: AttendanceStructureValues[] = []
 
   ConfigurationElement: FeeStructureCondfigurationElement<TEventFreeFees> = () => {
     return (

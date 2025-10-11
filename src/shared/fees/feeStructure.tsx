@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react'
 import { PartialDeep } from 'type-fest'
 
-import { AttendanceTypes } from '../attendance/attendance'
+import { AttendanceStructureValues, AttendanceTypes } from '../attendance/attendance'
 import { PartialBookingType, TBooking, TBookingForType } from '../schemas/booking'
 import { TEvent, TEventFeesUnion } from '../schemas/event'
 import { TFee } from '../schemas/fees'
@@ -28,7 +28,7 @@ export type EmailElement<T extends TEventFeesUnion> = React.FC<{ event: TEvent<a
 export interface FeeStructure<T extends TEventFeesUnion = TEventFeesUnion> {
   typeName: T['feeStructure']
   name: string
-  supportedAttendance: AttendanceTypes[]
+  supportedAttendance: AttendanceStructureValues[]
   getFeeLines: GetFeeLineFunction<T>
   ConfigurationElement: FeeStructureCondfigurationElement<T>
   BookingFormDisplayElement: BookingFormDisplayElement<T>

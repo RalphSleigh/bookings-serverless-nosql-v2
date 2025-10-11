@@ -18,10 +18,12 @@ export type TEventLargeConsents = z.infer<typeof largeConsents>
 
 
 const wholeAttendance = z.object({ attendanceStructure: z.literal('whole') })
-const attendanceOptions = z.discriminatedUnion('attendanceStructure', [wholeAttendance])
+const freeChoiceAttendance = z.object({ attendanceStructure: z.literal('freechoice') })
+const attendanceOptions = z.discriminatedUnion('attendanceStructure', [wholeAttendance, freeChoiceAttendance])
 
 export type TEventAttendanceUnion = z.infer<typeof attendanceOptions>
 export type TEventWholeAttendance = z.infer<typeof wholeAttendance>
+export type TEventFreeChoiceAttendance = z.infer<typeof freeChoiceAttendance>
 
 const ealingFee = z.object({
   feeStructure: z.literal('ealing'),
