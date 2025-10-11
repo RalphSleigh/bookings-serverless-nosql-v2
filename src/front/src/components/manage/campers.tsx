@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
-import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
+import { MantineReactTable, MRT_ShowHideColumnsButton, MRT_ColumnDef, MRT_Row, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
 import { TPerson } from '../../../../shared/schemas/person'
@@ -51,6 +51,7 @@ export const ManageCampers = () => {
   )
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-campers-column-visibility-default`, { defaultValue: visibilityDefault })
+  const [columnSize, setColumnSize] = useLocalStorageState<{ [key: string]: number }>(`event-${eventId}-campers-column-size`, { defaultValue: {} })
 
   const columns = useMemo<MRT_ColumnDef<TPerson>[]>(() => fields.map((f) => f.personTableDef()), [])
 
@@ -87,7 +88,7 @@ export const ManageCampers = () => {
     mantineTableProps: {
       className: styles.table,
     },
-    state: { columnVisibility: columnVisibility },
+    state: { columnVisibility: columnVisibility, columnSizing: columnSize },
     onColumnVisibilityChange: setColumnVisibility,
     mantineTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
@@ -101,10 +102,14 @@ export const ManageCampers = () => {
           <IconDownload />
         </ActionIcon>
         {/* along-side built-in buttons in whatever order you want them */}
+        <MRT_ShowHideColumnsButton table={table} />
         <MRT_ToggleDensePaddingButton table={table} />
         <MRT_ToggleFullScreenButton table={table} />
       </Flex>
     ),
+    enableColumnResizing: true,
+    onColumnSizingChange: setColumnSize,
+    layoutMode: 'grid'
   })
 
   const selectedPerson = campers.find((c) => c.personId === selected)

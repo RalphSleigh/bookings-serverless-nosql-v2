@@ -3,6 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime.js'
 import { getProperty } from 'dot-prop'
 import { MRT_ColumnDef } from 'mantine-react-table'
 
+import { getAttendanceType } from './attendance/attendance'
 import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
@@ -12,12 +13,12 @@ dayjs.extend(relativeTime)
 
 type CellType = MRT_ColumnDef<TPerson>['Cell']
 
-abstract class PersonField {
+export abstract class PersonField {
   event: TEvent
   abstract name: string
   enabledForDrive: (event: TEvent) => boolean = () => true
   enabled: (event: TEvent) => boolean = () => true
-  abstract accessor: string | ((p: TPerson) => string | Date | boolean)
+  abstract accessor: string | ((p: TPerson) => string | Date | boolean | number)
   hideByDefault: boolean = false
   filterVariant: 'text' | 'date-range' = 'text'
   Cell?: CellType
@@ -28,12 +29,22 @@ abstract class PersonField {
   valueForDrive: (p: TPerson) => string = (p) => {
     if (typeof this.accessor === 'function') {
       const v = this.accessor(p)
-      return typeof v === 'string' ? v : typeof v === 'boolean' ? v.toString() : v.toLocaleDateString()
+      switch (typeof v) {
+        case 'string':
+          return v
+        case 'boolean':
+          return v.toString()
+        case 'object':
+          return v.toLocaleDateString()
+        case 'number':
+          return v.toString()
+      }
     } else {
       const v = getProperty<TPerson, string, string>(p, this.accessor, '')
       return v
     }
   }
+  sortingFn?: MRT_ColumnDef<TPerson>['sortingFn']
 
   constructor(event: TEvent) {
     this.event = event
@@ -46,6 +57,10 @@ abstract class PersonField {
       size: this.size,
       minSize: 20,
     } as MRT_ColumnDef<TPerson>
+
+    if (this.sortingFn) {
+      def.sortingFn = this.sortingFn
+    }
 
     if (typeof this.accessor === 'function') {
       def.accessorFn = this.accessor
@@ -80,7 +95,7 @@ class Dob extends PersonField {
   hideByDefault = true
   filterVariant = 'date-range' as const
   Cell: CellType = ({ cell }) => cell.getValue<Date>().toLocaleDateString()
-  size: number = 40
+  size: number = 100
 }
 
 class Age extends PersonField {
@@ -90,12 +105,16 @@ class Age extends PersonField {
     const group = ageGroupFromPerson(this.event)(p)
     return group.toAgeGroupString()
   }
+  size: number = 130
+  sortingFn: MRT_ColumnDef<TPerson>['sortingFn'] = (a, b, id) => {
+    return new Date(a.original.basic.dob).getTime() - new Date(b.original.basic.dob).getTime()
+  }
 }
 
 class Diet extends PersonField {
   name = 'Diet'
   accessor = 'kp.diet'
-  size: number = 40
+  size: number = 100
 }
 
 class DietDetails extends PersonField {
@@ -128,5 +147,17 @@ export class Current extends PersonField {
 }
 
 export const personFields: (event: TEvent) => PersonField[] = (event) => {
-  return [new Name(event), new Email(event), new Dob(event), new Age(event), new Diet(event), new DietDetails(event), new Medical(event), new Created(event), new Updated(event)]
+  const attendance = getAttendanceType(event)
+  return [
+    new Name(event),
+    new Email(event),
+    new Dob(event),
+    new Age(event),
+    new Diet(event),
+    new DietDetails(event),
+    new Medical(event),
+    ...attendance.PersonFields(event),
+    new Created(event),
+    new Updated(event),
+  ]
 }

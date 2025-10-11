@@ -7,4 +7,5 @@ export class WholeAttendance implements AttendanceStructure<TEventWholeAttendanc
     name = 'Whole event'
     BookingFormDisplayElement: AttendanceBookingFormDisplayElement<TEventWholeAttendance> = () => null
     getDefaultData = (event: TEvent<any, any, TEventWholeAttendance, any>) => ({})
+    PersonFields = (event: TEvent<any, any, TEventWholeAttendance, any>) => []
 }

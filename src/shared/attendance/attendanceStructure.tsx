@@ -1,3 +1,4 @@
+import { PersonField } from '../personFields';
 import { TEvent, TEventAttendanceUnion } from '../schemas/event'
 import { TPerson } from '../schemas/person';
 
@@ -8,4 +9,5 @@ export interface AttendanceStructure<A extends TEventAttendanceUnion = TEventAtt
   name: string
   getDefaultData: (event: TEvent<any, any, A, any>) => TPerson<TEvent<any, any, A, any>>['attendance']
   BookingFormDisplayElement: AttendanceBookingFormDisplayElement<A>
+  PersonFields: (event: TEvent<any, any, A, any>) => PersonField[]
 }
