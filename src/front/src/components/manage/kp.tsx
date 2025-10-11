@@ -46,7 +46,7 @@ export const ManageKP: React.FC = () => {
 const ageGroupList = ageGroups.map(ag => ag.construct(0))
 
   const rows = ageGroupList.map((ageGroup) => {
-    const row = KPBasicOptions.map((k) => totals[ageGroup.plural]?.[k] || 0).map((t) => <Table.Td key={t}>{t}</Table.Td>)
+    const row = KPBasicOptions.map((k) => totals[ageGroup.plural]?.[k] || 0).map((t, i) => <Table.Td key={i}>{t}</Table.Td>)
     const total = KPBasicOptions.reduce((acc, k) => acc + (totals[ageGroup.plural]?.[k] || 0), 0)
     return (
       <Table.Tr key={ageGroup.plural}>
