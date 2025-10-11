@@ -2,7 +2,7 @@ import { Grid, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { useFormContext } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 
-import { AttendanceStructureValues, AttendanceTypes } from '../attendance/attendance'
+import { AttendanceStructureValues } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
 import { TEvent, TEventFeesUnion, TEventFreeFees } from '../schemas/event'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'

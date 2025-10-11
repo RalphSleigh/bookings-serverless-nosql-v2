@@ -11,22 +11,21 @@ import { ageGroupFromPerson } from './woodcraft'
 
 dayjs.extend(relativeTime)
 
-type CellType = MRT_ColumnDef<TPerson>['Cell']
 
-export abstract class PersonField {
+export abstract class PersonField<T extends TEvent = TEvent> {
   event: TEvent
   abstract name: string
   enabledForDrive: (event: TEvent) => boolean = () => true
   enabled: (event: TEvent) => boolean = () => true
-  abstract accessor: string | ((p: TPerson) => string | Date | boolean | number)
+  abstract accessor: string | ((p: TPerson<T>) => string | Date | boolean | number)
   hideByDefault: boolean = false
   filterVariant: 'text' | 'date-range' = 'text'
-  Cell?: CellType
+  Cell?: MRT_ColumnDef<TPerson<T>>['Cell']
   size: number = 100
   roles: TRole['role'][] = ['owner']
   available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role))
   titleForDrive: () => string = () => this.name
-  valueForDrive: (p: TPerson) => string = (p) => {
+  valueForDrive: (p: TPerson<T>) => string = (p) => {
     if (typeof this.accessor === 'function') {
       const v = this.accessor(p)
       switch (typeof v) {
@@ -40,11 +39,11 @@ export abstract class PersonField {
           return v.toString()
       }
     } else {
-      const v = getProperty<TPerson, string, string>(p, this.accessor, '')
+      const v = getProperty<TPerson<T>, string, string>(p, this.accessor, '')
       return v
     }
   }
-  sortingFn?: MRT_ColumnDef<TPerson>['sortingFn']
+  sortingFn?: MRT_ColumnDef<TPerson<T>>['sortingFn']
 
   constructor(event: TEvent) {
     this.event = event
@@ -56,7 +55,7 @@ export abstract class PersonField {
       filterVariant: this.filterVariant,
       size: this.size,
       minSize: 20,
-    } as MRT_ColumnDef<TPerson>
+    } as MRT_ColumnDef<TPerson<T>>
 
     if (this.sortingFn) {
       def.sortingFn = this.sortingFn
@@ -94,7 +93,7 @@ class Dob extends PersonField {
   accessor = (p: TPerson) => new Date(p.basic.dob)
   hideByDefault = true
   filterVariant = 'date-range' as const
-  Cell: CellType = ({ cell }) => cell.getValue<Date>().toLocaleDateString()
+  Cell: MRT_ColumnDef<TPerson>['Cell'] = ({ cell }) => cell.getValue<Date>().toLocaleDateString()
   size: number = 100
 }
 
@@ -131,14 +130,14 @@ class Created extends PersonField {
   name = 'Created'
   filterVariant = 'date-range' as const
   accessor = (p: TPerson) => new Date(p.createdAt!)
-  Cell: CellType = ({ cell }) => dayjs(cell.getValue<Date>()).fromNow()
+  Cell: MRT_ColumnDef<TPerson>['Cell'] = ({ cell }) => dayjs(cell.getValue<Date>()).fromNow()
 }
 
 class Updated extends PersonField {
   name = 'Updated'
   filterVariant = 'date-range' as const
   accessor = (p: TPerson) => new Date(p.updatedAt!)
-  Cell: CellType = ({ cell }) => dayjs(cell.getValue<Date>()).fromNow()
+  Cell: MRT_ColumnDef<TPerson>['Cell'] = ({ cell }) => dayjs(cell.getValue<Date>()).fromNow()
 }
 
 export class Current extends PersonField {

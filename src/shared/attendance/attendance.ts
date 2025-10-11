@@ -1,4 +1,4 @@
-import { EventSchema, TEvent } from '../schemas/event'
+import { EventSchema, TEvent, TEventAttendanceUnion } from '../schemas/event'
 import { WholeAttendance } from './whole'
 import { FreeChoiceAttendance } from './freechoice'
 import { AttendanceStructure } from './attendanceStructure'
@@ -8,7 +8,6 @@ export const AttendanceOptions = EventSchema.shape.attendance.options.map((optio
 
 const attendanceTypes = [WholeAttendance, FreeChoiceAttendance]
 
-export type AttendanceTypes = InstanceType<(typeof attendanceTypes)[number]>
 export type AttendanceStructureValues = TEvent["attendance"]["attendanceStructure"];
 
 export const maybeGetAttendanceType = (attendanceStructure: AttendanceStructureValues | undefined): AttendanceStructure<any> | undefined => {

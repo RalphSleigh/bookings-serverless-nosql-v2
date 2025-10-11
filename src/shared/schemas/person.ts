@@ -2,7 +2,7 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { z } from 'zod/v4'
 
 import { KPBasicOptions } from '../kp/kp'
-import { TEvent } from './event'
+import { TEvent, TEventBasicKP, TEventFreeChoiceAttendance, TEventLargeKP, TEventWholeAttendance } from './event'
 import { at } from 'lodash'
 
 const KPBasic = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional() }).strict()
@@ -76,19 +76,16 @@ export const PersonSchemaForType = z
   })
   .strict()
 
-type MapEventKPToPersonKP<Event extends TEvent> = Event['kp'] extends { kpStructure: 'basic' }
+type MapEventKPToPersonKP<Event extends TEvent> = Event['kp'] extends TEventBasicKP
   ? TPersonBasicKPData
-  : Event['kp'] extends { kpStructure: 'large' }
+  : Event['kp'] extends TEventLargeKP
     ? TPersonLargeKPData
     : TPersonKPData
 
-type MapEventAttendanceToPersonAttendance<Event extends TEvent> = Event['attendance'] extends { attendanceStructure: 'whole' }
+type MapEventAttendanceToPersonAttendance<Event extends TEvent> = Event['attendance'] extends TEventWholeAttendance
   ? TPersonWholeAttendance
-  : Event['attendance'] extends { attendanceStructure: 'freechoice' }
+  : Event['attendance'] extends TEventFreeChoiceAttendance
     ? TPersonFreeChoiceAttendance
     : TPersonAttendance
 
-export type TPerson<Event extends TEvent = TEvent> = z.infer<typeof PersonSchemaForType> & { kp: MapEventKPToPersonKP<Event>, attendance: MapEventAttendanceToPersonAttendance<Event> }
-/* export type TPersonWithBasicKP = TPerson & { kp: z.infer<typeof KPBasic> }
-export type TPersonWithOptions<KP extends TPersonBasicKPData | TPersonLargeKPData> = TPerson & { kp: KP }
- */
+export type TPerson<Event extends TEvent = TEvent> = Omit<z.infer<typeof PersonSchemaForType>, 'kp' | 'attendance'> & { kp: MapEventKPToPersonKP<Event>, attendance: MapEventAttendanceToPersonAttendance<Event> }
