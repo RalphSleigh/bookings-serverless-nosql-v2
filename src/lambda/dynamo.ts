@@ -533,6 +533,16 @@ const PersonAttributes = {
     properties: {
       diet: { type: KPBasicOptions, required: true },
       details: { type: 'string' },
+      preferences: { type: 'string' },
+      nut: { type: 'boolean', default: false },
+      gluten: { type: 'boolean', default: false },
+      soya: { type: 'boolean', default: false },
+      dairy: { type: 'boolean', default: false },
+      egg: { type: 'boolean', default: false },
+      pork: { type: 'boolean', default: false },
+      chickpea: { type: 'boolean', default: false },
+      diabetic: { type: 'boolean', default: false },
+      contactMe: { type: 'boolean', default: false },
     },
   },
   health: {

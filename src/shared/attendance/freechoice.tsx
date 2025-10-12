@@ -10,11 +10,13 @@ import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
 import { TEvent, TEventFreeChoiceAttendance } from '../schemas/event'
 import { TPerson } from '../schemas/person'
-import { AttendanceBookingFormDisplayElement, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
+import { AttendanceBookingFormDisplayElement, AttendanceIsWholeAttendanceFunction, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
 
 dayjs.extend(AdvancedFormat)
 
 type Nights = { start: Dayjs; end: Dayjs }[]
+
+const nightsFromEventCached: { [eventId: string]: Nights } = {}
 
 export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoiceAttendance> {
   typeName: 'freechoice' = 'freechoice'
@@ -63,6 +65,7 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
   }
 
   getNightsFromEvent(event: TEvent<any, any, TEventFreeChoiceAttendance, any>): Nights {
+    if (nightsFromEventCached[event.eventId]) return nightsFromEventCached[event.eventId]
     const start = dayjs(event.startDate)
     const end = dayjs(event.endDate)
     const nights: Nights = []
@@ -70,7 +73,7 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
     for (let d = start; d < end; d = d.add(1, 'day')) {
       nights.push({ start: d, end: d.add(1, 'day') })
     }
-
+    nightsFromEventCached[event.eventId] = nights
     return nights
   }
 
@@ -108,6 +111,12 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
     })
 
     return [new Mask(event), new NightsAttending(event), ...nights]
+  }
+
+  isWholeAttendance: AttendanceIsWholeAttendanceFunction<TEventFreeChoiceAttendance> = (event, person): boolean => {
+    const nights = this.getNightsFromEvent(event)
+    const bitMask = person.attendance?.bitMask || 0
+    return nights.every((_, nightIndex) => bitMask & (1 << nightIndex))
   }
 
   circles = (bitMask: number, event: TEvent<any, any, TEventFreeChoiceAttendance, any>): string => {

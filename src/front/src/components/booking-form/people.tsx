@@ -8,7 +8,7 @@ import { z } from 'zod/v4'
 
 import { app } from '../../../../lambda/app.js'
 import { getAttendanceType } from '../../../../shared/attendance/attendance.js'
-import { KPBasicOptions } from '../../../../shared/kp/kp.js'
+import { getKPType, KPBasicOptions } from '../../../../shared/kp/kp.js'
 import { BookingSchema, BookingSchemaForType, PartialBookingType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
@@ -135,6 +135,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
   )
 
   const attendance = getAttendanceType(event)
+  const kp = getKPType(event)
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={personId}>
@@ -154,18 +155,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
         </Grid.Col>
         {emailAndDiet}
-        <Grid.Col span={12}>
-          <Textarea
-            autoComplete={`section-person-${index} diet-details`}
-            id={`person-details-${index}`}
-            data-form-type="other"
-            label="Additional dietary requirement or food related allergies"
-            {...register(`people.${index}.kp.details` as const)}
-            {...e(`people.${index}.kp.details`)}
-            autosize
-            minRows={2}
-          />
-        </Grid.Col>
+        <kp.PersonFormSection index={index} />
         <Grid.Col span={12}>
           <Textarea
             autoComplete={`section-person-${index} health-medical`}

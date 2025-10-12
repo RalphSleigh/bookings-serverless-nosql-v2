@@ -1,15 +1,37 @@
-import { Table, Text } from '@mantine/core'
+import { Grid, Table, Text, Textarea } from '@mantine/core'
+import { useFormContext } from 'react-hook-form'
 
+import { errorProps } from '../../front/src/utils'
 import { TBooking } from '../schemas/booking'
 import { TEvent, TEventBasicKP } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { ageGroupFromPerson } from '../woodcraft'
-import { KPStructure } from './kp'
+import { KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
 
 export class BasicKP implements KPStructure<TEventBasicKP> {
   typeName: 'basic' = 'basic'
 
-  ManageKPPageList: React.FC<{ event: TEvent<TEventBasicKP>; campers: TPerson<TEvent<TEventBasicKP>>[] }> = ({ event, campers }) => {
+  PersonFormSection: React.FC<{ index: number }> = ({ index }) => {
+    const { register, formState } = useFormContext<TBooking<TEvent<TEventBasicKP>>>()
+    const errors = formState.errors
+    const e = errorProps(errors)
+    return (
+      <Grid.Col span={12}>
+        <Textarea
+          autoComplete={`section-person-${index} diet-details`}
+          id={`person-details-${index}`}
+          data-form-type="other"
+          label="Additional dietary requirement or food related allergies"
+          {...register(`people.${index}.kp.details` as const)}
+          {...e(`people.${index}.kp.details`)}
+          autosize
+          minRows={2}
+        />
+      </Grid.Col>
+    )
+  }
+
+  ManageKPPageList: ManageKPPageList<TEventBasicKP> = ({ event, campers }) => {
     const interestingCampers = campers.filter((c) => c.kp.details && c.kp.details !== '')
 
     const ageFn = ageGroupFromPerson(event)
@@ -36,7 +58,7 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
     )
   }
 
-  PersonCardSection: React.FC<{ person: TPerson<TEvent<TEventBasicKP>> }> = ({ person }) => {
+  PersonCardSection: KPPersonCardSection = ({ person }) => {
     return (
       <>
         <Text>
