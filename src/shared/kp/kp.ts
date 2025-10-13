@@ -17,9 +17,6 @@ export interface KPStructure<T extends TEventKPUnion = TEventKPUnion> {
   PersonCardSection: KPPersonCardSection
 }
 
-type checkbasic = BasicKP extends KPStructure<TEventKPUnion> ? true : false
-type checklarge = LargeKP extends KPStructure<TEventKPUnion> ? true : false
-
 
 export const KPBasicOptions = ['omnivore', 'pescatarian', 'vegetarian', 'vegan'] as const
 export type TKPBasicOptions = (typeof KPBasicOptions)[number]

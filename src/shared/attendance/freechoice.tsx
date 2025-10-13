@@ -1,6 +1,6 @@
-import { Button, Input, Text } from '@mantine/core'
+import { Button, Divider, Input, Text } from '@mantine/core'
 import dayjs, { Dayjs } from 'dayjs'
-import AdvancedFormat from 'dayjs/plugin/advancedFormat'
+import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
 import e from 'express'
 import { get } from 'lodash'
 import { useController, useFormContext } from 'react-hook-form'
@@ -57,7 +57,8 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
     ))
     return (
       <>
-        <Input.Label required>Nights attending</Input.Label>
+        <Divider my="xs" label="Attendance" labelPosition="center" />
+        <Input.Label required>Nights attending:</Input.Label>
         <Button.Group style={{ flexWrap: 'wrap' }}>{buttons}</Button.Group>
         {invalid && <Input.Error>{error?.message}</Input.Error>}
       </>

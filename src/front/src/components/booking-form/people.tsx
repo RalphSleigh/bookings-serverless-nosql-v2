@@ -1,4 +1,4 @@
-import { ActionIcon, Anchor, Button, Flex, Grid, Paper, Textarea, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Flex, Grid, Paper, Textarea, TextInput, Title, Text, Divider } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import React, { useMemo, useState } from 'react'
@@ -18,6 +18,8 @@ import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
 import { defaultPersonData } from './defaults.js'
 import { SheetsInput } from './sheetsInput.js'
+import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
+import { getConsentsType } from '../../../../shared/consents/consents.js'
 
 type PeopleFormProps = {
   event: TEvent
@@ -109,9 +111,9 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
       remove(index)
     }
   }
-  const emailAndDiet = event.allParticipantEmails ? (
+  const email = event.allParticipantEmails ? (
     <>
-      <Grid.Col span={8}>
+      <Grid.Col span={12}>
         <TextInput
           required
           autoComplete={`section-person-${index} email`}
@@ -122,20 +124,15 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           {...e(`people.${index}.basic.email`)}
         />
       </Grid.Col>
-      <Grid.Col span={4}>
-        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
-      </Grid.Col>
     </>
   ) : (
-    <>
-      <Grid.Col span={12}>
-        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
-      </Grid.Col>
-    </>
+    <></>
   )
 
   const attendance = getAttendanceType(event)
   const kp = getKPType(event)
+  const HealthElement = event.bigCampMode ? HealthLargeElement : HealthSmallElement
+  const consent = getConsentsType(event)
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={personId}>
@@ -154,24 +151,15 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
         <Grid.Col span={4}>
           <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
         </Grid.Col>
-        {emailAndDiet}
+        {email}
         <kp.PersonFormSection index={index} />
-        <Grid.Col span={12}>
-          <Textarea
-            autoComplete={`section-person-${index} health-medical`}
-            id={`person-health-medical-${index}`}
-            data-form-type="other"
-            label="Details of relevant medical conditions, medication taken or addtional needs"
-            {...register(`people.${index}.health.medical` as const)}
-            {...e(`people.${index}.health.medical`)}
-            autosize
-            minRows={2}
-          />
-        </Grid.Col>
+        <HealthElement index={index} />
+
         <Grid.Col span={12}>
           <attendance.BookingFormDisplayElement event={event} index={index} />
         </Grid.Col>
         <Grid.Col span={12}>
+          <consent.FormSection index={index} />
           <Flex justify="flex-end">
             <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>
               <IconX size={16} stroke={3} color="red" />
@@ -183,6 +171,62 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
         </Grid.Col>
       </Grid>
     </Paper>
+  )
+}
+
+const HealthSmallElement: React.FC<{ index: number }> = ({ index }) => {
+  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { errors } = formState
+  const e = errorProps(errors)
+
+  return (
+    <Grid.Col span={12}>
+      <Textarea
+        autoComplete={`section-person-${index} health-medical`}
+        id={`person-health-medical-${index}`}
+        data-form-type="other"
+        label="Details of relevant medical conditions, medication taken or addtional needs"
+        {...register(`people.${index}.health.medical` as const)}
+        {...e(`people.${index}.health.medical`)}
+        autosize
+        minRows={2}
+      />
+    </Grid.Col>
+  )
+}
+
+const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
+  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { errors } = formState
+  const e = errorProps(errors)
+
+  return (
+    <Grid.Col span={12}>
+                <Divider my="xs" label="Medical & Accessbility" labelPosition="center" />
+      <Textarea
+        autoComplete={`section-person-${index} health-medical`}
+        id={`person-health-medical-${index}`}
+        data-form-type="other"
+        label="Details of relevant medical conditions, medication taken or addtional needs"
+        {...register(`people.${index}.health.medical` as const)}
+        {...e(`people.${index}.health.medical`)}
+        autosize
+        minRows={2}
+      />
+      <Text size='sm' mt={16}>Please provide us with details of any accessibility requirements, this may include mobility issues, a requirement for power or other access requirements.</Text>
+      <Textarea
+        mt={16}
+        autoComplete={`section-person-${index} health-accessibility`}
+        id={`person-health-accessibility-${index}`}
+        data-form-type="other"
+        label="Details of relevant medical conditions, medication taken or addtional needs"
+        {...register(`people.${index}.health.accessibility` as const)}
+        {...e(`people.${index}.health.accessibility`)}
+        autosize
+        minRows={2}
+      />
+      <CustomCheckbox mt={16} label="I would like to talk to the accessibility team about my accessibility requirements" id={`person-health-contactme-${index}`} name={`people.${index}.health.contactMe`} m={4} />
+    </Grid.Col>
   )
 }
 

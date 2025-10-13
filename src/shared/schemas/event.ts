@@ -9,12 +9,12 @@ export type TEventBasicKP = z.infer<typeof basicKP>
 export type TEventLargeKP = z.infer<typeof largeKP>
 
 const noneConsents = z.object({ consentsStructure: z.literal('none') })
-const largeConsents = z.object({ consentsStructure: z.literal('large') })
-const consentsOptions = z.discriminatedUnion('consentsStructure', [noneConsents, largeConsents])
+const vcampConsents = z.object({ consentsStructure: z.literal('vcamp') })
+const consentsOptions = z.discriminatedUnion('consentsStructure', [noneConsents, vcampConsents])
 
 export type TEventConsentsUnion = z.infer<typeof consentsOptions>
 export type TEventNoneConsents = z.infer<typeof noneConsents>
-export type TEventLargeConsents = z.infer<typeof largeConsents>
+export type TEventVCampConsents = z.infer<typeof vcampConsents>
 
 const wholeAttendance = z.object({ attendanceStructure: z.literal('whole') })
 const freeChoiceAttendance = z.object({ attendanceStructure: z.literal('freechoice') })

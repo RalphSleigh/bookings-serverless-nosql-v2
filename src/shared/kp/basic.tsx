@@ -6,7 +6,8 @@ import { TBooking } from '../schemas/booking'
 import { TEvent, TEventBasicKP } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { ageGroupFromPerson } from '../woodcraft'
-import { KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
+import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
+import { CustomSelect } from '../../front/src/components/custom-inputs/customSelect'
 
 export class BasicKP implements KPStructure<TEventBasicKP> {
   typeName: 'basic' = 'basic'
@@ -17,6 +18,7 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
     const e = errorProps(errors)
     return (
       <Grid.Col span={12}>
+         <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
         <Textarea
           autoComplete={`section-person-${index} diet-details`}
           id={`person-details-${index}`}
