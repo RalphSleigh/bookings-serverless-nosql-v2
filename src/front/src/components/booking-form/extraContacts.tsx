@@ -25,7 +25,7 @@ export function ExtraContactsForm() {
   return (
     <Grid>
       <Grid.Col>
-        <Title order={2} size="h5" mt={16}>
+        <Title size="h4" order={2} mt={16}>
           Extra Contacts
         </Title>
         <Text>Here you can supply contact details for additional people we can contact about your booking, this is optional but may be useful.</Text>

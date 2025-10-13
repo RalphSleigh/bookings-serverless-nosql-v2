@@ -49,6 +49,16 @@ const extraContact = z.object({
   email: z.string().email(),
 })
 
+// Camping
+
+const campingBig = z.object({
+  who: z.string().optional(),
+  equipment: z.string().optional(),
+  accessibility: z.string().optional(),
+}).strict()
+
+const campingSmall = z.undefined()
+
 // Other Stuff
 
 const otherBig = z.object({
@@ -71,6 +81,7 @@ export const BookingSchema = (event: TEvent) =>
       basic: event.bigCampMode ? (event.organisations ? basicBigWithOrg : basicBigNoOrg) : basicSmall,
       extraContacts: z.array(extraContact).optional(),
       people: z.array(PersonSchema(event)).min(1),
+      camping: event.bigCampMode ? campingBig : campingSmall,
       other: event.bigCampMode ? otherBig : otherSmall,
       createdAt: z.number().optional(),
       updatedAt: z.number().optional(),
@@ -87,6 +98,7 @@ export const BookingSchemaForType = z
     basic: basicSmall.or(basicBigForType),
     extraContacts: z.array(extraContact).optional(),
     people: z.array(PersonSchemaForType).min(1),
+    camping: campingBig.or(campingSmall),
     other: otherBig.or(otherSmall),
     createdAt: z.number().optional(),
     updatedAt: z.number().optional(),

@@ -21,31 +21,50 @@ export function OtherQuestionsForm() {
 
   const event = useEvent()
 
-  return (
-    <Grid>
-      <Grid.Col>
-        <Title order={2} size="h5" mt={16}>
-          Other Stuff
-        </Title>
-        {!event.bigCampMode && (
+  if (event.bigCampMode) {
+    return (
+      <Grid>
+        <Grid.Col>
+          <Title size="h4" order={2} mt={16}>
+            Other Stuff
+          </Title>
+          <Textarea
+            mt={8}
+            label="Do you know how you plan to travel to camp? Will you need the shuttle bus?"
+            {...register('other.anythingElse')}
+            {...e('anythingElse')}
+            autoComplete={`section-anything-else anything-else`}
+            id={`section-anything-else-anything-else`}
+            data-form-type="other"
+          />
+        </Grid.Col>
+      </Grid>
+    )
+  } else {
+    return (
+      <Grid>
+        <Grid.Col>
+          <Title size="h4" order={2} mt={16}>
+            Other Stuff
+          </Title>
           <CustomRadioGroup name="other.whatsApp" label="Do you want to be added to camp Whatsapp group?">
             <Group mt={8}>
               <Radio value={'yes'} label="Yes" />
               <Radio value={'no'} label="No" />
             </Group>
           </CustomRadioGroup>
-        )}
 
-        <Textarea
-          mt={8}
-          label="Anything else"
-          {...register('other.anythingElse')}
-          {...e('anythingElse')}
-          autoComplete={`section-anything-else anything-else`}
-          id={`section-anything-else-anything-else`}
-          data-form-type="other"
-        />
-      </Grid.Col>
-    </Grid>
-  )
+          <Textarea
+            mt={8}
+            label="Anything else:"
+            {...register('other.anythingElse')}
+            {...e('anythingElse')}
+            autoComplete={`section-anything-else anything-else`}
+            id={`section-anything-else-anything-else`}
+            data-form-type="other"
+          />
+        </Grid.Col>
+      </Grid>
+    )
+  }
 }

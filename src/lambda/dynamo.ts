@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Attributes, Entity, Service, type EntityItem } from 'electrodb'
 import { application } from 'express'
+import { first } from 'lodash'
 import { v7 as uuidv7 } from 'uuid'
 
 import { KPBasicOptions } from '../shared/kp/kp'
@@ -342,6 +343,14 @@ const BookingAttributes = {
       },
     },
   },
+  camping: {
+    type: 'map',
+    properties: {
+      who: { type: 'string' },
+      equipment: { type: 'string' },
+      accessibility: { type: 'string' },
+    },
+  },
   other: {
     type: 'map',
     properties: {
@@ -553,6 +562,15 @@ const PersonAttributes = {
       contactMe: { type: 'boolean' },
     },
   },
+  consents: {
+    type: 'map',
+    properties: {
+      photo: { type: ['Yes', 'No'] as const },
+      rse: { type: ['Yes', 'No'] as const },
+      activities: { type: ['Yes', 'No'] as const },
+    },
+  },
+  firstAid: { type: 'boolean' },
 } as const
 
 export const DBPerson = new Entity(
