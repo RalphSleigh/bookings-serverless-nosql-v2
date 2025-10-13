@@ -1,6 +1,7 @@
-import { ActionIcon, Anchor, Button, Flex, Grid, Paper, Textarea, TextInput, Title, Text, Divider } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Paper, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
+import dayjs from 'dayjs'
 import React, { useMemo, useState } from 'react'
 import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
 import { v7 as uuidv7 } from 'uuid'
@@ -8,18 +9,18 @@ import { z } from 'zod/v4'
 
 import { app } from '../../../../lambda/app.js'
 import { getAttendanceType } from '../../../../shared/attendance/attendance.js'
+import { getConsentsType } from '../../../../shared/consents/consents.js'
 import { getKPType, KPBasicOptions } from '../../../../shared/kp/kp.js'
-import { BookingSchema, BookingSchemaForType, PartialBookingType } from '../../../../shared/schemas/booking.js'
+import { BookingSchema, BookingSchemaForType, PartialBookingType, TBooking } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
-import { errorProps } from '../../utils.js'
+import { errorProps, useEvent } from '../../utils.js'
+import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
 import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
 import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
 import { defaultPersonData } from './defaults.js'
 import { SheetsInput } from './sheetsInput.js'
-import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
-import { getConsentsType } from '../../../../shared/consents/consents.js'
 
 type PeopleFormProps = {
   event: TEvent
@@ -160,6 +161,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
         </Grid.Col>
         <Grid.Col span={12}>
           <consent.FormSection index={index} />
+          {event.bigCampMode ? <FirstAid index={index} /> : null}
           <Flex justify="flex-end">
             <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>
               <IconX size={16} stroke={3} color="red" />
@@ -202,7 +204,7 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
 
   return (
     <Grid.Col span={12}>
-                <Divider my="xs" label="Medical & Accessbility" labelPosition="center" />
+      <Divider my="xs" label="Medical & Accessbility" labelPosition="center" />
       <Textarea
         autoComplete={`section-person-${index} health-medical`}
         id={`person-health-medical-${index}`}
@@ -213,7 +215,9 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
         autosize
         minRows={2}
       />
-      <Text size='sm' mt={16}>Please provide us with details of any accessibility requirements, this may include mobility issues, a requirement for power or other access requirements.</Text>
+      <Text size="sm" mt={16}>
+        Please provide us with details of any accessibility requirements, this may include mobility issues, a requirement for power or other access requirements.
+      </Text>
       <Textarea
         mt={16}
         autoComplete={`section-person-${index} health-accessibility`}
@@ -225,9 +229,32 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
         autosize
         minRows={2}
       />
-      <CustomCheckbox mt={16} label="I would like to talk to the accessibility team about my accessibility requirements" id={`person-health-contactme-${index}`} name={`people.${index}.health.contactMe`} m={4} />
+      <CustomCheckbox
+        mt={16}
+        label="I would like to talk to the accessibility team about my accessibility requirements"
+        id={`person-health-contactme-${index}`}
+        name={`people.${index}.health.contactMe`}
+        m={4}
+      />
     </Grid.Col>
   )
+}
+
+const FirstAid: React.FC<{ index: number }> = ({ index }) => {
+  const dob = useWatch<TBooking>({
+    name: `people.${index}.basic.dob`,
+  })
+
+  const event = useEvent()
+  if (!event) return null
+  const DoBdate = typeof dob === 'string' ? dayjs(dob) : null
+  const EventStartDate = dayjs(event.startDate)
+
+  const isAdult = DoBdate && DoBdate.add(18, 'years').isBefore(EventStartDate)
+
+  if (!isAdult) return null
+
+  return <CustomCheckbox mt={16} label="First Aider (18+ only)" id={`person-firstaid-${index}`} name={`people.${index}.firstAid`} m={4} />
 }
 
 /* const COLLAPSE_DEFAULT_THRESHOLD = 20

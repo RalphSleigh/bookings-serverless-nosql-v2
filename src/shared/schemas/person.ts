@@ -62,6 +62,7 @@ export const PersonSchema = (event: TEvent) => {
       kp: event.kp.kpStructure === 'basic' ? KPBasic : KPLarge,
       health: event.bigCampMode ? HealthLarge : HealthSmall,
       consents: event.consents.consentsStructure === 'none' ? ConsentNone : ConsentVCamp,
+      firstAid: z.boolean().optional(),
       createdAt: z.number().optional(),
       updatedAt: z.number().optional(),
     })
@@ -92,6 +93,7 @@ export const PersonSchemaForType = z
     kp: KPBasic.or(KPLarge),
     health: HealthSmall.or(HealthLarge),
     consents: ConsentNone.or(ConsentVCamp),
+    firstAid: z.boolean().optional(),
     createdAt: z.number().optional(),
     updatedAt: z.number().optional(),
   })
