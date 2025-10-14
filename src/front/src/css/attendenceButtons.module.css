@@ -1,0 +1,15 @@
+.root {
+  &[data-variant='attendanceUnselected'] {
+    background: light-dark(var(--mantine-color-white), var(--mantine-color-gray-9));
+    color: light-dark(var(--mantine-color-text), var(--mantine-color-green-0));
+    border-width: 1px;
+    border-color: light-dark(var(--mantine-color-green-9), var(--mantine-color-gray-6));
+  }
+
+  &[data-variant='attendanceSelected'] {
+    background: light-dark(var(--mantine-color-green-7), var(--mantine-color-green-9));
+    color: light-dark(var(--mantine-color-white), var(--mantine-color-green-0));
+    border-width: 1px;
+    border-color: light-dark(var(--mantine-color-green-9), var(--mantine-color-green-6));
+  }
+}

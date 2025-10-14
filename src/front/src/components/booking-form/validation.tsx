@@ -30,6 +30,10 @@ const mapValidationError = (data: PartialBookingType | undefined) => (issue: z.c
       if (issue.path[2] === 'basic' && issue.path[3] === 'email') return `Please enter an email address for ${name}`
       if (issue.path[2] === 'basic' && issue.path[3] === 'dob') return `Please enter a DoB for ${name}`
       if (issue.path[2] === 'kp' && issue.path[3] === 'diet') return `Please select a diet for ${name}`
+      if (issue.path[2] === 'attendance' && issue.path[3] === 'bitMask') return `Please select at least one night for ${name}`
+      if (issue.path[2] === 'consents' && issue.path[3] === 'photo') return `Please answer the photo consent question for ${name}`
+      if (issue.path[2] === 'consents' && issue.path[3] === 'activities') return `Please answer the adventurous activities consent question for ${name}`
+      if (issue.path[2] === 'consents' && issue.path[3] === 'rse') return `Please answer the RSE consent question for ${name}`
     } else {
       if (issue.path[2] === 'basic' && issue.path[3] === 'name') return `Please enter a name for person ${personIndex + 1}`
       return null

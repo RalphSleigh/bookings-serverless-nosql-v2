@@ -1,20 +1,25 @@
-import { ActionIcon, Anchor, Button, Flex, Grid, Paper, Textarea, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Paper, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
+import dayjs from 'dayjs'
 import React, { useMemo, useState } from 'react'
 import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
 import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod/v4'
 
 import { app } from '../../../../lambda/app.js'
-import { KPBasicOptions } from '../../../../shared/kp/kp.js'
-import { BookingSchema, BookingSchemaForType, PartialBookingType } from '../../../../shared/schemas/booking.js'
+import { getAttendanceType } from '../../../../shared/attendance/attendance.js'
+import { getConsentsType } from '../../../../shared/consents/consents.js'
+import { getKPType, KPBasicOptions } from '../../../../shared/kp/kp.js'
+import { BookingSchema, BookingSchemaForType, PartialBookingType, TBooking } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
-import { errorProps } from '../../utils.js'
+import { errorProps, useEvent } from '../../utils.js'
+import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
 import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
 import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
+import { defaultPersonData } from './defaults.js'
 import { SheetsInput } from './sheetsInput.js'
 
 type PeopleFormProps = {
@@ -37,13 +42,13 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
   })
 
   const appendFn = () => {
-    const newPerson = { personId: uuidv7(), eventId: event.eventId, userId: user.userId, cancelled: false }
+    const newPerson = defaultPersonData(user, event)
     append(newPerson as TPerson)
   }
 
   return (
     <>
-      <Title order={2} size="h5" mt={16}>
+      <Title size="h4" order={2} mt={16}>
         People
       </Title>
       <SmallSuspenseWrapper>
@@ -107,9 +112,9 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
       remove(index)
     }
   }
-  const emailAndDiet = event.allParticipantEmails ? (
+  const email = event.allParticipantEmails ? (
     <>
-      <Grid.Col span={8}>
+      <Grid.Col span={12}>
         <TextInput
           required
           autoComplete={`section-person-${index} email`}
@@ -120,17 +125,15 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           {...e(`people.${index}.basic.email`)}
         />
       </Grid.Col>
-      <Grid.Col span={4}>
-        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
-      </Grid.Col>
     </>
   ) : (
-    <>
-      <Grid.Col span={12}>
-        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
-      </Grid.Col>
-    </>
+    <></>
   )
+
+  const attendance = getAttendanceType(event)
+  const kp = getKPType(event)
+  const HealthElement = event.bigCampMode ? HealthLargeElement : HealthSmallElement
+  const consent = getConsentsType(event)
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={personId}>
@@ -149,32 +152,16 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
         <Grid.Col span={4}>
           <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
         </Grid.Col>
-        {emailAndDiet}
+        {email}
+        <kp.PersonFormSection index={index} />
+        <HealthElement index={index} />
+
         <Grid.Col span={12}>
-          <Textarea
-            autoComplete={`section-person-${index} diet-details`}
-            id={`person-details-${index}`}
-            data-form-type="other"
-            label="Additional dietary requirement or food related allergies"
-            {...register(`people.${index}.kp.details` as const)}
-            {...e(`people.${index}.kp.details`)}
-            autosize
-            minRows={2}
-          />
+          <attendance.BookingFormDisplayElement event={event} index={index} />
         </Grid.Col>
         <Grid.Col span={12}>
-          <Textarea
-            autoComplete={`section-person-${index} health-medical`}
-            id={`person-health-medical-${index}`}
-            data-form-type="other"
-            label="Details of relevant medical conditions, medication taken or addtional needs"
-            {...register(`people.${index}.health.medical` as const)}
-            {...e(`people.${index}.health.medical`)}
-            autosize
-            minRows={2}
-          />
-        </Grid.Col>
-        <Grid.Col span={12}>
+          <consent.FormSection index={index} />
+          {event.bigCampMode ? <FirstAid index={index} /> : null}
           <Flex justify="flex-end">
             <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>
               <IconX size={16} stroke={3} color="red" />
@@ -187,6 +174,87 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
       </Grid>
     </Paper>
   )
+}
+
+const HealthSmallElement: React.FC<{ index: number }> = ({ index }) => {
+  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { errors } = formState
+  const e = errorProps(errors)
+
+  return (
+    <Grid.Col span={12}>
+      <Textarea
+        autoComplete={`section-person-${index} health-medical`}
+        id={`person-health-medical-${index}`}
+        data-form-type="other"
+        label="Details of relevant medical conditions, medication taken or addtional needs"
+        {...register(`people.${index}.health.medical` as const)}
+        {...e(`people.${index}.health.medical`)}
+        autosize
+        minRows={2}
+      />
+    </Grid.Col>
+  )
+}
+
+const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
+  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { errors } = formState
+  const e = errorProps(errors)
+
+  return (
+    <Grid.Col span={12}>
+      <Divider my="xs" label="Medical & Accessbility" labelPosition="center" />
+      <Textarea
+        autoComplete={`section-person-${index} health-medical`}
+        id={`person-health-medical-${index}`}
+        data-form-type="other"
+        label="Details of relevant medical conditions, medication taken or addtional needs"
+        {...register(`people.${index}.health.medical` as const)}
+        {...e(`people.${index}.health.medical`)}
+        autosize
+        minRows={2}
+      />
+      <Text size="sm" mt={16}>
+        Please provide us with details of any accessibility requirements, this may include mobility issues, a requirement for power or other access requirements.
+      </Text>
+      <Textarea
+        mt={16}
+        autoComplete={`section-person-${index} health-accessibility`}
+        id={`person-health-accessibility-${index}`}
+        data-form-type="other"
+        label="Details of relevant medical conditions, medication taken or addtional needs"
+        {...register(`people.${index}.health.accessibility` as const)}
+        {...e(`people.${index}.health.accessibility`)}
+        autosize
+        minRows={2}
+      />
+      <CustomCheckbox
+        mt={16}
+        label="I would like to talk to the accessibility team about my accessibility requirements"
+        id={`person-health-contactme-${index}`}
+        name={`people.${index}.health.contactMe`}
+        m={4}
+      />
+    </Grid.Col>
+  )
+}
+
+const FirstAid: React.FC<{ index: number }> = ({ index }) => {
+  const dob = useWatch<TBooking>({
+    name: `people.${index}.basic.dob`,
+  })
+
+  const event = useEvent()
+  if (!event) return null
+  const DoBdate = typeof dob === 'string' ? dayjs(dob) : null
+  const EventStartDate = dayjs(event.startDate)
+
+  const isAdult = DoBdate && DoBdate.add(18, 'years').isBefore(EventStartDate)
+
+  if (!isAdult) return null
+
+  return <CustomCheckbox mt={16} label="First Aider (18+ only)" id={`person-firstaid-${index}`} name={`people.${index}.firstAid`} m={4} />
 }
 
 /* const COLLAPSE_DEFAULT_THRESHOLD = 20

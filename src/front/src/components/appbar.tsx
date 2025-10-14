@@ -1,7 +1,7 @@
 import { ActionIcon, AppShell, Avatar, Box, Button, Flex, Text, ThemeIcon, Title, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { IconBug, IconLogout, IconMoon, IconSun } from '@tabler/icons-react'
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouteContext, useSearch } from '@tanstack/react-router'
 import React, { useContext } from 'react'
 
@@ -34,9 +34,11 @@ export const AppToolbar = () => {
 
         {matches && (
           <>
-            <Text c="var(--mantine-color-text)" size="xl" fw={700}>
-              {window.location.hostname}
-            </Text>
+            <CustomLink underline="hover" to="/">
+              <Text c="var(--mantine-color-text)" size="xl" fw={700}>
+                {window.location.hostname}
+              </Text>
+            </CustomLink>
             <Box component="div" flex={1} />
           </>
         )}

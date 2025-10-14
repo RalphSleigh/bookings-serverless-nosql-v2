@@ -26,6 +26,7 @@ import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { MemoValidationErrors } from './validation.js'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CampingFormSection } from './camping.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -95,8 +96,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               <BasicFields event={event} />
               {event.bigCampMode && <ExtraContactsForm />}
               <PeopleForm event={event} userId={inputData.userId} />
+              {event.bigCampMode && <CampingFormSection />}
               <OtherQuestionsForm />
-              <Title order={3} mt={8}>
+              <Title size="h4" order={2} mt={8}>
                 Pricing
               </Title>
               <fees.BookingFormDisplayElement event={event} />

@@ -17,6 +17,7 @@ import { updateBooking } from './endpoints/booking/updateBooking'
 import { getEnv } from './endpoints/env'
 import { logClientErrors } from './endpoints/errors'
 import { createEvent } from './endpoints/event/createEvent'
+import { deleteEvent } from './endpoints/event/deleteEvent'
 import { editEvent } from './endpoints/event/editEvent'
 import { getEvents } from './endpoints/event/getEvents'
 import { approveApplicationEndpoint } from './endpoints/event/manage/approveApplication'
@@ -26,12 +27,11 @@ import { declineApplicationEndpoint } from './endpoints/event/manage/declineAppl
 import { deleteFeeItem } from './endpoints/event/manage/deleteFeeItem'
 import { deleteRole } from './endpoints/event/manage/deleteRole'
 import { getEventApplications } from './endpoints/event/manage/getEventApplications'
+import { getEventBookingHistory } from './endpoints/event/manage/getEventBookingHistory'
 import { getEventBookings } from './endpoints/event/manage/getEventBookings'
 import { getEventFees } from './endpoints/event/manage/getEventFees'
 import { getEventRoles } from './endpoints/event/manage/getEventRoles'
 import { getUsers } from './endpoints/event/manage/getUsers'
-import { testCreateRole } from './endpoints/test/addAdminRole'
-import { testLoggedIn } from './endpoints/test/testLoggedIn'
 import { getUser } from './endpoints/user/getUser'
 import { updateUserPreference } from './endpoints/user/updateUserPreference'
 import { configMiddleware } from './middleware/config'
@@ -40,7 +40,6 @@ import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { userMiddleware } from './middleware/user'
 import { am_in_lambda } from './utils'
-import { getEventBookingHistory } from './endpoints/event/manage/getEventBookingHistory'
 
 export const router = express.Router()
 export const app = express()
@@ -61,15 +60,16 @@ router.get('/user/current', getUser)
 router.get('/user/logout', logout)
 router.get('/user/bookings', getUserBookings)
 router.post('/user/updateUserPreference', updateUserPreference)
+
 //app.get('/test/loggedIn', testLoggedIn)
-//
-router.get('/test/createRole', testCreateRole)
+//router.get('/test/createRole', testCreateRole)
 
 router.get('/events', getEvents)
 router.post('/event/create', createEvent)
 
 router.use('/event/:eventId/{*splat}', [eventMiddleware, ownBookingMiddleware])
 router.post('/event/:eventId/edit', editEvent)
+router.delete('/event/:eventId/delete', deleteEvent)
 router.post('/event/:eventId/booking/create', createBooking)
 router.post('/event/:eventId/booking/update', updateBooking)
 router.get('/event/:eventId/booking/:userId/sheet', getBookingHasSheet)

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
-import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
+import { MantineReactTable, MRT_ShowHideColumnsButton, MRT_ColumnDef, MRT_Row, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
 import { TPerson } from '../../../../shared/schemas/person'
@@ -19,6 +19,8 @@ import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { useEvent } from '../../utils'
+import { getKPType } from '../../../../shared/kp/kp'
+import { getAttendanceType } from '../../../../shared/attendance/attendance'
 
 export const ManageCampers = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -50,6 +52,7 @@ export const ManageCampers = () => {
   )
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-campers-column-visibility-default`, { defaultValue: visibilityDefault })
+  const [columnSize, setColumnSize] = useLocalStorageState<{ [key: string]: number }>(`event-${eventId}-campers-column-size`, { defaultValue: {} })
 
   const columns = useMemo<MRT_ColumnDef<TPerson>[]>(() => fields.map((f) => f.personTableDef()), [])
 
@@ -86,7 +89,7 @@ export const ManageCampers = () => {
     mantineTableProps: {
       className: styles.table,
     },
-    state: { columnVisibility: columnVisibility },
+    state: { columnVisibility: columnVisibility, columnSizing: columnSize },
     onColumnVisibilityChange: setColumnVisibility,
     mantineTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
@@ -100,10 +103,14 @@ export const ManageCampers = () => {
           <IconDownload />
         </ActionIcon>
         {/* along-side built-in buttons in whatever order you want them */}
+        <MRT_ShowHideColumnsButton table={table} />
         <MRT_ToggleDensePaddingButton table={table} />
         <MRT_ToggleFullScreenButton table={table} />
       </Flex>
     ),
+    enableColumnResizing: true,
+    onColumnSizingChange: setColumnSize,
+    layoutMode: 'grid'
   })
 
   const selectedPerson = campers.find((c) => c.personId === selected)
@@ -128,6 +135,8 @@ export const ManageCampers = () => {
 const PersonDetails = ({ event, person }: { event: TEvent; person: TPerson }) => {
   const age = dayjs(event.endDate).diff(dayjs(person.basic.dob), 'year')
   const group = ageGroupFromPerson(event)(person)
+  const kp = getKPType(event)
+  const attendance = getAttendanceType(event)
   return (
     <>
       <Title order={3}>{person.basic.name}</Title>
@@ -139,8 +148,8 @@ const PersonDetails = ({ event, person }: { event: TEvent; person: TPerson }) =>
           <a href={`mailto:${person.basic.email}`}>{person.basic.email}</a>
         </Text>
       )}
-      <Text>{person.kp.diet}</Text>
-      <Text>{person.kp.details}</Text>
+      <kp.PersonCardSection person={person} />
+      <attendance.PersonCardElement event={event} person={person} />
       <Text>{person.health.medical}</Text>
     </>
   )

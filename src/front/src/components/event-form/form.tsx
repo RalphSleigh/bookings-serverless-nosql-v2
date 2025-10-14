@@ -19,6 +19,7 @@ import { NumberValue } from '@aws-sdk/util-dynamodb/dist-types/NumberValue.js'
 import { useDebounce } from '@react-hook/debounce'
 import { z } from "zod/v4";
 import { CustomSwitch } from '../custom-inputs/customSwitch.js'
+import { deleteEventMuation } from '../../mutations/deleteEvent.js'
 
 type PartialEventType = PartialDeep<TEventWhenCreating, {recurseIntoArrays: true}>
 
@@ -44,6 +45,14 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
     setData({ ...event });
   };
  */
+
+  const deleteEvent = deleteEventMuation(inputData.eventId as string)
+
+  const deleteFunc = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if(confirm("Are you sure you want to delete this event? This will remove all bookings for this event!")) {
+      deleteEvent.mutate()
+    }
+  }
 
   const { isValid, errors } = formState
   return (
@@ -86,6 +95,7 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
             <CustomQuestionsForm />
             <ValidationErrors />
             <Button variant="contained" type='submit' mt={16} disabled={!isValid} loading={mutation.isPending}>{mode == 'create' ? 'Create' : 'Edit'}</Button>
+            { mode === "edit" && <Button ml={8} bg="red" variant="contained" type='button' mt={16} onClick={deleteFunc} loading={deleteEvent.isPending}>Delete</Button> }
           </form>
         </Paper>
       </Container>

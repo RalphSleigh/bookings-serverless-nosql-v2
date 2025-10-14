@@ -3,7 +3,7 @@ import { Button, Container, Paper, Table, Text, Title } from '@mantine/core'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { LinkProps, useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import AdvancedFormat from 'dayjs/plugin/advancedFormat'
+import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
 import Markdown from 'react-markdown'
 
 import { getFeeType } from '../../../shared/fees/fees.js'

@@ -1,36 +1,79 @@
+import { Grid, Table, Text, Textarea } from '@mantine/core'
+import { useFormContext } from 'react-hook-form'
 
-import { Table } from '@mantine/core';
-import { TBooking } from '../schemas/booking';
+import { errorProps } from '../../front/src/utils'
+import { TBooking } from '../schemas/booking'
 import { TEvent, TEventBasicKP } from '../schemas/event'
-import { TPerson } from '../schemas/person';
-import { KPStructure } from './kp'
-import { ageGroupFromPerson } from '../woodcraft';
+import { TPerson } from '../schemas/person'
+import { ageGroupFromPerson } from '../woodcraft'
+import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
+import { CustomSelect } from '../../front/src/components/custom-inputs/customSelect'
 
 export class BasicKP implements KPStructure<TEventBasicKP> {
   typeName: 'basic' = 'basic'
 
-  ManageKPPageList: React.FC<{ event: TEvent<TEventBasicKP>; campers: TPerson<TEvent<TEventBasicKP>>[] }> = ({ event, campers }) => {
-    const interestingCampers = campers.filter(c => c.kp.details && c.kp.details !== "");
+  PersonFormSection: React.FC<{ index: number }> = ({ index }) => {
+    const { register, formState } = useFormContext<TBooking<TEvent<TEventBasicKP>>>()
+    const errors = formState.errors
+    const e = errorProps(errors)
+    return (
+      <Grid.Col span={12}>
+         <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
+        <Textarea
+          autoComplete={`section-person-${index} diet-details`}
+          id={`person-details-${index}`}
+          data-form-type="other"
+          label="Additional dietary requirement or food related allergies"
+          {...register(`people.${index}.kp.details` as const)}
+          {...e(`people.${index}.kp.details`)}
+          autosize
+          minRows={2}
+        />
+      </Grid.Col>
+    )
+  }
 
-    const ageFn = ageGroupFromPerson(event);
-    
-    return <Table mt={16} striped>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th>Name</Table.Th>
-          <Table.Th>Age</Table.Th>
-          <Table.Th>Details</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {interestingCampers.map(c => (
-          <Table.Tr key={c.personId}>
-            <Table.Td>{c.basic.name}</Table.Td>
-            <Table.Td>{ageFn(c).toAgeGroupString()}</Table.Td>
-            <Table.Td>{c.kp.details}</Table.Td>
+  ManageKPPageList: ManageKPPageList<TEventBasicKP> = ({ event, campers }) => {
+    const interestingCampers = campers.filter((c) => c.kp.details && c.kp.details !== '')
+
+    const ageFn = ageGroupFromPerson(event)
+
+    return (
+      <Table mt={16} striped>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Age</Table.Th>
+            <Table.Th>Details</Table.Th>
           </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
+        </Table.Thead>
+        <Table.Tbody>
+          {interestingCampers.map((c) => (
+            <Table.Tr key={c.personId}>
+              <Table.Td>{c.basic.name}</Table.Td>
+              <Table.Td>{ageFn(c).toAgeGroupString()}</Table.Td>
+              <Table.Td>{c.kp.details}</Table.Td>
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
+    )
+  }
+
+  PersonCardSection: KPPersonCardSection = ({ person }) => {
+    return (
+      <>
+        <Text>
+          {' '}
+          <b>Diet:</b> {person.kp.diet}
+        </Text>
+        {person.kp.details && (
+          <Text>
+            {' '}
+            <b>Diet Details:</b> {person.kp.details}
+          </Text>
+        )}
+      </>
+    )
   }
 }

@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Attributes, Entity, Service, type EntityItem } from 'electrodb'
 import { application } from 'express'
+import { first } from 'lodash'
 import { v7 as uuidv7 } from 'uuid'
 
 import { KPBasicOptions } from '../shared/kp/kp'
@@ -161,6 +162,11 @@ export const DBEvent = new Entity(
         required: true,
         default: () => uuidv7(),
       },
+      deleted: {
+        type: 'boolean',
+        required: true,
+        default: false,
+      },
       name: {
         type: 'string',
         required: true,
@@ -229,7 +235,7 @@ export const DBEvent = new Entity(
         type: 'map',
         properties: {
           consentsStructure: {
-            type: ['none', 'large'] as const,
+            type: ['none', 'vcamp'] as const,
             required: true,
           },
         },
@@ -238,7 +244,7 @@ export const DBEvent = new Entity(
         type: 'map',
         properties: {
           attendanceStructure: {
-            type: ['whole'] as const,
+            type: ['whole', 'freechoice'] as const,
             required: true,
           },
         },
@@ -342,6 +348,14 @@ const BookingAttributes = {
       },
     },
   },
+  camping: {
+    type: 'map',
+    properties: {
+      who: { type: 'string' },
+      equipment: { type: 'string' },
+      accessibility: { type: 'string' },
+    },
+  },
   other: {
     type: 'map',
     properties: {
@@ -353,6 +367,10 @@ const BookingAttributes = {
         type: ['yes', 'no'] as const,
         required: false,
       },
+      shuttle: {
+        type: ['yes', 'no'] as const,
+        required: false,
+      }
     },
   },
 } as const
@@ -521,19 +539,47 @@ const PersonAttributes = {
       email: { type: 'string' },
     },
   },
+  attendance: {
+    type: 'map',
+    properties: {
+      bitMask: { type: 'number' },
+      // No properties for whole attendance
+    },
+  },
   kp: {
     type: 'map',
     properties: {
       diet: { type: KPBasicOptions, required: true },
       details: { type: 'string' },
+      preferences: { type: 'string' },
+      nut: { type: 'boolean' },
+      gluten: { type: 'boolean' },
+      soya: { type: 'boolean' },
+      dairy: { type: 'boolean' },
+      egg: { type: 'boolean' },
+      pork: { type: 'boolean' },
+      chickpea: { type: 'boolean' },
+      diabetic: { type: 'boolean' },
+      contactMe: { type: 'boolean' },
     },
   },
   health: {
     type: 'map',
     properties: {
       medical: { type: 'string' },
+      accessibility: { type: 'string' },
+      contactMe: { type: 'boolean' },
     },
   },
+  consents: {
+    type: 'map',
+    properties: {
+      photo: { type: ['Yes', 'No'] as const },
+      rse: { type: ['Yes', 'No'] as const },
+      activities: { type: ['Yes', 'No'] as const },
+    },
+  },
+  firstAid: { type: 'boolean' },
 } as const
 
 export const DBPerson = new Entity(

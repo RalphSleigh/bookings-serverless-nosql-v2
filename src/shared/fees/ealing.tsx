@@ -6,19 +6,17 @@ import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { WatchDebounce } from '../../front/src/utils'
-import { AttendanceTypes } from '../attendance/attendance'
+import { AttendanceStructureValues } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
 import { TEvent, TEventEalingFees,} from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
 
-type EventWithEalingFees = TEvent & { fees: TEventEalingFees }
-
 export class EalingFees implements FeeStructure<TEventEalingFees> {
   typeName: 'ealing' = 'ealing'
   name = 'Ealing Fees'
-  supportedAttendance: AttendanceTypes[] = ['whole']
+  supportedAttendance: AttendanceStructureValues[] = ['whole']
   ConfigurationElement: FeeStructureCondfigurationElement<TEventEalingFees> = () => {
     const { register } = useFormContext<{ fee: TEventEalingFees }>()
     //const { updateNumber, updateField } = getMemoObjectUpdateFunctions(getSubUpdate(update, 'ealingData'))

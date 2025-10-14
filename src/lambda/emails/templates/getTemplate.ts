@@ -6,7 +6,7 @@ import { ManagerBookingUpdatedEmail } from './default/managerUpdated'
 import { BookingUpdatedEmail } from './default/updated'
 import { EmailTemplate } from './template'
 
-const templates: Record<EmailData['template'], Record<string, EmailTemplate> & { default: EmailTemplate }> = {
+const templates: Partial<Record<EmailData['template'], Record<string, EmailTemplate> & { default: EmailTemplate }>> = {
   confirmation: {
     default: new BookingConfirmationEmail(),
     test: new BookingConfirmationEmail(),
@@ -27,5 +27,6 @@ const templates: Record<EmailData['template'], Record<string, EmailTemplate> & {
 
 export const getEmailTemplate: (data: EmailData) => EmailTemplate = (data) => {
   const template = templates[data.template]
+  if (!template) throw new Error(`No template found for ${data.template}`)
   return template[data.event.eventId] ? template[data.event.eventId] : template.default
 }

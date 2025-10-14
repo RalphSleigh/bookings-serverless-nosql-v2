@@ -1,5 +1,5 @@
 import { PartialDeep } from "type-fest";
-import { AttendanceTypes } from "../attendance/attendance";
+import { AttendanceStructureValues } from "../attendance/attendance";
 import { EventSchema, TEvent } from "../schemas/event";
 import { EalingFees } from "./ealing";
 import { FreeFees } from "./free";
@@ -10,10 +10,7 @@ export const FeeOptions = EventSchema.shape.fee.options.map((option) => option.s
 
 const feeTypes = [FreeFees, EalingFees]
 
-
-type FeeTypes = InstanceType<typeof feeTypes[number]>
-
-export const getFeeTypesForEvent = (attendanceStructure: AttendanceTypes | undefined) => {
+export const getFeeTypesForEvent = (attendanceStructure: AttendanceStructureValues | undefined) => {
     if(!attendanceStructure) return []
     return feeTypes.map((feeType) => new feeType()).filter((fee) => fee.supportedAttendance.includes(attendanceStructure))
 }

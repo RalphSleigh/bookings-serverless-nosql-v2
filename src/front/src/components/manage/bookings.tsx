@@ -8,18 +8,18 @@ import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
 import 'mantine-react-table/styles.css'
 
-import { ActionIcon, Box, Container, Flex, Modal, Paper, Text, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Box, Container, Flex, Modal, Paper, ScrollArea, Stack, Text, Title } from '@mantine/core'
+import { IconDownload } from '@tabler/icons-react'
 import dayjs from 'dayjs'
+import { download, generateCsv, mkConfig } from 'export-to-csv'
 import useLocalStorageState from 'use-local-storage-state'
 
 import { bookingFields } from '../../../../shared/bookingFields'
+import { TBooking } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { CustomLink, useEvent } from '../../utils'
-import { TBooking } from '../../../../shared/schemas/booking'
-import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { IconDownload } from '@tabler/icons-react'
 
 export const ManageBookings = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -103,6 +103,7 @@ export const ManageBookings = () => {
         <Modal.CloseButton style={{ float: 'right' }} />
         {selectedBooking !== undefined && <BookingDetails event={event} booking={selectedBooking!} />}
       </Modal>
+
       <Container strategy="grid" fluid mt={8}>
         <Box data-breakout>
           <MantineReactTable table={table} />
@@ -114,26 +115,79 @@ export const ManageBookings = () => {
 
 //initialState={{ columnVisibility: { address: false } }}
 
-const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBooking }) => {
-  return (
-    <>
-    <CustomLink to={`/event/$eventId/manage/booking/$userId/history`} params={{ eventId: event.eventId, userId: booking.userId }} style={{ float: 'right', marginTop: 10, marginRight: 10 }}>
-                History
-              </CustomLink>
-      {/*
-      { <Title order={3}>{person.basic.name}</Title>
+const basicDetailsSmall = (event: TEvent, booking: TBooking) => (
+  <>
+    <Title order={4}>{booking.basic.name}</Title>
+    <Text>
+      <b>Email:</b> <Anchor href={`mailto:${booking.basic.email}`}>{booking.basic.email}</Anchor>
+    </Text>
+    <Text>
+      <b>Phone:</b> <Anchor href={`tel:${booking.basic.telephone}`}>{booking.basic.telephone}</Anchor>
+    </Text>
+  </>
+)
+
+const basicDetailsLargeIndvidual = (event: TEvent, booking: TBooking) => (
+  <>
+    <Title order={4}>{booking.basic.name}&nbsp;-&nbsp;Indvidiual</Title>
+    {'district' in booking.basic ? (
       <Text>
-        {new Date(person.basic.dob).toLocaleDateString()} - {age < 21 ? `${group.singular} (${age})` : `${group.singular}`}
+        <b>District:</b> {booking.basic.district}
       </Text>
-      {person.basic.email && (
+    ) : null}
+    <Text>
+      <b>Email:</b> <Anchor href={`mailto:${booking.basic.email}`}>{booking.basic.email}</Anchor>
+    </Text>
+    <Text>
+      <b>Phone:</b> <Anchor href={`tel:${booking.basic.telephone}`}>{booking.basic.telephone}</Anchor>
+    </Text>
+  </>
+)
+
+const basicDetailsLargeGroup = (event: TEvent, booking: TBooking) => (
+  <>
+    <Title order={4}>{booking.basic.name}&nbsp;-&nbsp;Group</Title>
+    {'district' in booking.basic ? (
+      <Text>
+        <b>District:</b> {booking.basic.district}
+      </Text>
+    ) : null}
+    <Text>
+      <b>Email:</b> <Anchor href={`mailto:${booking.basic.email}`}>{booking.basic.email}</Anchor>
+    </Text>
+    <Text>
+      <b>Phone:</b> <Anchor href={`tel:${booking.basic.telephone}`}>{booking.basic.telephone}</Anchor>
+    </Text>
+  </>
+)
+
+const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBooking }) => {
+  const basic = event.bigCampMode
+    ? 'type' in booking.basic && booking.basic.type === 'individual'
+      ? basicDetailsLargeIndvidual(event, booking)
+      : basicDetailsLargeGroup(event, booking)
+    : basicDetailsSmall(event, booking)
+
+  const peopleList = booking.people.map((p) => <li key={p.personId}>{p.basic.name}</li>)
+
+  return (
+    <Flex>
+      <Box>
+        {basic}
         <Text>
-          <a href={`mailto:${person.basic.email}`}>{person.basic.email}</a>
+          <b>Booked:</b> {booking.people.length}
         </Text>
-      )}
-      <Text>{person.kp.diet}</Text>
-      <Text>{person.kp.details}</Text>
-      <Text>{person.health.medical}</Text>
-    </> */}
-    </>
+        <CustomLink to={`/event/$eventId/manage/booking/$userId/history`} params={{ eventId: event.eventId, userId: booking.userId }} style={{ float: 'right', marginTop: 10, marginRight: 10 }}>
+          History
+        </CustomLink>
+      </Box>
+      <Box h="calc(100dvh - var(--modal-y-offset) * 2 - var(--mantine-spacing-md) * 2)">
+        <Stack h="100%" gap={0}>
+          <ScrollArea pr={16}>
+            <ul>{peopleList}</ul>
+          </ScrollArea>
+        </Stack>
+      </Box>
+    </Flex>
   )
 }
