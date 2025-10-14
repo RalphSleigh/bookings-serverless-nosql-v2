@@ -51,6 +51,7 @@ export type TCustomQuestion = z.infer<typeof customQuestion>
 export const EventSchema = z
   .object({
     eventId: z.uuidv7(),
+    deleted: z.boolean().default(false),
     name: z.string().nonempty(),
     description: z.string().nonempty(),
     startDate: z.iso.datetime(),

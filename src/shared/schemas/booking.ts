@@ -63,6 +63,7 @@ const campingSmall = z.undefined()
 
 const otherBig = z.object({
   anythingElse: z.string().optional(),
+  shuttle: z.enum(['yes', 'no']),
 })
 
 const otherSmall = z.object({

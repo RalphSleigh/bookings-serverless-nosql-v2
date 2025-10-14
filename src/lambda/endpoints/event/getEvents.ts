@@ -6,7 +6,7 @@ export type getEventsResponseType = { events: TEvent[] }
 export const getEvents = HandlerWrapper((req, res) => ['get', 'events'], async (req, res) => {
   try {
     const events = await DBEvent.query.natural({}).go()
-    if (events.data) res.json({ events: events.data.map((event) => EventSchema.parse(event)) })
+    if (events.data) res.json({ events: events.data.map((event) => EventSchema.parse(event)).filter((event) => !event.deleted) } as getEventsResponseType)
   } catch (error) {
     res.locals.logger.logToPath('Events query failed')
     res.locals.logger.logToPath(error)

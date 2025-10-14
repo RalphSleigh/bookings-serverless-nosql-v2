@@ -28,9 +28,15 @@ export function OtherQuestionsForm() {
           <Title size="h4" order={2} mt={16}>
             Other Stuff
           </Title>
+          <CustomRadioGroup name="other.shuttle" label="Will you need the shuttle bus to/from the station to camp?">
+            <Group mt={8}>
+              <Radio value={'yes'} label="Yes" />
+              <Radio value={'no'} label="No" />
+            </Group>
+          </CustomRadioGroup>
           <Textarea
             mt={8}
-            label="Do you know how you plan to travel to camp? Will you need the shuttle bus?"
+            label="Anything else:"
             {...register('other.anythingElse')}
             {...e('anythingElse')}
             autoComplete={`section-anything-else anything-else`}
@@ -53,7 +59,6 @@ export function OtherQuestionsForm() {
               <Radio value={'no'} label="No" />
             </Group>
           </CustomRadioGroup>
-
           <Textarea
             mt={8}
             label="Anything else:"

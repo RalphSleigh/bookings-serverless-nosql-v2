@@ -162,6 +162,11 @@ export const DBEvent = new Entity(
         required: true,
         default: () => uuidv7(),
       },
+      deleted: {
+        type: 'boolean',
+        required: true,
+        default: false,
+      },
       name: {
         type: 'string',
         required: true,
@@ -362,6 +367,10 @@ const BookingAttributes = {
         type: ['yes', 'no'] as const,
         required: false,
       },
+      shuttle: {
+        type: ['yes', 'no'] as const,
+        required: false,
+      }
     },
   },
 } as const
