@@ -1,5 +1,5 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { ActionIcon, Button, Container, Flex, Grid, keys, Paper, Select, Switch, Text, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Button, Container, Flex, Grid, keys, Paper, Select, Switch, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 import { IconAlertCircle, IconAlertTriangle, IconTrash } from '@tabler/icons-react'
 import { UseMutationResult } from '@tanstack/react-query'
@@ -76,7 +76,7 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
                     
                   </FormControl> */}
             <TextInput label="Name" {...register('name')} mt={16} error={errors.name ? errors.name.message : null} />
-            <TextInput label="Description" {...register('description')} mt={16} />
+            <Textarea label="Description" {...register('description')} mt={16} />
             <CustomDatePicker name="startDate" control={control} label="Start Date" mt={16} />
             <CustomDatePicker name="endDate" control={control} label="End Date" mt={16} />
             <CustomDateTimePicker name="bookingDeadline" control={control} label="Booking Deadline" mt={16} />
