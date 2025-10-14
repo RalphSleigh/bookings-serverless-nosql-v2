@@ -53,7 +53,7 @@ export const EventSchema = z
     eventId: z.uuidv7(),
     deleted: z.boolean().default(false),
     name: z.string().nonempty(),
-    description: z.string().nonempty(),
+    description: z.string().optional(),
     startDate: z.iso.datetime(),
     endDate: z.iso.datetime(),
     bookingDeadline: z.iso.datetime(),
