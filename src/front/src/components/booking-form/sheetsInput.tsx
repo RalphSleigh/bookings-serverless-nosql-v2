@@ -12,18 +12,18 @@ import { createSheetForBooking } from '../../mutations/createSheetForBooking'
 import { getCampersFromSheetMutation } from '../../mutations/getCampersFromSheet'
 import { getDoesBookingHaveSpreadsheet } from '../../queries/getDoesBookingHaveSpreadsheet'
 
-export const SheetsInput: React.FC<{ event: TEvent; userId: string }> = ({ event, userId }) => {
+export const SheetsInput: React.FC<{ event: TEvent; userId: string, replace: (value: any) => void }> = ({ event, userId, replace  }) => {
   const basic = useWatch<TBookingSchemaForTypeBasicBig, 'basic'>({ name: 'basic' })
   if (basic?.type !== 'group') return null
   if (!event.bigCampMode) return null
-  return <SheetsDecider event={event} userId={userId} />
+  return <SheetsDecider event={event} userId={userId} replace={replace} />
 }
 
-const SheetsDecider: React.FC<{ event: TEvent; userId: string }> = ({ event, userId }) => {
+const SheetsDecider: React.FC<{ event: TEvent; userId: string, replace: (value: any) => void }> = ({ event, userId, replace }) => {
   const hasSheetsQuery = useSuspenseQuery(getDoesBookingHaveSpreadsheet(event.eventId, userId))
 
   if (hasSheetsQuery.data.sheet) {
-    return <SheetBoxHasSheets sheet={hasSheetsQuery.data.sheet} event={event} userId={userId} />
+    return <SheetBoxHasSheets sheet={hasSheetsQuery.data.sheet} event={event} userId={userId} replace={replace} />
   } else {
     return <SheetBoxNoSheets event={event} />
   }
@@ -68,21 +68,24 @@ const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
   )
 }
 
-const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; userId: string }> = ({ sheet, event, userId }) => {
+const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; userId: string, replace: (value: any) => void }> = ({ sheet, event, userId, replace }) => {
   const getPeopleMutation = getCampersFromSheetMutation()
 
-  const { setValue } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
+  // const { setValue } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
 
   useEffect(() => {
     if (getPeopleMutation.isSuccess) {
       console.log('Got people from sheet:', getPeopleMutation.data)
-      setValue('people', getPeopleMutation.data.people, { shouldDirty: true })
+      //setValue('people', getPeopleMutation.data.people, { shouldDirty: true })
+      replace(getPeopleMutation.data.people)
     }
   }, [getPeopleMutation.isSuccess, getPeopleMutation.data])
 
   const updatePeopleFromSheet: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault()
     getPeopleMutation.mutate({ eventId: event.eventId, userId: userId })
+    replace([])
+    //setValue('people', []) // Clear existing people first to ensure react-hook-form picks up the changes
   }
 
   return (

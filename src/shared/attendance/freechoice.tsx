@@ -3,7 +3,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
 import e from 'express'
 import { get } from 'lodash'
-import { useController, useFormContext } from 'react-hook-form'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import styles from '../../front/src/css/attendenceButtons.module.css'
 import { PersonField } from '../personFields'
@@ -22,7 +22,8 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
   typeName: 'freechoice' = 'freechoice'
   name = 'Free choice event'
   BookingFormDisplayElement: AttendanceBookingFormDisplayElement<TEventFreeChoiceAttendance> = ({ index, event }) => {
-    const { control, watch } = useFormContext<TBooking<TEvent<any, any, TEventFreeChoiceAttendance>>>()
+    const { control } = useFormContext<TBooking<TEvent<any, any, TEventFreeChoiceAttendance>>>()
+    const value = useWatch({name: `people.${index}.attendance.bitMask`, control})
 
     const {
       field,
@@ -34,7 +35,7 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
       rules: { required: true },
     })
 
-    const currentBitMask = field.value || 0
+    const currentBitMask = value || 0
     //console.log(currentBitMask)
 
     const nights = this.getNightsFromEvent(event)

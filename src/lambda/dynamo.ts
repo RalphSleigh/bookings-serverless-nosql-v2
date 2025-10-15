@@ -173,7 +173,6 @@ export const DBEvent = new Entity(
       },
       description: {
         type: 'string',
-        required: true,
       },
       startDate: {
         type: 'string',
