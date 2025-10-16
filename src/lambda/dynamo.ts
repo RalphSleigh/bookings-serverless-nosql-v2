@@ -191,7 +191,7 @@ export const DBEvent = new Entity(
         required: true,
         properties: {
           feeStructure: {
-            type: ['free', 'ealing'] as const,
+            type: ['free', 'ealing', 'vcamp'] as const,
             required: true,
           },
           ealingData: {
