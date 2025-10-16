@@ -19,7 +19,7 @@ export const getBookingHasSheet = HandlerWrapperLoggedIn<{ userId: string }, TBo
 
     if (user.userId !== userId) {
       //fetch the user for the userId in the path
-      const userResult = await DBUser.find({ userId: userId }).go()
+      const userResult = await DBUser.find({ userId: userId }).go({pages: "all"})
       user = UserSchema.parse(userResult.data[0])
     }
 

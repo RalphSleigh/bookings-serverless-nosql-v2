@@ -30,9 +30,10 @@ export const ManageRoles = () => {
   const { handleSubmit, control, formState } = form
   const { isValid } = formState
 
-  const rolesData = [
-    { value: 'admin', label: 'Admin' },
+  const rolesData: { value: TRole['role']; label: string }[] = [
     { value: 'owner', label: 'Owner' },
+    { value: 'manager', label: 'Manager' },
+    { value: 'viewer', label: 'Viewer' },
   ]
 
   const createMutation = createRoleMuation(eventId)

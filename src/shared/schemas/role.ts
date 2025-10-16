@@ -4,7 +4,7 @@ export const EventRoleSchema = z
   .object({
     roleId: z.uuidv7(),
     userId: z.uuidv7(),
-    role: z.enum(['owner']),
+    role: z.enum(['owner','manager','viewer']),
     eventId: z.uuidv7(),
   })
   .strict()
@@ -20,7 +20,7 @@ const globalRole = z
 
 export const RoleSchema = z.union([EventRoleSchema, globalRole])
 
-export const RoleForFormSchema = z.union([EventRoleSchema.omit({ roleId: true }), globalRole.omit({ roleId: true })])
+export const RoleForFormSchema = EventRoleSchema.omit({ roleId: true })
 
 export type TRole = z.infer<typeof RoleSchema>
 export type TRoleForForm = z.infer<typeof RoleForFormSchema>

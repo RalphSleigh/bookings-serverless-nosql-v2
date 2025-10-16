@@ -11,7 +11,7 @@ export const getUsers = HandlerWrapper(
   (req, res) => ['get','users'],
   async (req, res) => {
     try {
-      const users = await DBUser.scan.go()
+      const users = await DBUser.scan.go({pages: "all"})
       if (users.data) {
         res.json({ users: users.data })
       } else {

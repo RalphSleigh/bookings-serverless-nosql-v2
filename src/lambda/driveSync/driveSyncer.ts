@@ -27,7 +27,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
     .where(({ preferences }, { contains }) => {
       return contains(preferences.driveSyncList, eventId)
     })
-    .go()
+    .go({pages: "all"})
 
   const bookingsQuery = await DB.collections.booking({ eventId }).go()
   if (bookingsQuery.data) {
