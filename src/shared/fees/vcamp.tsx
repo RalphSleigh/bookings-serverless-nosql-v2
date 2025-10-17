@@ -30,10 +30,10 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
   }
 
   BookingFormDisplayElement: BookingFormDisplayElement<TEventVCampFees> = ({ event }) => {
-    const { watch } = useFormContext<PartialBookingType>()
-    const people = watch('people') || []
+   //const { watch } = useFormContext<PartialBookingType>()
+    //const people = watch('people') || []
 
-    const lines = this.getFeeLines(event, { people })
+    //const lines = this.getFeeLines(event, { people })
 
     return (
       <>
