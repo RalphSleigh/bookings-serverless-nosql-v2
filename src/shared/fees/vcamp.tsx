@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 
 import { AttendanceStructureValues } from '../attendance/attendance'
-import { PartialBookingType } from '../schemas/booking'
+import { PartialBookingType, TBooking } from '../schemas/booking'
 import { TEvent, TEventFeesUnion, TEventFreeFees, TEventVCampFees } from '../schemas/event'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
 
@@ -30,7 +30,7 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
   }
 
   BookingFormDisplayElement: BookingFormDisplayElement<TEventVCampFees> = ({ event }) => {
-   //const { watch } = useFormContext<PartialBookingType>()
+    //const { watch } = useFormContext<PartialBookingType>()
     //const people = watch('people') || []
 
     //const lines = this.getFeeLines(event, { people })
@@ -38,9 +38,7 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
     return (
       <>
         <Paper shadow="xs" radius="xl" withBorder p="xl" mt={16}>
-          <Title order={4}>
-            TODO: Information about the fees will go here
-          </Title>
+          <Title order={4}>TODO: Information about the fees will go here</Title>
         </Paper>
       </>
     )
@@ -50,9 +48,7 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
     return (
       <>
         <Paper shadow="xs" radius="xl" withBorder p="xl" mt={16}>
-          <Title order={4}>
-            TODO: Information about the fees will go here
-          </Title>
+          <Title order={4}>TODO: Information about the fees will go here</Title>
         </Paper>
       </>
     )
@@ -60,5 +56,9 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
 
   EmailElement: EmailElement<TEventVCampFees> = ({ event, booking }) => {
     return <></>
+  }
+
+  getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventVCampFees>>): string {
+    return ''
   }
 }
