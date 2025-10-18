@@ -25,6 +25,7 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
     email: 'Email',
     dob: 'Date of Birth',
     accessibilityNeeds: 'Accessibility Needs',
+    firstAid: 'First Aid',
   }
 
   const updateString = (updateItem: IChange, stack: IChange[]) => {
