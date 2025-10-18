@@ -23,7 +23,7 @@ export const createApplicationEndpoint = HandlerWrapper<{}, TCreateApplicationDa
       await enqueueAsyncTask({
         type: 'discordMessage',
         data: {
-          message: `Application recieved from ${validatedApplication.name} (${validatedApplication.email}) - ${validatedApplication.type === 'group' ? validatedApplication.district : validatedApplication.district ? `Individual - ${validatedApplication.district}` : 'Individual'}`,
+          message: `Application received from ${validatedApplication.name} (${validatedApplication.email}) - ${validatedApplication.type === 'group' ? validatedApplication.district : validatedApplication.district ? `Individual - ${validatedApplication.district}` : 'Individual'}`,
         },
       })
 

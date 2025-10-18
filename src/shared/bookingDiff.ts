@@ -67,7 +67,7 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
     updateString(u, [])
   })
 
-  const unquieUpdateStrings = [...new Set(updateStrings)]
+  const uniqueUpdateStrings = [...new Set(updateStrings)]
 
-  return updates.length > 0 ? unquieUpdateStrings : []
+  return updates.length > 0 ? uniqueUpdateStrings : []
 }

@@ -4,7 +4,7 @@ import { sendApplicationReceivedEmails } from "../emails/sendApplicationReceived
 import { sendBookingCreatedEmails } from "../emails/sendBookingCreatedEmails";
 import { sendBookingUpdatedEmails } from "../emails/sendBookingUpdatedEmails";
 import { sendManagerDataAccessEmail } from "../emails/sendManagerDataAccessEmail";
-import { sendApplicationApprovedEmails } from "../emails/sendsendApplicationApprovedEmails.";
+import { sendApplicationApprovedEmails } from "../emails/sendApplicationApprovedEmails";
 import { ConfigType, getConfig } from "../getConfig";
 import { AsyncTask } from "./asyncTaskQueuer";
 
