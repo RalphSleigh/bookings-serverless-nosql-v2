@@ -2,9 +2,10 @@ import { subject } from '@casl/ability'
 import { v7 as uuidv7 } from 'uuid'
 
 import { DBApplication } from '../../../dynamo'
-import { HandlerWrapper } from '../../../utils'
+import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../../utils'
+import { enqueueAsyncTask } from '../../../asyncTasks/asyncTaskQueuer'
 
-export const approveApplicationEndpoint = HandlerWrapper<any, { eventId: string; userId: string }>(
+export const approveApplicationEndpoint = HandlerWrapperLoggedIn<any, { eventId: string; userId: string }>(
   (req, res) => ['approveApplication', subject('eventId', { eventId: res.locals.event.eventId })],
   async (req, res) => {
     try {
@@ -14,6 +15,22 @@ export const approveApplicationEndpoint = HandlerWrapper<any, { eventId: string;
       }
 
       const updatedApplication = await DBApplication.patch(application.data).set({ status: 'approved' }).go({ response: 'all_new' })
+
+      await enqueueAsyncTask({
+        type: 'discordMessage',
+        data: {
+          message: `${res.locals.user.name} approved application from ${updatedApplication.data.name} (${updatedApplication.data.district || "Individual"})`
+        },
+      })
+
+      await enqueueAsyncTask({
+        type: 'emailApplicationApproved',
+        data: {
+          eventId: res.locals.event.eventId,
+          userId: req.params.userId
+        }
+      })
+
       res.json({ application: updatedApplication.data })
     } catch (error) {
       res.locals.logger.logToPath('Create Application Failed')

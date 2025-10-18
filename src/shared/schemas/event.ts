@@ -51,31 +51,29 @@ const customQuestion = z.object({
 
 export type TCustomQuestion = z.infer<typeof customQuestion>
 
-export const EventSchema = z
-  .object({
-    eventId: z.uuidv7(),
-    deleted: z.boolean().default(false),
-    name: z.string().nonempty(),
-    description: z.string().optional(),
-    startDate: z.iso.datetime(),
-    endDate: z.iso.datetime(),
-    bookingDeadline: z.iso.datetime(),
-    fee: feeOptions,
-    kp: kpOptions,
-    consents: consentsOptions,
-    attendance: attendanceOptions,
-    emailSubjectTag: z.string().nonempty(),
-    replyTo: z.string().nonempty(),
-    bigCampMode: z.boolean().default(false),
-    organisations: z.boolean().default(false),
-    applicationsRequired: z.boolean().default(false),
-    allParticipantEmails: z.boolean().default(false),
-    howDidYouHear: z.boolean().default(false),
-    customQuestions: z.array(customQuestion),
-  })
-  .strict()
+export const EventSchema = z.object({
+  eventId: z.uuidv7(),
+  deleted: z.boolean().default(false),
+  name: z.string().nonempty(),
+  description: z.string().optional(),
+  startDate: z.iso.datetime(),
+  endDate: z.iso.datetime(),
+  bookingDeadline: z.iso.datetime(),
+  fee: feeOptions,
+  kp: kpOptions,
+  consents: consentsOptions,
+  attendance: attendanceOptions,
+  emailSubjectTag: z.string().nonempty(),
+  replyTo: z.string().nonempty(),
+  bigCampMode: z.boolean().default(false),
+  organisations: z.boolean().default(false),
+  applicationsRequired: z.boolean().default(false),
+  allParticipantEmails: z.boolean().default(false),
+  howDidYouHear: z.boolean().default(false),
+  customQuestions: z.array(customQuestion),
+})
 
-export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true }).strict()
+export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true })
 
 export type TEvent<
   KP extends TEventKPUnion = TEventKPUnion,

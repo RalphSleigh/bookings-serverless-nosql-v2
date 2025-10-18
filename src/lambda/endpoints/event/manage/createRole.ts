@@ -57,7 +57,7 @@ export const createRole = HandlerWrapperLoggedIn<{}, TCreateRoleData>(
       await enqueueAsyncTask({
         type: 'discordMessage',
         data: {
-          message: `${currentUser.name} assigned ${targetUser.name} role ${validatedRole.role} for event ${event.name}`,
+          message: `${currentUser.name} **granted** ${targetUser.name} role ${validatedRole.role} for event ${event.name}`,
         },
       })
 

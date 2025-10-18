@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 
 import { AttendanceStructureValues } from '../attendance/attendance'
-import { PartialBookingType } from '../schemas/booking'
+import { PartialBookingType, TBooking } from '../schemas/booking'
 import { TEvent, TEventFeesUnion, TEventFreeFees } from '../schemas/event'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
 
@@ -47,13 +47,14 @@ export class FreeFees implements FeeStructure<TEventFreeFees> {
   }
 
   EventListDisplayElement: EventListDisplayElement<TEventFreeFees> = ({ event, booking, fees }) => {
-      return (
-        <>
-        </>
-      )
-    }
+    return <></>
+  }
 
   EmailElement: EmailElement<TEventFreeFees> = ({ event, booking }) => {
     return <></>
+  }
+
+  getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventFreeFees>>): string {
+    return ''
   }
 }

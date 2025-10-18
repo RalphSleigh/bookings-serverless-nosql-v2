@@ -1,7 +1,9 @@
 //import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox, Alert, AlertTitle } from "@mui/material"
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Container, Flex, Grid, Paper, Text, Textarea, Title } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
+import { IconAlertTriangle } from '@tabler/icons-react'
 import { UseMutationResult } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
@@ -19,14 +21,14 @@ import { TEvent } from '../../../../shared/schemas/event.js'
 import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
 import { cancelBooking } from '../../mutations/cancelBooking.js'
 import { BasicFieldsBig, BasicFieldsSmall } from './basicFields.js'
+import { CampingFormSection } from './camping.js'
+import { ChangesDisplay } from './changes.js'
 import { ExtraContactsForm } from './extraContacts.js'
 import { OtherQuestionsForm } from './otherQuestions.js'
 import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { MemoValidationErrors } from './validation.js'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { CampingFormSection } from './camping.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -87,6 +89,22 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
 
   const [checked, setChecked] = React.useState(false)
 
+  let itemToDisplay = null
+
+  if (isValid) {
+    if (checked) {
+      if (mode === 'edit') {
+        itemToDisplay = <ChangesDisplay inputData={inputData} />
+      } else {
+        itemToDisplay = null
+      }
+    } else {
+      itemToDisplay = <CheckTheBox />
+    }
+  } else {
+    itemToDisplay = <MemoValidationErrors schema={schema} />
+  }
+
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -102,8 +120,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
                 Pricing
               </Title>
               <fees.BookingFormDisplayElement event={event} />
-              <MemoValidationErrors schema={schema} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
+              {itemToDisplay}
               <Flex gap={8} mt={16}>
                 <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid}>
                   {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
@@ -124,5 +142,18 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
         </Grid>
       </form>
     </FormProvider>
+  )
+}
+
+const CheckTheBox = () => {
+  return (
+    <Paper shadow="md" radius="md" withBorder mt={16} p="lg" c="yellow.9" bg="yellow.0" bd="1 solid yellow.3">
+      <Flex gap="xs" align="center" mb={8}>
+        <IconAlertTriangle size={32} stroke={1.5} color="orange" />
+        <Title order={2} size="h4">
+          Please check the permission box
+        </Title>
+      </Flex>
+    </Paper>
   )
 }
