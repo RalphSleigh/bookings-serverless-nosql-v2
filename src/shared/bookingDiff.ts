@@ -15,7 +15,7 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
     canBringEquipment: 'Camping Equipment',
     attendance: 'Attendance',
     kp: 'Dietary Requirements',
-    medical: 'Medical & Accessibility',
+    health: 'Medical & Accessibility',
     consent: 'Consents',
     extraContacts: 'Extra Contacts',
     district: 'District',
