@@ -2,6 +2,7 @@ import { subject } from '@casl/ability'
 import { CreateEntityItem, EntityIdentifiers, UpdateEntityItem } from 'electrodb'
 import { isEqual } from 'lodash-es'
 
+import { generateDiscordDiff } from '../../../shared/bookingDiff'
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
 import { DB, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
@@ -106,6 +107,55 @@ export const updateBooking = HandlerWrapper(
             .go()
         }
       }
+    }
+
+    const discordDiffs = generateDiscordDiff(existingBooking as TBooking, { ...updatedBooking.data, people: people } as TBooking)
+
+    if (discordDiffs.length > 0) {
+      if (own) {
+        await enqueueAsyncTask({
+          type: 'discordMessage',
+          data: {
+            message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) edited their booking for event ${event.name}, they have booked ${people.length} people (previously ${existingBooking.people.length})`,
+          },
+        })
+      } else {
+        await enqueueAsyncTask({
+          type: 'discordMessage',
+          data: {
+            message: `${user.name} edited booking ${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) for event ${event.name}, they have booked ${people.length} people (previously ${existingBooking.people.length})`,
+          },
+        })
+      }
+
+      let discordString = ''
+      while (discordDiffs.length > 0) {
+        discordString += discordDiffs.shift() + '\n'
+        if (discordString.length > 1900) {
+          console.log('Posting to discord')
+          console.log(discordString)
+          await enqueueAsyncTask({
+            type: 'discordMessage',
+            data: {
+              message: '```' + discordString + '```',
+            },
+          })
+          discordString = ''
+        }
+      }
+
+      if (discordString.length > 0) {
+        console.log('Posting to discord')
+        console.log(discordString)
+        await enqueueAsyncTask({
+          type: 'discordMessage',
+          data: {
+            message: '```' + discordString + '```',
+          },
+        })
+      }
+    } else {
+      console.log('No diff to post to discord')
     }
 
     res.locals.logger.logToPath('Enqueuing async email task')

@@ -19,7 +19,7 @@ export type Abilities =
   | ['getBackend' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
-  | ['delete', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
+  | ['delete', 'role' | (TRole & ForcedSubject<'role'>)]
   | ['getSheet' | 'createSheet' | 'getSheetData' | 'cancelBooking', 'eventBookingIds' | ({ eventId: string; userId: string } & ForcedSubject<'eventBookingIds'>)]
 
 const lambdaMatcher: ConditionsMatcher<MatchConditions> = (matchConditions) => matchConditions
