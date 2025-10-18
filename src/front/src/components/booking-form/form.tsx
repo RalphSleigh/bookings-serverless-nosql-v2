@@ -92,19 +92,19 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
   let itemToDisplay = null
 
   if (isValid) {
-    if(checked) {
-      if(mode === 'edit') {
+    if (checked) {
+      if (mode === 'edit') {
         itemToDisplay = <ChangesDisplay inputData={inputData} />
       } else {
         itemToDisplay = null
-      } 
-    } else {
-        itemToDisplay = <CheckTheBox />
       }
     } else {
-    itemToDisplay = <MemoValidationErrors schema={schema} />
+      itemToDisplay = <CheckTheBox />
     }
-  
+  } else {
+    itemToDisplay = <MemoValidationErrors schema={schema} />
+  }
+
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
