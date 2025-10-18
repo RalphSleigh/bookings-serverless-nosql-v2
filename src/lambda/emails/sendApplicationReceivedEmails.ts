@@ -9,7 +9,6 @@ import { sendEmail } from './sendEmail'
 export const sendApplicationReceivedEmails = async (task: EmailApplicationReceivedTask, config: ConfigType) => {
   const eventFromDB = await DBEvent.get({ eventId: task.data.eventId }).go()
   const event = EventSchema.parse(eventFromDB.data)
-  const booking = await getBookingByIDs(task.data.eventId, task.data.userId)
   const userQuery = await DB.collections.userWithRoles({ userId: task.data.userId }).go()
   const user = UserSchema.parse(userQuery.data.user[0])
   if (user) {
