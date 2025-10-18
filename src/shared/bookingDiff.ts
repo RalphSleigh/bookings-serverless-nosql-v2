@@ -15,7 +15,7 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
     canBringEquipment: 'Camping Equipment',
     attendance: 'Attendance',
     kp: 'Dietary Requirements',
-    medical: 'Medical & Accessibility',
+    health: 'Medical & Accessibility',
     consent: 'Consents',
     extraContacts: 'Extra Contacts',
     district: 'District',
@@ -35,7 +35,7 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
       })
       return
     }
-    if (['version', 'created', 'updated'].includes(updateItem.key)) return
+    if (['version', 'createdAt', 'updatedAt', 'cancelled'].includes(updateItem.key)) return
 
     const capitalise = (string: string) => {
       return string[0].toUpperCase() + string.slice(1).toLowerCase()
