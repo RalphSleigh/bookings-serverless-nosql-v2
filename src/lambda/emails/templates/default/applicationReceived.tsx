@@ -13,7 +13,7 @@ export class ApplicationReceivedEmail extends EmailTemplate {
         return (<Html lang="en">
             <Text>Hi {data.recipient.name}</Text>
             <Text>Thanks for applying to book for {data.event.name}. One of our team will check your application as soon as
-                    possible and you will recieve another e-mail as soon as you are approved to book in.
+                    possible and you will receive another e-mail as soon as you are approved to book in.
             </Text>
             <Text>
                 <p>Blue Skies and Friendship,</p>
