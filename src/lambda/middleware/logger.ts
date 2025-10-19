@@ -109,6 +109,7 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
       console.log("Calling next()")
       next()
+      res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
       console.log("After next()")
       await res.locals.logger.flush()
       console.log("After flush()")
