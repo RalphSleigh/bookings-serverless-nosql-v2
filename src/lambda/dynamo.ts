@@ -369,7 +369,7 @@ const BookingAttributes = {
       shuttle: {
         type: ['yes', 'no'] as const,
         required: false,
-      }
+      },
     },
   },
 } as const
@@ -578,7 +578,7 @@ const PersonAttributes = {
       activities: { type: ['Yes', 'No'] as const },
     },
   },
-  firstAid: { type: 'boolean' },
+  firstAid: { type: 'boolean', default: false },
 } as const
 
 export const DBPerson = new Entity(
