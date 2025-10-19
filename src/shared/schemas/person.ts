@@ -24,7 +24,7 @@ export type TPersonBasicKPData = z.infer<typeof KPBasic>
 export type TPersonLargeKPData = z.infer<typeof KPLarge>
 export type TPersonKPData = TPersonBasicKPData | TPersonLargeKPData
 
-const AttendanceWhole = z.object({})
+const AttendanceWhole = z.undefined()
 const AttendanceFreeChoice = z.object({ bitMask: z.number().min(1, { message: 'Please select at least one night' }) })
 
 export type TPersonWholeAttendance = z.infer<typeof AttendanceWhole>
