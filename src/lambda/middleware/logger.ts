@@ -80,7 +80,9 @@ class AWSLogger implements Logger {
   }
 
   async flush() {
+    console.log("Flushing logs")
     await Promise.all(this.tasks)
+    console.log("Flushed logs")
   }
 }
 
@@ -104,6 +106,7 @@ class ConsoleLogger implements Logger {
 
 export const loggerMiddleware: RequestHandler = async (req, res, next) => {
   try {
+    console.log("In logger middleware")
     if (am_in_lambda()) {
       res.locals.logger = new AWSLogger(req)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
@@ -125,6 +128,7 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
       })
       next()
     }
+    console.log("Finished logger middleware")
   } catch (error) {
     console.log(error)
     throw error
@@ -132,6 +136,7 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
 }
 
 export const requestLoggerMiddleware: RequestHandler = async (req, res, next) => {
+  console.log("In request logger middleware")
   if (res.locals.user) {
     console.log('sending system log')
     res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
@@ -140,4 +145,5 @@ export const requestLoggerMiddleware: RequestHandler = async (req, res, next) =>
     res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
   }
   next()
+  console.log("Finished request logger middleware")
 }
