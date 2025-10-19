@@ -133,8 +133,10 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
 
 export const requestLoggerMiddleware: RequestHandler = async (req, res, next) => {
   if (res.locals.user) {
+    console.log('sending system log')
     res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
   } else {
+    console.log('sending system log')
     res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
   }
   next()
