@@ -21,7 +21,7 @@ class AWSLogger implements Logger {
   }
 
   logToPath(message: any) {
-    if(typeof message !== 'string') {
+    if (typeof message !== 'string') {
       message = JSON.stringify(message)
     }
     console.log(`[${this.req.path}][${this.req.method}] ${message}`)
@@ -65,7 +65,7 @@ class AWSLogger implements Logger {
   }
 
   logToSystem(message: any) {
-    if(typeof message !== 'string') {
+    if (typeof message !== 'string') {
       message = JSON.stringify(message)
     }
     console.log(`[system] ${message}`)
@@ -107,18 +107,20 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
     if (am_in_lambda()) {
       res.locals.logger = new AWSLogger(req)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
-      res.on('finish', async () => {
+      next()
+      await res.locals.logger.flush()
+      /*       res.on('finish', async () => {
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
         await res.locals.logger.flush()
-      })
+      }) */
     } else {
       res.locals.logger = new ConsoleLogger(req)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
       res.on('finish', () => {
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
       })
+      next()
     }
-    next()
   } catch (error) {
     console.log(error)
     throw error
@@ -126,13 +128,10 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
 }
 
 export const requestLoggerMiddleware: RequestHandler = async (req, res, next) => {
-    if(res.locals.user) {
-        res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
-    } else {
-        res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
-    }
-    next()
+  if (res.locals.user) {
+    res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+  } else {
+    res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+  }
+  next()
 }
-
-
-
