@@ -5,10 +5,11 @@ import { EalingFees } from "./ealing";
 import { FreeFees } from "./free";
 import { FeeStructure } from "./feeStructure";
 import { FeeStructureValues } from ".";
+import { VCampFees } from "./vcamp";
 
 export const FeeOptions = EventSchema.shape.fee.options.map((option) => option.shape.feeStructure.value);
 
-const feeTypes = [FreeFees, EalingFees]
+const feeTypes = [FreeFees, EalingFees, VCampFees]
 
 export const getFeeTypesForEvent = (attendanceStructure: AttendanceStructureValues | undefined) => {
     if(!attendanceStructure) return []

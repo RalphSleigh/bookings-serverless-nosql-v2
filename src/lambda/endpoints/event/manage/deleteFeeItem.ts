@@ -1,17 +1,16 @@
 import { subject } from '@casl/ability'
 
-import { TBooking } from '../../../../shared/schemas/booking'
 import { FeeSchema, TFee } from '../../../../shared/schemas/fees'
-import { EventRoleSchema, RoleSchema, TRole, TRoleForForm } from '../../../../shared/schemas/role'
-import { TUser } from '../../../../shared/schemas/user'
-import { DB, DBFee, DBRole, DBUser } from '../../../dynamo'
-import { HandlerWrapper } from '../../../utils'
+import { currency } from '../../../../shared/util'
+import { enqueueAsyncTask } from '../../../asyncTasks/asyncTaskQueuer'
+import { DB, DBBooking, DBFee, DBRole, DBUser } from '../../../dynamo'
+import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../../utils'
 
 export type TCreateFeeItemData = {
   fee: TFee
 }
 
-export const deleteFeeItem = HandlerWrapper<any, { eventId: string; feeId: string }>(
+export const deleteFeeItem = HandlerWrapperLoggedIn<any, { eventId: string; feeId: string }>(
   (req, res) => ['createFee', subject('eventId', { eventId: req.params.eventId })],
   async (req, res) => {
     try {
@@ -23,6 +22,17 @@ export const deleteFeeItem = HandlerWrapper<any, { eventId: string; feeId: strin
         await DBFee.delete(fee.data[0]).go()
         return res.status(204).send()
       }
+      const booking = await DBBooking.get({
+        userId: fee.data[0].userId,
+        eventId: fee.data[0].eventId,
+      }).go()
+      if (!booking.data) throw new Error('Booking not found for fee item')
+      await enqueueAsyncTask({
+        type: 'discordMessage',
+        data: {
+          message: `${res.locals.user.name} deleted a ${fee.data[0].type} from booking ${booking.data.basic!.district || booking.data.basic!.name} of ${currency(fee.data[0].amount)} (${fee.data[0].note})`,
+        },
+      })
     } catch (error) {
       res.locals.logger.logToPath('Delete Fee Failed')
       res.locals.logger.logToPath(error)

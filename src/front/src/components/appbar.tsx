@@ -25,7 +25,7 @@ export const AppToolbar = () => {
 
   return (
     <AppShell.Header>
-      <Flex gap="xs" justify="flex-start" align="center" direction="row" wrap="wrap">
+      <Flex gap="xs" justify="flex-start" align="center" direction="row" wrap="wrap" mr={8}>
         <Box>
           <CustomLink underline="hover" to="/">
             <img src="/logoonly.png" alt="Logo" style={{ display: 'block', height: '3em' }} />

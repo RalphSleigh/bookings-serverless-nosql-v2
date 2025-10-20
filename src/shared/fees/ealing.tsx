@@ -7,7 +7,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import { WatchDebounce } from '../../front/src/utils'
 import { AttendanceStructureValues } from '../attendance/attendance'
-import { PartialBookingType } from '../schemas/booking'
+import { PartialBookingType, TBooking } from '../schemas/booking'
 import { TEvent, TEventEalingFees,} from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { currency } from '../util'
@@ -239,5 +239,9 @@ export class EalingFees implements FeeStructure<TEventEalingFees> {
         </table>
       </>
     )
+  }
+  
+  getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventEalingFees>>): string {
+    return `EALING${booking.userId.split('-')[0].toUpperCase()}`
   }
 }

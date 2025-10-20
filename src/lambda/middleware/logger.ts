@@ -1,5 +1,5 @@
 import { CloudWatchLogsClient, CreateLogStreamCommand, PutLogEventsCommand, PutLogEventsCommandOutput } from '@aws-sdk/client-cloudwatch-logs'
-import { Request, RequestHandler } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 
 import { am_in_lambda } from '../utils'
 
@@ -16,12 +16,23 @@ export interface Logger {
 class AWSLogger implements Logger {
   private tasks: Promise<any>[] = []
   createTask: Promise<PutLogEventsCommandOutput> | undefined
-  constructor(private req: Request) {
+  req?: Request
+  res?: Response
+
+  constructor() {}
+
+  setRequests(req: Request, res: Response) {
     this.req = req
+    this.res = res
   }
 
   logToPath(message: any) {
-    if(typeof message !== 'string') {
+    if (!this.req) {
+      console.log('Request not set in logger')
+      console.log(message)
+      return
+    }
+    if (typeof message !== 'string') {
       message = JSON.stringify(message)
     }
     console.log(`[${this.req.path}][${this.req.method}] ${message}`)
@@ -65,7 +76,7 @@ class AWSLogger implements Logger {
   }
 
   logToSystem(message: any) {
-    if(typeof message !== 'string') {
+    if (typeof message !== 'string') {
       message = JSON.stringify(message)
     }
     console.log(`[system] ${message}`)
@@ -80,7 +91,10 @@ class AWSLogger implements Logger {
   }
 
   async flush() {
+    this.logToPath(`Request finished with status ${this.res?.statusCode} at ${new Date().toISOString()}`)
+    console.log('Flushing logs')
     await Promise.all(this.tasks)
+    console.log('Flushed logs')
   }
 }
 
@@ -102,23 +116,27 @@ class ConsoleLogger implements Logger {
   }
 }
 
+export const AWSLoggerInstance = new AWSLogger()
+
 export const loggerMiddleware: RequestHandler = async (req, res, next) => {
   try {
     if (am_in_lambda()) {
-      res.locals.logger = new AWSLogger(req)
+      res.locals.logger = AWSLoggerInstance
+      res.locals.logger.setRequests(req, res)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
-      res.on('finish', async () => {
+      next()
+      /*       res.on('finish', async () => {
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
         await res.locals.logger.flush()
-      })
+      }) */
     } else {
       res.locals.logger = new ConsoleLogger(req)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
       res.on('finish', () => {
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
       })
+      next()
     }
-    next()
   } catch (error) {
     console.log(error)
     throw error
@@ -126,13 +144,10 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
 }
 
 export const requestLoggerMiddleware: RequestHandler = async (req, res, next) => {
-    if(res.locals.user) {
-        res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
-    } else {
-        res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
-    }
-    next()
+  if (res.locals.user) {
+    res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+  } else {
+    res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+  }
+  next()
 }
-
-
-

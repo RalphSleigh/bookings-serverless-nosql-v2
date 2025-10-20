@@ -112,7 +112,7 @@ export const DBRole = new Entity(
         required: true,
       },
       role: {
-        type: ['admin', 'owner'] as const,
+        type: ['admin', 'owner', 'manager', 'viewer'] as const,
         required: true,
       },
       eventId: {
@@ -173,7 +173,6 @@ export const DBEvent = new Entity(
       },
       description: {
         type: 'string',
-        required: true,
       },
       startDate: {
         type: 'string',
@@ -192,7 +191,7 @@ export const DBEvent = new Entity(
         required: true,
         properties: {
           feeStructure: {
-            type: ['free', 'ealing'] as const,
+            type: ['free', 'ealing', 'vcamp'] as const,
             required: true,
           },
           ealingData: {
@@ -370,7 +369,7 @@ const BookingAttributes = {
       shuttle: {
         type: ['yes', 'no'] as const,
         required: false,
-      }
+      },
     },
   },
 } as const
@@ -579,7 +578,7 @@ const PersonAttributes = {
       activities: { type: ['Yes', 'No'] as const },
     },
   },
-  firstAid: { type: 'boolean' },
+  firstAid: { type: 'boolean', default: false },
 } as const
 
 export const DBPerson = new Entity(

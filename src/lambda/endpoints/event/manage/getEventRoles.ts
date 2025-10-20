@@ -12,7 +12,7 @@ export const getEventRoles = HandlerWrapper(
   async (req, res) => {
     try {
       const event = res.locals.event
-      const roles = await DBRole.find({eventId: event.eventId}).go()
+      const roles = await DBRole.find({eventId: event.eventId}).go({pages: "all"})
     
       if(roles.data){
         res.json({ roles: roles.data })

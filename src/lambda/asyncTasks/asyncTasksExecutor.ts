@@ -1,14 +1,24 @@
 import { postDiscordMessage } from "../discord/discordMessagePoster";
 import { syncDriveForEvent } from "../driveSync/driveSyncer";
+import { sendApplicationReceivedEmails } from "../emails/sendApplicationReceivedEmails";
 import { sendBookingCreatedEmails } from "../emails/sendBookingCreatedEmails";
 import { sendBookingUpdatedEmails } from "../emails/sendBookingUpdatedEmails";
 import { sendManagerDataAccessEmail } from "../emails/sendManagerDataAccessEmail";
-import { getConfig } from "../getConfig";
+import { sendApplicationApprovedEmails } from "../emails/sendApplicationApprovedEmails";
+import { ConfigType, getConfig } from "../getConfig";
 import { AsyncTask } from "./asyncTaskQueuer";
 
 export const asyncTasksExecutor = async (task: AsyncTask) => {
     const config = await getConfig()
     switch (task.type) {
+        case "emailApplicationReceived":
+            console.log("Handling emailApplicationReceived");
+            await sendApplicationReceivedEmails(task, config);
+            break;
+        case "emailApplicationApproved":
+            console.log("Handling emailApplicationApproved");
+            await sendApplicationApprovedEmails(task, config);
+            break;
         case "emailBookingCreated":
             console.log("Handling emailBookingCreated");
             await sendBookingCreatedEmails(task, config);
@@ -31,3 +41,4 @@ export const asyncTasksExecutor = async (task: AsyncTask) => {
             break;
     }
 }
+

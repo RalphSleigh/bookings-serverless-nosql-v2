@@ -34,4 +34,5 @@ export interface FeeStructure<T extends TEventFeesUnion = TEventFeesUnion> {
   BookingFormDisplayElement: BookingFormDisplayElement<T>
   EventListDisplayElement: EventListDisplayElement<T>
   EmailElement: EmailElement<T>
+  getPaymentReference(booking: TBooking<TEvent<any, any, any, T>>): string
 }

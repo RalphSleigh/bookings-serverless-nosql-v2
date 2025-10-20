@@ -19,7 +19,7 @@ export type Abilities =
   | ['getBackend' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
-  | ['delete', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
+  | ['delete', 'role' | (TRole & ForcedSubject<'role'>)]
   | ['getSheet' | 'createSheet' | 'getSheetData' | 'cancelBooking', 'eventBookingIds' | ({ eventId: string; userId: string } & ForcedSubject<'eventBookingIds'>)]
 
 const lambdaMatcher: ConditionsMatcher<MatchConditions> = (matchConditions) => matchConditions
@@ -86,5 +86,37 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
   },
   owner: (can, role) => {
     can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+    can('viewRoles', 'eventId', (e) => e.eventId === role.eventId)
+    can('get', 'users')
+    can('create', 'role', (r) => r.eventId === role.eventId)
+    can('delete', 'role', (r) => r.eventId === role.eventId)
+    can('getFees', 'eventId', (e) => e.eventId === role.eventId)
+    can('createFee', 'eventId', (e) => e.eventId === role.eventId)
+    can('getApplications', 'eventId', (e) => e.eventId === role.eventId)
+    can('approveApplication', 'eventId', (e) => e.eventId === role.eventId)
+    can('update', 'eventBooking', (b) => b.event.eventId === role.eventId && b.booking.eventId === role.eventId)
+
+    can('getSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
+    can('createSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
+    can('getSheetData', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
   },
+  manager: (can, role) => {
+    can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+    can('viewRoles', 'eventId', (e) => e.eventId === role.eventId)
+    can('get', 'users')
+    can('create', 'role', (r) => r.eventId === role.eventId && r.role !== 'owner')
+    can('delete', 'role', (r) => r.eventId === role.eventId && r.role !== 'owner')
+    can('getFees', 'eventId', (e) => e.eventId === role.eventId)
+    can('createFee', 'eventId', (e) => e.eventId === role.eventId)
+    can('getApplications', 'eventId', (e) => e.eventId === role.eventId)
+    can('approveApplication', 'eventId', (e) => e.eventId === role.eventId)
+    can('update', 'eventBooking', (b) => b.event.eventId === role.eventId && b.booking.eventId === role.eventId)
+
+    can('getSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
+    can('createSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
+    can('getSheetData', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
+  },
+  viewer: (can, role) => {
+    can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+  }
 }

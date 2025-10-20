@@ -29,7 +29,7 @@ type PeopleFormProps = {
 
 export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
   const { user } = useRouteContext({ from: '/_user' })
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray<z.infer<typeof BookingSchemaForType>>({
+  const { fields, append, remove, replace } = useFieldArray<z.infer<typeof BookingSchemaForType>>({
     name: 'people', // unique name for your Field Array
   })
 
@@ -52,7 +52,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
         People
       </Title>
       <SmallSuspenseWrapper>
-        <SheetsInput event={event} userId={userId} />
+        <SheetsInput event={event} userId={userId} replace={replace} />
       </SmallSuspenseWrapper>
       {people}
       <Button onClick={appendFn} mt={16} variant="outline">

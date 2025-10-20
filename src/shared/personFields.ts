@@ -11,7 +11,6 @@ import { ageGroupFromPerson } from './woodcraft'
 
 dayjs.extend(relativeTime)
 
-
 export abstract class PersonField<T extends TEvent = TEvent> {
   event: TEvent
   abstract name: string
@@ -22,7 +21,7 @@ export abstract class PersonField<T extends TEvent = TEvent> {
   filterVariant: 'text' | 'date-range' = 'text'
   Cell?: MRT_ColumnDef<TPerson<T>>['Cell']
   size: number = 100
-  roles: TRole['role'][] = ['owner']
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role))
   titleForDrive: () => string = () => this.name
   valueForDrive: (p: TPerson<T>) => string = (p) => {

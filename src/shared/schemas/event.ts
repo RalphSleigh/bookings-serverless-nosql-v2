@@ -34,12 +34,15 @@ const ealingFee = z.object({
     paymentInstructions: z.string().nonempty(),
   }),
 })
+
 const freeFee = z.object({ feeStructure: z.literal('free') })
-const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee])
+const vcampFee = z.object({ feeStructure: z.literal('vcamp') })
+const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee, vcampFee])
 
 export type TEventFeesUnion = z.infer<typeof feeOptions>
 export type TEventEalingFees = z.infer<typeof ealingFee>
 export type TEventFreeFees = z.infer<typeof freeFee>
+export type TEventVCampFees = z.infer<typeof vcampFee>
 
 const customQuestion = z.object({
   questionType: z.enum(['yesnochoice', 'text', 'longtext']),
@@ -48,31 +51,29 @@ const customQuestion = z.object({
 
 export type TCustomQuestion = z.infer<typeof customQuestion>
 
-export const EventSchema = z
-  .object({
-    eventId: z.uuidv7(),
-    deleted: z.boolean().default(false),
-    name: z.string().nonempty(),
-    description: z.string().optional(),
-    startDate: z.iso.datetime(),
-    endDate: z.iso.datetime(),
-    bookingDeadline: z.iso.datetime(),
-    fee: feeOptions,
-    kp: kpOptions,
-    consents: consentsOptions,
-    attendance: attendanceOptions,
-    emailSubjectTag: z.string().nonempty(),
-    replyTo: z.string().nonempty(),
-    bigCampMode: z.boolean().default(false),
-    organisations: z.boolean().default(false),
-    applicationsRequired: z.boolean().default(false),
-    allParticipantEmails: z.boolean().default(false),
-    howDidYouHear: z.boolean().default(false),
-    customQuestions: z.array(customQuestion),
-  })
-  .strict()
+export const EventSchema = z.object({
+  eventId: z.uuidv7(),
+  deleted: z.boolean().default(false),
+  name: z.string().nonempty(),
+  description: z.string().optional(),
+  startDate: z.iso.datetime(),
+  endDate: z.iso.datetime(),
+  bookingDeadline: z.iso.datetime(),
+  fee: feeOptions,
+  kp: kpOptions,
+  consents: consentsOptions,
+  attendance: attendanceOptions,
+  emailSubjectTag: z.string().nonempty(),
+  replyTo: z.string().nonempty(),
+  bigCampMode: z.boolean().default(false),
+  organisations: z.boolean().default(false),
+  applicationsRequired: z.boolean().default(false),
+  allParticipantEmails: z.boolean().default(false),
+  howDidYouHear: z.boolean().default(false),
+  customQuestions: z.array(customQuestion),
+})
 
-export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true }).strict()
+export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true })
 
 export type TEvent<
   KP extends TEventKPUnion = TEventKPUnion,

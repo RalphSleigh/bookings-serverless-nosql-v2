@@ -25,6 +25,9 @@ export const createBooking = HandlerWrapperLoggedIn(
     const { people, ...validatedBooking } = bookingSchema.parse(booking)
 
     const createdBooking = await DBBooking.create(validatedBooking).go()
+
+    if (!createdBooking.data) throw new Error('Failed to create booking')
+
     const bookingHistoryItem: CreateEntityItem<typeof DBBookingHistory> = {
       eventId: event.eventId,
       userId: user.userId,
@@ -46,6 +49,13 @@ export const createBooking = HandlerWrapperLoggedIn(
       }
       await DBPersonHistory.create(personHistoryItem).go()
     }
+
+    await enqueueAsyncTask({
+      type: 'discordMessage',
+      data: {
+        message: `${createdBooking.data.basic!.name} (${createdBooking.data.basic!.district ? createdBooking.data.basic!.district : 'Individual'}) created a booking for event ${event.name}, they have booked ${booking.people.length} people`,
+      },
+    })
 
     await enqueueAsyncTask({
       type: 'emailBookingCreated',
