@@ -5,7 +5,7 @@ import { AWSLoggerInstance } from './middleware/logger'
 import { Context, Callback } from 'aws-lambda'
 
 export const handler = async (event: any, context: Context, callback: Callback<any>) => {
-    const result = serverlessExpress({ app })(event, context, callback)
+    const result = await serverlessExpress({ app })(event, context, callback)
     await AWSLoggerInstance.flush()
     return result
 }
