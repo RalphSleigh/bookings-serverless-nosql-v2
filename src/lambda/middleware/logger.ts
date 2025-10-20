@@ -137,7 +137,6 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
       })
       next()
     }
-    console.log('Finished logger middleware')
   } catch (error) {
     console.log(error)
     throw error
