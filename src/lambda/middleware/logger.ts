@@ -1,5 +1,5 @@
 import { CloudWatchLogsClient, CreateLogStreamCommand, PutLogEventsCommand, PutLogEventsCommandOutput } from '@aws-sdk/client-cloudwatch-logs'
-import { Request, RequestHandler } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 
 import { am_in_lambda } from '../utils'
 
@@ -17,12 +17,13 @@ class AWSLogger implements Logger {
   private tasks: Promise<any>[] = []
   createTask: Promise<PutLogEventsCommandOutput> | undefined
   req?: Request
+  res?: Response
 
-  constructor() {
-  }
+  constructor() {}
 
-  setRequest(req: Request) {
+  setRequests(req: Request, res: Response) {
     this.req = req
+    this.res = res
   }
 
   logToPath(message: any) {
@@ -86,14 +87,14 @@ class AWSLogger implements Logger {
         logEvents: [{ message, timestamp: Date.now() }],
       }),
     )
-    this.tasks.push(task) 
+    this.tasks.push(task)
   }
 
   async flush() {
-    this.logToPath(`Request finished with status ${this.req?.statusCode} at ${new Date().toISOString()}`)
-    console.log("Flushing logs")
+    this.logToPath(`Request finished with status ${this.res?.statusCode} at ${new Date().toISOString()}`)
+    console.log('Flushing logs')
     await Promise.all(this.tasks)
-    console.log("Flushed logs")
+    console.log('Flushed logs')
   }
 }
 
@@ -119,17 +120,11 @@ export const AWSLoggerInstance = new AWSLogger()
 
 export const loggerMiddleware: RequestHandler = async (req, res, next) => {
   try {
-    console.log("In logger middleware")
     if (am_in_lambda()) {
       res.locals.logger = AWSLoggerInstance
-      res.locals.logger.setRequest(req)
+      res.locals.logger.setRequests(req, res)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
-      console.log("Calling next()")
       next()
-/*       res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
-      console.log("After next()")
-      await res.locals.logger.flush()
-      console.log("After flush()") */
       /*       res.on('finish', async () => {
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
         await res.locals.logger.flush()
@@ -142,7 +137,7 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
       })
       next()
     }
-    console.log("Finished logger middleware")
+    console.log('Finished logger middleware')
   } catch (error) {
     console.log(error)
     throw error
@@ -150,14 +145,10 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
 }
 
 export const requestLoggerMiddleware: RequestHandler = async (req, res, next) => {
-  console.log("In request logger middleware")
   if (res.locals.user) {
-    console.log('sending system log')
     res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
   } else {
-    console.log('sending system log')
     res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
   }
   next()
-  console.log("Finished request logger middleware")
 }
