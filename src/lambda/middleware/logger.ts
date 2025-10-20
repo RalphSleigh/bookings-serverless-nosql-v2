@@ -16,11 +16,21 @@ export interface Logger {
 class AWSLogger implements Logger {
   private tasks: Promise<any>[] = []
   createTask: Promise<PutLogEventsCommandOutput> | undefined
-  constructor(private req: Request) {
+  req?: Request
+
+  constructor() {
+  }
+
+  setRequest(req: Request) {
     this.req = req
   }
 
   logToPath(message: any) {
+    if (!this.req) {
+      console.log('Request not set in logger')
+      console.log(message)
+      return
+    }
     if (typeof message !== 'string') {
       message = JSON.stringify(message)
     }
@@ -76,10 +86,11 @@ class AWSLogger implements Logger {
         logEvents: [{ message, timestamp: Date.now() }],
       }),
     )
-    this.tasks.push(task)
+    this.tasks.push(task) 
   }
 
   async flush() {
+    this.logToPath(`Request finished with status ${this.req?.statusCode} at ${new Date().toISOString()}`)
     console.log("Flushing logs")
     await Promise.all(this.tasks)
     console.log("Flushed logs")
@@ -104,18 +115,21 @@ class ConsoleLogger implements Logger {
   }
 }
 
+export const AWSLoggerInstance = new AWSLogger()
+
 export const loggerMiddleware: RequestHandler = async (req, res, next) => {
   try {
     console.log("In logger middleware")
     if (am_in_lambda()) {
-      res.locals.logger = new AWSLogger(req)
+      res.locals.logger = AWSLoggerInstance
+      res.locals.logger.setRequest(req)
       res.locals.logger.logToPath(`Request started at ${new Date().toISOString()}`)
       console.log("Calling next()")
       next()
-      res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
+/*       res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
       console.log("After next()")
       await res.locals.logger.flush()
-      console.log("After flush()")
+      console.log("After flush()") */
       /*       res.on('finish', async () => {
         res.locals.logger.logToPath(`Request finished with status ${res.statusCode} at ${new Date().toISOString()}`)
         await res.locals.logger.flush()
