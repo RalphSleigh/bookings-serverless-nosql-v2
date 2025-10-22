@@ -1,14 +1,14 @@
 import { Grid, Table, Text, Textarea } from '@mantine/core'
 import { useFormContext } from 'react-hook-form'
 
+import { CustomSelect } from '../../front/src/components/custom-inputs/customSelect'
 import { errorProps } from '../../front/src/utils'
+import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
 import { TEvent, TEventBasicKP } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { ageGroupFromPerson } from '../woodcraft'
 import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
-import { CustomSelect } from '../../front/src/components/custom-inputs/customSelect'
-import { PersonField } from '../personFields'
 
 export class BasicKP implements KPStructure<TEventBasicKP> {
   typeName: 'basic' = 'basic'
@@ -19,7 +19,7 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
     const e = errorProps(errors)
     return (
       <Grid.Col span={12}>
-         <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
+        <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
         <Textarea
           autoComplete={`section-person-${index} diet-details`}
           id={`person-details-${index}`}
@@ -79,13 +79,13 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
   }
 
   PersonFields = (event: TEvent<TEventBasicKP>) => {
-    class Diet extends PersonField {
+    class Diet extends PersonField<TEvent<TEventBasicKP>> {
       name = 'Diet'
       accessor = 'kp.diet'
       size: number = 100
     }
-    
-    class DietDetails extends PersonField {
+
+    class DietDetails extends PersonField<TEvent<TEventBasicKP>> {
       name = 'Diet Details'
       accessor = (p: TPerson) => p.kp?.details || ''
     }
