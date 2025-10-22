@@ -8,6 +8,7 @@ import { TPerson } from '../schemas/person'
 import { ageGroupFromPerson } from '../woodcraft'
 import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
 import { CustomSelect } from '../../front/src/components/custom-inputs/customSelect'
+import { PersonField } from '../personFields'
 
 export class BasicKP implements KPStructure<TEventBasicKP> {
   typeName: 'basic' = 'basic'
@@ -60,7 +61,7 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
     )
   }
 
-  PersonCardSection: KPPersonCardSection = ({ person }) => {
+  PersonCardSection: KPPersonCardSection<TEventBasicKP> = ({ person }) => {
     return (
       <>
         <Text>
@@ -75,5 +76,20 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
         )}
       </>
     )
+  }
+
+  PersonFields = (event: TEvent<TEventBasicKP>) => {
+    class Diet extends PersonField {
+      name = 'Diet'
+      accessor = 'kp.diet'
+      size: number = 100
+    }
+    
+    class DietDetails extends PersonField {
+      name = 'Diet Details'
+      accessor = (p: TPerson) => p.kp?.details || ''
+    }
+
+    return [new Diet(event), new DietDetails(event)]
   }
 }

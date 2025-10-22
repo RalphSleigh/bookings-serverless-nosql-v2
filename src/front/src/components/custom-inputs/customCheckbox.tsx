@@ -35,7 +35,7 @@ export const CustomCheckbox = <T extends FieldValues>({
     <$Checkbox
       error={fieldState.error?.message}
       value={value}
-      checked={value}
+      checked={value || false}
       onChange={(e) => {
         fieldOnChange(e);
         onChange?.(e);
