@@ -191,65 +191,62 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => p.kp.preferences || ''
     }
 
-    /*
-    nut: z.boolean().default(false),
-      gluten: z.boolean().default(false),
-      soya: z.boolean().default(false),
-      dairy: z.boolean().default(false),
-      egg: z.boolean().default(false),
-      pork: z.boolean().default(false),
-      chickpea: z.boolean().default(false),
-      diabetic: z.boolean().default(false),
-      contactMe: z.boolean().default(false),
-      */
-
     class DietNut extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Nut Free'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.nut ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
 
     class DietGluten extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Gluten Free'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.gluten ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
 
     class DietSoya extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Soya Free'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.soya ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
     class DietDairy extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Dairy/Lactose Free'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.dairy ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
     class DietEgg extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Egg Free'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.egg ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
     class DietPork extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Pork Free'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.pork ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
     class DietChickpea extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Chickpea Free'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.chickpea ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
     class DietDiabetic extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diabetic'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.diabetic ? '❌' : '')
       size: number = 80
+      hideByDefault = true
     }
 
     class DietContactMe extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Contact Me'
       accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.contactMe ? '✅' : '')
       size: number = 80
+      hideByDefault = true
     }
 
     return [
