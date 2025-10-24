@@ -102,6 +102,8 @@ const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
     userAgent: req.headers['user-agent'],
   }
 
+  console.log('Error handler called:', JSON.stringify(message, null, 2))
+
   if (am_in_lambda()) {
     const client = new SNSClient({})
     const input = {
