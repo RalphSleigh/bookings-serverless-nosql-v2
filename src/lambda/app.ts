@@ -93,18 +93,27 @@ router.post('/event/:eventId/manage/application/:userId/decline', declineApplica
 router.get('/event/:eventId/manage/bookingHistory/:userId', getEventBookingHistory)
 
 const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
+  const message = {
+    err: serializeError(err),
+    message: err.message,
+    stack: err.stack,
+    user: res.locals.user,
+    url: req.originalUrl,
+    userAgent: req.headers['user-agent'],
+  }
+
   if (am_in_lambda()) {
     const client = new SNSClient({})
     const input = {
       // PublishInput
       TopicArn: process.env.SNS_QUEUE_ARN,
-      Message: JSON.stringify(serializeError(err)), // required
+      Message: JSON.stringify(message), // required
     }
     const command = new PublishCommand(input)
     const response = await client.send(command)
   }
   res.locals.logger.logToSystem('Error handler called')
-  res.locals.logger.logToSystem(serializeError(err))
+  res.locals.logger.logToSystem(JSON.stringify(message))
   next(err)
 }
 router.use(errorHandler)

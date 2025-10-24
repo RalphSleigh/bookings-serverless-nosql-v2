@@ -16,10 +16,17 @@ export const handler = async (event: SQSEvent, context: Context): Promise<SQSBat
       console.error(`Error processing record ${record.messageId}:`, error)
       if (am_in_lambda()) {
         const client = new SNSClient({})
+
+        const message = {
+          err: serializeError(error),
+          record: record,
+          message: `Error processing record ${record.messageId}`,
+        }
+
         const input = {
           // PublishInput
           TopicArn: process.env.SNS_QUEUE_ARN,
-          Message: JSON.stringify(serializeError(error)),
+          Message: JSON.stringify(message),
         }
         const command = new PublishCommand(input)
         const response = await client.send(command)
