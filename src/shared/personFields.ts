@@ -8,6 +8,7 @@ import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { ageGroupFromPerson } from './woodcraft'
+import { getKPType } from './kp/kp'
 
 dayjs.extend(relativeTime)
 
@@ -109,17 +110,6 @@ class Age extends PersonField {
   }
 }
 
-class Diet extends PersonField {
-  name = 'Diet'
-  accessor = 'kp.diet'
-  size: number = 100
-}
-
-class DietDetails extends PersonField {
-  name = 'Diet Details'
-  accessor = (p: TPerson) => p.kp?.details || ''
-}
-
 class Medical extends PersonField {
   name = 'Medical'
   accessor = (p: TPerson) => p.health?.medical || ''
@@ -144,15 +134,15 @@ export class Current extends PersonField {
   accessor = (p: TPerson) => !p.cancelled
 }
 
-export const personFields: (event: TEvent) => PersonField[] = (event) => {
+export const personFields = <E extends TEvent>(event: E): PersonField<E>[]  => {
   const attendance = getAttendanceType(event)
+  const kp = getKPType(event)
   return [
     new Name(event),
     new Email(event),
     new Dob(event),
     new Age(event),
-    new Diet(event),
-    new DietDetails(event),
+    ...kp.PersonFields(event),
     new Medical(event),
     ...attendance.PersonFields(event),
     new Created(event),

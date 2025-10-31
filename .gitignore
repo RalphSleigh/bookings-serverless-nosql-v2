@@ -19,6 +19,7 @@ dist/
 
 docker/*
 dist-local/*
+dist-lambda/*
 
 **/.terraform/*
 **/*.gen.ts

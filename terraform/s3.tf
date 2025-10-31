@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "lambda_code" {
   bucket = "bookings-lambda-code-${data.aws_caller_identity.current.account_id}"
 
   tags = {
-    Name        = "Lambda Code Bucket"
+    Name = "Lambda Code Bucket"
   }
 }
 
@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "public_static" {
   bucket = "bookings-public-${data.aws_caller_identity.current.account_id}"
 
   tags = {
-    Name        = "Public Static Bucket"
+    Name = "Public Static Bucket"
   }
 }
 
@@ -80,6 +80,6 @@ resource "aws_s3_object" "static_files" {
 
   # Unless the bucket has encryption enabled, the ETag of each object is an
   # MD5 hash of that object.
-  source_hash = each.value.digests.md5
+  source_hash   = each.value.digests.md5
   cache_control = "max-age=3600, no-cache"
 }

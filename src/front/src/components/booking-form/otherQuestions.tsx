@@ -30,7 +30,8 @@ export function OtherQuestionsForm() {
           </Title>
           <CustomRadioGroup name="other.shuttle" label="Will you need the shuttle bus to/from the station to camp?">
             <Group mt={8}>
-              <Radio value={'yes'} label="Yes" />
+              <Radio value={'yes'} label="Yes " />
+              <Radio value={'maybe'} label="Not sure - but might" />
               <Radio value={'no'} label="No" />
             </Group>
           </CustomRadioGroup>

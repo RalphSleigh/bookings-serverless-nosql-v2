@@ -110,7 +110,8 @@ export const ManageCampers = () => {
     ),
     enableColumnResizing: true,
     onColumnSizingChange: setColumnSize,
-    layoutMode: 'grid'
+    layoutMode: 'grid',
+    initialState: { density: 'xs' },
   })
 
   const selectedPerson = campers.find((c) => c.personId === selected)

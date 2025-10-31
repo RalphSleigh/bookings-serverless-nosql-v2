@@ -1,3 +1,4 @@
+import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
 import { EventSchema, TEvent, TEventBasicKP, TEventKPUnion, TEventLargeKP } from '../schemas/event'
 import { TPerson, TPersonBasicKPData, TPersonLargeKPData } from '../schemas/person'
@@ -8,13 +9,14 @@ export type KPTypes = TEvent['kp']['kpStructure']
 
 export type ManageKPPageList<KP extends TEventKPUnion> = React.FC<{ event: TEvent<KP>; campers: TPerson[] }>
 
-export type KPPersonCardSection = React.FC<{ person: TPerson }>
+export type KPPersonCardSection<KP extends TEventKPUnion> = React.FC<{ person: TPerson<TEvent<KP>> }>
 
 export interface KPStructure<T extends TEventKPUnion = TEventKPUnion> {
   typeName: T['kpStructure']
   PersonFormSection: React.FC<{ index: number }>
   ManageKPPageList: ManageKPPageList<T>
-  PersonCardSection: KPPersonCardSection
+  PersonCardSection: KPPersonCardSection<T>
+  PersonFields: (event: TEvent<T>) => PersonField<TEvent<T>>[]
 }
 
 

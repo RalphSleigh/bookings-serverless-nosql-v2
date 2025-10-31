@@ -367,7 +367,7 @@ const BookingAttributes = {
         required: false,
       },
       shuttle: {
-        type: ['yes', 'no'] as const,
+        type: ['yes', 'no', 'maybe'] as const,
         required: false,
       },
     },
