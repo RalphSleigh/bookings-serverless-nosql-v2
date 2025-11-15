@@ -148,6 +148,7 @@ const UserSelect = ({}) => {
         userCombobox.closeDropdown()
       }}
       store={userCombobox}
+      withinPortal={true}
     >
       <Combobox.Target>
         {selectedUser ? (
