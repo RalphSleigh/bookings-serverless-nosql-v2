@@ -13,7 +13,7 @@ export const logClientErrors = HandlerWrapper(
       user: res.locals.user,
     }
 
-    res.locals.logger.logToPath(`CLIENT ERROR from ${res.locals.currentUser?.userName}: ${JSON.stringify(errorJson)}`)
+    res.locals.logger.logToPath(`CLIENT ERROR from ${res.locals.user?.name}: ${JSON.stringify(errorJson)}`)
 
     if (!am_in_lambda()) return res.json({})
 

@@ -56,7 +56,7 @@ export class VCampConsents implements ConsentStructure<TEventVCampConsents> {
           required
         >
           <Group mt={8}>
-            <Input.Label required><b>Relations & Sex Education Consent:</b> I have permission for this individual to take part in Relationship & Sex Education workshops as part of Camp 100 MEST UP programme. Everyone on camp will take part in a basic consent workshop, this consent is for content above and beyond that. (<a href="https://woodcraft.org.uk/resources/relationship-sex-education-policy/" target="_blank">policy</a>)</Input.Label>
+            <Input.Label required><b>Relations & Sex Education Consent:</b> I have permission for this individual to take part in Relationship & Sex Education workshops as part of the Venturer Camp MEST-UP programme. Everyone on camp will take part in a basic consent workshop, this consent is for content above and beyond that. (<a href="https://woodcraft.org.uk/resources/relationship-sex-education-policy/" target="_blank">policy</a>)</Input.Label>
             <Radio value={'Yes'} label="Yes" />
             <Radio value={'No'} label="No" />
           </Group>

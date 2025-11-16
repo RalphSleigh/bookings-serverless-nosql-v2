@@ -93,6 +93,7 @@ export const ManageBookings = () => {
         <MRT_ToggleFullScreenButton table={table} />
       </Flex>
     ),
+    initialState: { density: 'xs', pagination: { pageSize: 100, pageIndex: 0 } },
   })
 
   const selectedBooking = bookings.find((b) => b.userId === selected)

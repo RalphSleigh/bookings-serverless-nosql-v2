@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
-import { MantineReactTable, MRT_ShowHideColumnsButton, MRT_ColumnDef, MRT_Row, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
+import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
 import { TPerson } from '../../../../shared/schemas/person'
@@ -14,13 +14,13 @@ import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import useLocalStorageState from 'use-local-storage-state'
 
+import { getAttendanceType } from '../../../../shared/attendance/attendance'
+import { getKPType } from '../../../../shared/kp/kp'
 import { personFields } from '../../../../shared/personFields'
 import { TEvent } from '../../../../shared/schemas/event'
-import { ageGroupFromPerson } from '../../../../shared/woodcraft'
+import { ageGroupFromPerson, ageGroups, campersInAgeGroup } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { useEvent } from '../../utils'
-import { getKPType } from '../../../../shared/kp/kp'
-import { getAttendanceType } from '../../../../shared/attendance/attendance'
 
 export const ManageCampers = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -83,6 +83,18 @@ export const ManageCampers = () => {
     download(csvConfig)(csv)
   }
 
+  const totals = ageGroups.map((ag) => {
+    const campersInGroup = campersInAgeGroup(event)(ag)
+    const count = campers.filter(campersInGroup).length
+    if (count === 0) {
+      return null
+    }
+    const agInstance = ag.construct(0);
+    return `${agInstance.plural}: ${count}`; 
+  })
+  .filter((s) => s !== null)
+  .join(', ');
+
   const table = useMantineReactTable({
     columns,
     data: campers, //must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
@@ -110,7 +122,8 @@ export const ManageCampers = () => {
     ),
     enableColumnResizing: true,
     onColumnSizingChange: setColumnSize,
-    layoutMode: 'grid'
+    layoutMode: 'grid',
+    initialState: { density: 'xs', pagination: { pageSize: 100, pageIndex: 0 } },
   })
 
   const selectedPerson = campers.find((c) => c.personId === selected)
@@ -123,6 +136,7 @@ export const ManageCampers = () => {
       </Modal>
       <Container strategy="grid" fluid mt={8}>
         <Box data-breakout>
+          <Text mt={4} mb={4}><b>Total: {campers.length}</b>, {totals}</Text>
           <MantineReactTable table={table} />
         </Box>
       </Container>
