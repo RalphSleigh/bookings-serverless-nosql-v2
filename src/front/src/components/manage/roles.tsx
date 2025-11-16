@@ -174,7 +174,7 @@ const UserSelect = ({}) => {
         )}
       </Combobox.Target>
       <Combobox.Dropdown>
-        <Combobox.Options style={{ overflowY: 'auto' }}>{items}</Combobox.Options>
+        <Combobox.Options mah={"70vh"} style={{ overflowY: 'auto' }}>{items}</Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
   )
