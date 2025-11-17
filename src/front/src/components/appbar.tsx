@@ -71,7 +71,7 @@ export const AppToolbar = () => {
               <IconBug />
             </ActionIcon>
             <Title order={6} c="orange" pr={16}>
-              TEST MODE
+              TEST
             </Title>
           </>
         ) : null}
