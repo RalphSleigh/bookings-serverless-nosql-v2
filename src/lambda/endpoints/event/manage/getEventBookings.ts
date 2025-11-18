@@ -14,7 +14,9 @@ export const getEventBookings = HandlerWrapper(
       const event = res.locals.event
       const bookings = await DB.collections.booking({ eventId: event.eventId }).go()
       if (bookings.data) {
-        const bookingsWithPeople = bookings.data.booking.map((b) => {
+        const bookingsWithPeople = bookings.data.booking
+        .filter((b) => !b.cancelled)
+        .map((b) => {
           const people = bookings.data.person.filter((p) => p.userId === b.userId && p.eventId === b.eventId && !p.cancelled).sort((a, b) => a.createdAt - b.createdAt)
           return { ...b, people } as TBooking
         })
