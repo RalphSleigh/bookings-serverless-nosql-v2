@@ -31,9 +31,9 @@ export const deleteFeeItem = HandlerWrapperLoggedIn<any, { eventId: string; feeI
           message: `${res.locals.user.name} deleted a ${fee.data[0].type} from booking ${booking.data.basic!.district || booking.data.basic!.name} of ${currency(fee.data[0].amount)} (${fee.data[0].note})`,
         },
       })
-        return res.status(204)
+        return res.status(204).send()
       }
-      return res.status(401)
+      return res.status(401).send()
     } catch (error) {
       res.locals.logger.logToPath('Delete Fee Failed')
       res.locals.logger.logToPath(error)
