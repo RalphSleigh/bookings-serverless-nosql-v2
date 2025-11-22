@@ -31,19 +31,9 @@ export const deleteFeeItem = HandlerWrapperLoggedIn<any, { eventId: string; feeI
           message: `${res.locals.user.name} deleted a ${fee.data[0].type} from booking ${booking.data.basic!.district || booking.data.basic!.name} of ${currency(fee.data[0].amount)} (${fee.data[0].note})`,
         },
       })
-        return res.status(204).send()
+        return res.status(204)
       }
-      const booking = await DBBooking.get({
-        userId: fee.data[0].userId,
-        eventId: fee.data[0].eventId,
-      }).go()
-      if (!booking.data) throw new Error('Booking not found for fee item')
-      await enqueueAsyncTask({
-        type: 'discordMessage',
-        data: {
-          message: `${res.locals.user.name} deleted a ${fee.data[0].type} from booking ${booking.data.basic!.district || booking.data.basic!.name} of ${currency(fee.data[0].amount)} (${fee.data[0].note})`,
-        },
-      })
+      return res.status(401)
     } catch (error) {
       res.locals.logger.logToPath('Delete Fee Failed')
       res.locals.logger.logToPath(error)

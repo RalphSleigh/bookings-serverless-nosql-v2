@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import Stripe from 'stripe'
 
-import { FeeForCreateSchema, FeeSchema } from '../../shared/schemas/fees'
+import { FeeForCreateSchema } from '../../shared/schemas/fees'
 import { enqueueAsyncTask } from '../asyncTasks/asyncTaskQueuer'
 import { DBBooking, DBFee } from '../dynamo'
 import { ConfigType } from '../getConfig'
