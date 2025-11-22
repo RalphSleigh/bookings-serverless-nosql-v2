@@ -40,6 +40,7 @@ function BookEventComponent() {
   const inputData: DefaultValues<TBooking> & { userId: string; eventId: string } = defaultBookingData(user, event)
 
   const application = bookingsQuery.data?.applications.find((a) => a.eventId === event.eventId && a.userId === user.userId)
+  const fees = bookingsQuery.data?.fees.filter((f) => f.eventId === event.eventId && f.userId === user.userId) || []
   if (event.applicationsRequired && application) {
     inputData.basic = { name: application.name, email: application.email, type: application.type }
     if (application.type === 'group' && application.district) {
@@ -49,5 +50,5 @@ function BookEventComponent() {
     inputData.basic = { name: user.name, email: user.email }
   }
 
-  return <BookingForm mode="create" event={event} inputData={inputData} mutation={createBookingMuation()} />
+  return <BookingForm mode="create" event={event} inputData={inputData} mutation={createBookingMuation()} payments={fees} />
 }

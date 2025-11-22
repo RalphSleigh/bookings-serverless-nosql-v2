@@ -43,7 +43,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
 
   const appendFn = () => {
     const newPerson = defaultPersonData(user, event)
-    append(newPerson as TPerson, {focusName: `people.${fields.length}.basic.name`})
+    append(newPerson as TPerson, { focusName: `people.${fields.length}.basic.name` })
   }
 
   return (
@@ -153,28 +153,46 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           <Controller
             control={control}
             name={`people.${index}.basic.dob`}
-            render={(props) => (
-              <TextInput
-                required
-                autoComplete={`section-person-${index} dob`}
-                id={`person-dob-${index}`}
-                data-form-type="other"
-                label="Date of Birth"
-                /* {...register(`people.${index}.basic.dob` as const)} */
-                {...e(`people.${index}.basic.dob`)}
-                type="date"
-                onChange={(e) => props.field.onChange(dayjs(e.target.value).toISOString())}
-                value={props.field.value ? dayjs(props.field.value).format('YYYY-MM-DD') : ''}
-                onBlur={props.field.onBlur}
-                ref={props.field.ref}
-              />
+            render={
+              (props) => {
+                console.log('value', props.field.value)
+                //const formatted = props.field.value.split('T')[0]
+                //console.log('formatted', formatted)
+                return (
+                  <TextInput
+                    required
+                    autoComplete={`section-person-${index} dob`}
+                    id={`person-dob-${index}`}
+                    data-form-type="other"
+                    label="Date of Birth"
+                    /* {...register(`people.${index}.basic.dob` as const)} */
+                    {...e(`people.${index}.basic.dob`)}
+                    type="date"
+                    onChange={(e) => {
+                      /*                   props.field.onChange(e.target.value)
+                  return */
+                      /* console.log('event', e.target.value)
+                      const parsed = new Date(e.target.value)
+                      console.log("Setting parsed date", parsed, parsed.toISOString())
+                      props.field.onChange(parsed.toISOString())
+                      return
+                      parsed.isValid() ? props.field.onChange(parsed.toISOString()) :  */
+                      props.field.onChange(e.target.value)
+                    }}
+                    value={props.field.value}
+                    /* value={props.field.value ? dayjs(props.field.value).format('YYYY-MM-DD') : ''} */
+                    onBlur={props.field.onBlur}
+                    ref={props.field.ref}
+                  />
+                )
+              }
               /*               <ReactDatePicker
                 className="input"
                 placeholderText="Select date"
                 onChange={(e) => props.onChange(e)}
                 selected={props.value}
               /> */
-            )}
+            }
           />
           {/* <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
            */}{' '}

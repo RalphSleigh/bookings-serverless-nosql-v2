@@ -29,6 +29,8 @@ function EditBookingComponent() {
   const event = useEvent()
   const booking = bookingsQuery.data.bookings.find((booking) => booking.eventId === event.eventId && booking.userId === user.userId)
 
+  const fees = bookingsQuery.data?.fees.filter((f) => f.eventId === event.eventId && f.userId === user.userId) || []
+
   if (!event || !booking || !permission.can('update', subject('eventBooking', { event, booking }))) {
     notifications.show({
       title: 'Error',
@@ -37,5 +39,5 @@ function EditBookingComponent() {
     })
     return <Navigate to="/" />
   }
-  return <BookingForm mode={booking.cancelled ? 'rebook' : 'edit'} event={event} inputData={booking} mutation={updateBookingMuation()} />
+  return <BookingForm mode={booking.cancelled ? 'rebook' : 'edit'} event={event} inputData={booking} mutation={updateBookingMuation()} payments={fees} />
 }

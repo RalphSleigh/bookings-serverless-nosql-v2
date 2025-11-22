@@ -524,7 +524,7 @@ const getPersonFromRow = (
   try {
     if (typeof row[2] !== 'number') throw 'Invalid date'
     const dateObj = ValueToDate(row[index('Date of Birth')])
-    dob = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString()
+    dob = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split('T')[0]
   } catch (e) {}
 
   const result: Partial<TPerson<TEvent<TEventLargeKP, TEventVCampConsents, TEventFreeChoiceAttendance>>> = {

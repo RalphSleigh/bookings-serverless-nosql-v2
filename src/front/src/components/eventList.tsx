@@ -17,6 +17,7 @@ import { getEventsQueryOptions } from '../queries/getEvents.js'
 import { getUserBookingsQueryOptions } from '../queries/geUserBookings.js'
 import { CustomLink, toLocalDate } from '../utils.js'
 import { CustomButtonLink } from './custom-inputs/customLinkButton.js'
+import { TUser } from '../../../shared/schemas/user.js'
 
 dayjs.extend(AdvancedFormat)
 
@@ -216,6 +217,8 @@ function BookingButton({ event, booking, application }: { event: TEvent; booking
 }
 
 const YourBooking = ({ event, booking, fees }: { event: TEvent; booking: TBooking; fees: TFee[] }) => {
+  const context = useRouteContext({ from: '__root__' })
+  const user = context.auth.user as TUser
   const feeStructure = getFeeType(event)
 
   const ageGroupFilter = ageGroupFromPerson(event)
@@ -251,7 +254,7 @@ const YourBooking = ({ event, booking, fees }: { event: TEvent; booking: TBookin
       <Title order={5} mt={8}>
         Money
       </Title>
-      <feeStructure.EventListDisplayElement event={event} booking={booking} fees={fees} />
+      <feeStructure.EventListDisplayElement event={event} booking={booking} user={user} fees={fees} />
     </>
   )
 }

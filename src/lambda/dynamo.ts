@@ -219,6 +219,9 @@ export const DBEvent = new Entity(
               },
             },
           },
+          price: {
+            type: 'number',
+          },
         },
       },
       kp: {

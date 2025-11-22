@@ -1,6 +1,6 @@
 import { subject } from '@casl/ability'
 
-import { FeeSchema, TFee } from '../../../../shared/schemas/fees'
+import { FeeForCreateSchema, TFee } from '../../../../shared/schemas/fees'
 import { currency } from '../../../../shared/util'
 import { enqueueAsyncTask } from '../../../asyncTasks/asyncTaskQueuer'
 import { DB, DBBooking, DBFee, DBRole, DBUser } from '../../../dynamo'
@@ -14,7 +14,7 @@ export const createFeeItem = HandlerWrapperLoggedIn<{}, TCreateFeeItemData>(
   (req, res) => ['createFee', subject('eventId', { eventId: req.body.fee.eventId })],
   async (req, res) => {
     try {
-      const validatedFee = FeeSchema.parse({ ...req.body.fee })
+      const validatedFee = FeeForCreateSchema.parse({ ...req.body.fee })
       await DBFee.create(validatedFee).go()
 
       const booking = await DBBooking.get({

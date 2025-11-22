@@ -29,6 +29,7 @@ import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { MemoValidationErrors } from './validation.js'
+import { TFee } from '../../../../shared/schemas/fees.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -37,9 +38,10 @@ type BookingFormProps = {
   event: TEvent
   inputData: DefaultValues<TBooking> & { userId: string; eventId: string }
   mutation: UseMutationResult<any, any, any, any>
+  payments: TFee[]
 }
 
-export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData, mutation }) => {
+export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData, mutation, payments }) => {
   // export function BookingForm({ data, originalData, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, originalData: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: (notify) => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
   const { user } = useRouteContext({ from: '/_user' })
   const readOnly = mode === 'view'
@@ -116,10 +118,10 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               <PeopleForm event={event} userId={inputData.userId} />
               {event.bigCampMode && <CampingFormSection />}
               <OtherQuestionsForm />
-              <Title size="h4" order={2} mt={8}>
+              <Title size="h4" order={2} mt={16}>
                 Pricing
               </Title>
-              <fees.BookingFormDisplayElement event={event} />
+              <fees.BookingFormDisplayElement event={event} user={user} fees={payments} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
               {itemToDisplay}
               <Flex gap={8} mt={16}>
