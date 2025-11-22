@@ -40,12 +40,17 @@ import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { userMiddleware } from './middleware/user'
 import { am_in_lambda } from './utils'
+import { redirectToStripe } from './endpoints/booking/redirectToStripe'
+import { stripeWebhookHandler } from './endpoints/stripe'
 
 export const router = express.Router()
 export const app = express()
 
 router.use(loggerMiddleware)
-router.use(express.json())
+router.use(express.json({verify(req, res, buf, encoding) {
+  //@ts-expect-error
+  req.rawBody = buf
+},}))
 router.use(cookieParser())
 router.use(configMiddleware)
 router.use(userMiddleware)
@@ -76,6 +81,7 @@ router.get('/event/:eventId/booking/:userId/sheet', getBookingHasSheet)
 router.post('/event/:eventId/booking/:userId/sheet', createSheetForBookingEndpoint)
 router.get('/event/:eventId/booking/:userId/sheet/data', getDataFromSheetEndpoint)
 router.delete('/event/:eventId/booking/:userId', cancelBooking)
+router.get('/event/:eventId/booking/redirectToStripe', redirectToStripe)
 
 router.post('/event/:eventId/application/create', createApplicationEndpoint)
 
@@ -91,6 +97,8 @@ router.get('/event/:eventId/manage/applications', getEventApplications)
 router.post('/event/:eventId/manage/application/:userId/approve', approveApplicationEndpoint)
 router.post('/event/:eventId/manage/application/:userId/decline', declineApplicationEndpoint)
 router.get('/event/:eventId/manage/bookingHistory/:userId', getEventBookingHistory)
+
+router.post('/stripe/webhook', stripeWebhookHandler)
 
 const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   const message = {

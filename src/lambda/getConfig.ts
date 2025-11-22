@@ -18,6 +18,8 @@ export type ConfigType = {
   EMAIL_ENABLED: boolean,
   DISCORD_ENABLED: boolean,
   DISCORD_WEBHOOK_URL: string,
+  STRIPE_SECRET_KEY: string,
+  STRIPE_WEBHOOK_SECRET: string,
 }
 
 let configData: ConfigType

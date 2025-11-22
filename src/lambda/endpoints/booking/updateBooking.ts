@@ -90,22 +90,22 @@ export const updateBooking = HandlerWrapper(
         }
         await DBPersonHistory.create(personHistoryItem).go()
       }
+    }
 
-      for (const person of existingBooking.people) {
-        if (!newPeopleIds.has(person.personId)) {
-          const { personId, userId, eventId, createdAt, updatedAt, ...personUpdateData } = person
-          const newPerson = await DBPerson.patch(person)
-            .set({ ...personUpdateData, cancelled: true })
-            .go({ response: 'all_new' })
-          const personHistoryItem: EntityIdentifiers<typeof DBPersonHistory> = {
-            eventId: event.eventId,
-            userId: user.userId,
-            personId: newPerson.data.personId,
-          }
-          await DBPersonHistory.update(personHistoryItem)
-            .append({ versions: [newPerson.data] })
-            .go()
+    for (const person of existingBooking.people) {
+      if (!newPeopleIds.has(person.personId)) {
+        const { personId, userId, eventId, createdAt, updatedAt, ...personUpdateData } = person
+        const newPerson = await DBPerson.patch(person)
+          .set({ ...personUpdateData, cancelled: true })
+          .go({ response: 'all_new' })
+        const personHistoryItem: EntityIdentifiers<typeof DBPersonHistory> = {
+          eventId: event.eventId,
+          userId: user.userId,
+          personId: newPerson.data.personId,
         }
+        await DBPersonHistory.update(personHistoryItem)
+          .append({ versions: [newPerson.data] })
+          .go()
       }
     }
 

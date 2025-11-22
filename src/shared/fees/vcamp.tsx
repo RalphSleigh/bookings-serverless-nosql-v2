@@ -1,7 +1,9 @@
-import { Grid, Paper, Skeleton, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
-import { useState } from 'react'
+import { Button, Grid, Group, Paper, Skeleton, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
+import { envQueryOptions } from '../../front/src/queries/env'
 import { WatchDebounce } from '../../front/src/utils'
 import { AttendanceStructureValues } from '../attendance/attendance'
 import { PartialBookingType, TBooking } from '../schemas/booking'
@@ -127,15 +129,15 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Td>
+            <Table.Th>
               <Text fw={700}>Item</Text>
-            </Table.Td>
-            <Table.Td>
+            </Table.Th>
+            <Table.Th>
               <Text fw={700}>Fee</Text>
-            </Table.Td>
-            <Table.Td>
+            </Table.Th>
+            <Table.Th>
               <Text fw={700}>Paid</Text>
-            </Table.Td>
+            </Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -177,6 +179,7 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
           <Text>
             Please use the reference <b>{this.getPaymentReference({ userId: user.userId } as TBooking<TEvent<any, any, any, TEventVCampFees>>)}</b> when making a bank transfer
           </Text>
+          <this.StripeElement event={event} booking={booking as TBooking<TEvent<any, any, any, TEventVCampFees>>} fees={fees} />
         </Grid.Col>
       </Grid>
     )
@@ -188,5 +191,24 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
 
   getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventVCampFees>>): string {
     return `VC26-${booking.userId.split('-')[4].slice(0, 6).toUpperCase()}`
+  }
+
+  StripeElement: React.FC<{ event: TEvent<any, any, any, TEventVCampFees>; booking: TBooking<TEvent<any, any, any, TEventVCampFees>>; fees: TFee[] }> = ({ event, booking, fees }) => {
+    if (booking.people.length > 3) return null
+    const outstanding =
+      this.getFeeLines(event, booking).reduce((sum, line) => sum + line.amount, 0) +
+      fees.filter((f) => f.type === 'adjustment').reduce((sum, f) => sum + f.amount, 0) -
+      fees.filter((f) => f.type === 'payment').reduce((sum, f) => sum + f.amount, 0)
+
+    if (outstanding <= 0) return null
+
+    return (
+      <Group>
+        <Text style={{ flex: 1 }}>As you are booking three or fewer people you can pay by card now:</Text>
+        <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} onClick={() => (window.location.href = `/api/event/${event.eventId}/booking/redirectToStripe`)}>
+          Pay by card
+        </Button>
+      </Group>
+    )
   }
 }
