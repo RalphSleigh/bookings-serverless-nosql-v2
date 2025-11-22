@@ -4,10 +4,10 @@ import Stripe from 'stripe'
 import { FeeForCreateSchema, FeeSchema } from '../../shared/schemas/fees'
 import { enqueueAsyncTask } from '../asyncTasks/asyncTaskQueuer'
 import { DBBooking, DBFee } from '../dynamo'
-import { getConfig } from '../getConfig'
+import { ConfigType } from '../getConfig'
 
 export const stripeWebhookHandler: RequestHandler = async (req, res) => {
-  const config = await getConfig()
+  const config = res.locals.config as ConfigType
 
   const stripe = new Stripe(config.STRIPE_SECRET_KEY)
 
