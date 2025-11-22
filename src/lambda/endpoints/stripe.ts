@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import e, { RequestHandler } from 'express'
 import Stripe from 'stripe'
 
 import { FeeForCreateSchema } from '../../shared/schemas/fees'
@@ -7,6 +7,7 @@ import { DBBooking, DBFee } from '../dynamo'
 import { ConfigType } from '../getConfig'
 
 export const stripeWebhookHandler: RequestHandler = async (req, res) => {
+    try {
   const config = res.locals.config as ConfigType
 
   const stripe = new Stripe(config.STRIPE_SECRET_KEY)
@@ -19,7 +20,7 @@ export const stripeWebhookHandler: RequestHandler = async (req, res) => {
 
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object
-    if (!paymentIntent.metadata.eventId || !paymentIntent.metadata.userId) return res.status(200)
+    if (!paymentIntent.metadata.eventId || !paymentIntent.metadata.userId) return res.status(200).send()
 
     const booking = await DBBooking.get({ eventId: paymentIntent.metadata.eventId, userId: paymentIntent.metadata.userId }).go()
     if (booking.data) {
@@ -42,5 +43,11 @@ export const stripeWebhookHandler: RequestHandler = async (req, res) => {
       })
     }
   }
-  return res.status(200)
+  return res.status(200).send()
+} catch (error) {
+    console.log(error)
+    res.locals.logger.logToPath('Stripe webhook failed')
+    res.locals.logger.logToPath(error)
+    return res.status(500).send()
+  }
 }
