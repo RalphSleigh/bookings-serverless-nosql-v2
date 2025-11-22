@@ -10,10 +10,6 @@ import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
 import { DB, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
 import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../utils'
 
-export type TCreateBookingData = {
-  booking: TBooking
-}
-
 export const redirectToStripe = HandlerWrapperLoggedIn(
   (req, res) => ['update', subject('eventBooking', { event: res.locals.event, booking: res.locals.booking })],
   async (req, res) => {

@@ -14,6 +14,12 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
   try {
     const event = res.locals.event
     const user = res.locals.user
+
+    if(req.params.splat[0] === 'edit'){
+      next()
+      return
+    }
+
     if (!event || !user) {
       res.status(401).send('Event not Found or User not authenticated')
       return
