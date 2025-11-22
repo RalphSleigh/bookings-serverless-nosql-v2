@@ -25,7 +25,8 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
     if (!booking) {
       next()
     } else {
-      res.locals.booking = { ...booking, people: bookingResult.data.person.filter((p) => p.eventId === booking.eventId) } as TBooking
+      res.locals.booking = { ...booking, people: bookingResult.data.person.filter((p) => p.eventId === booking.eventId && !p.cancelled) } as TBooking
+      res.locals.fees = bookingResult.data.fee.filter((f) => f.eventId === event.eventId)
       next()
     }
   } catch (error) {

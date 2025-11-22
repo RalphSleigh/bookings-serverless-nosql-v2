@@ -36,10 +36,8 @@ const ealingFee = z.object({
 })
 
 const freeFee = z.object({ feeStructure: z.literal('free') })
-const vcampFee = z.object({ feeStructure: z.literal('vcamp'),
-  price: z.number(),
- })
- 
+const vcampFee = z.object({ feeStructure: z.literal('vcamp'), price: z.number() })
+
 const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee, vcampFee])
 
 export type TEventFeesUnion = z.infer<typeof feeOptions>

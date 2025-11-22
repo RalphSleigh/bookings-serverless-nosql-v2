@@ -10,6 +10,7 @@ import { ContextUser, TUser } from '../shared/schemas/user'
 import { DB } from './dynamo'
 import { ConfigType } from './getConfig'
 import { Logger } from './middleware/logger'
+import { TFee } from '../shared/schemas/fees'
 
 export function am_in_lambda(): boolean {
   return process.env.LOCAL_SERVER !== 'true'
@@ -30,6 +31,7 @@ interface BasicLocals {
   event: TEvent
   booking: TBooking
   logger: Logger
+  fees: TFee[]
 }
 
 export const HandlerWrapper: THandlerWrapper<BasicLocals> = (permissionFn, fn) => async (req, res, next) => {
