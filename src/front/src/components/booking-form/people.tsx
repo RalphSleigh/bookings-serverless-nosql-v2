@@ -1,9 +1,9 @@
-import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Paper, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Input, Paper, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import React, { useMemo, useState } from 'react'
-import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
+import { Controller, DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
 import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod/v4'
 
@@ -43,7 +43,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
 
   const appendFn = () => {
     const newPerson = defaultPersonData(user, event)
-    append(newPerson as TPerson)
+    append(newPerson as TPerson, { focusName: `people.${fields.length}.basic.name` })
   }
 
   return (
@@ -102,7 +102,7 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: num
 
 const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEvent; index: number; remove: UseFieldArrayRemove; setCollapsed: (collapsed: boolean) => void }) => {
   const personId = useWatch<PartialBookingType, `people.${number}.personId`>({ name: `people.${index}.personId` })
-  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { register, formState, control } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
   const e = errorProps(errors)
@@ -150,7 +150,52 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           />
         </Grid.Col>
         <Grid.Col span={4}>
-          <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
+          <Controller
+            control={control}
+            name={`people.${index}.basic.dob`}
+            render={
+              (props) => {
+                console.log('value', props.field.value)
+                //const formatted = props.field.value.split('T')[0]
+                //console.log('formatted', formatted)
+                return (
+                  <TextInput
+                    required
+                    autoComplete={`section-person-${index} dob`}
+                    id={`person-dob-${index}`}
+                    data-form-type="other"
+                    label="Date of Birth"
+                    /* {...register(`people.${index}.basic.dob` as const)} */
+                    {...e(`people.${index}.basic.dob`)}
+                    type="date"
+                    onChange={(e) => {
+                      /*                   props.field.onChange(e.target.value)
+                  return */
+                      /* console.log('event', e.target.value)
+                      const parsed = new Date(e.target.value)
+                      console.log("Setting parsed date", parsed, parsed.toISOString())
+                      props.field.onChange(parsed.toISOString())
+                      return
+                      parsed.isValid() ? props.field.onChange(parsed.toISOString()) :  */
+                      props.field.onChange(e.target.value)
+                    }}
+                    value={props.field.value}
+                    /* value={props.field.value ? dayjs(props.field.value).format('YYYY-MM-DD') : ''} */
+                    onBlur={props.field.onBlur}
+                    ref={props.field.ref}
+                  />
+                )
+              }
+              /*               <ReactDatePicker
+                className="input"
+                placeholderText="Select date"
+                onChange={(e) => props.onChange(e)}
+                selected={props.value}
+              /> */
+            }
+          />
+          {/* <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
+           */}{' '}
         </Grid.Col>
         {email}
         <kp.PersonFormSection index={index} />

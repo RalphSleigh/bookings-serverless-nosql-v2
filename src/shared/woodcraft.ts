@@ -62,3 +62,8 @@ export const ageGroupFromPerson =
     const ageGroupFilter = ageGroups.find((ag) => ag.filter(age))
     return ageGroupFilter ? ageGroupFilter.construct(age) : ageGroups[ageGroups.length - 1].construct(age)
   }
+
+  export const campersInAgeGroup = (event: TEvent) => (ageGroup: AgeGroupFilter) => (person: TPerson): boolean => {
+    const age = dayjs(event.endDate).diff(dayjs(person.basic.dob), 'year')
+    return ageGroup.filter(age)
+  }

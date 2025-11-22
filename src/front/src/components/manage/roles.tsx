@@ -148,6 +148,7 @@ const UserSelect = ({}) => {
         userCombobox.closeDropdown()
       }}
       store={userCombobox}
+      withinPortal={true}
     >
       <Combobox.Target>
         {selectedUser ? (
@@ -173,7 +174,7 @@ const UserSelect = ({}) => {
         )}
       </Combobox.Target>
       <Combobox.Dropdown>
-        <Combobox.Options>{items}</Combobox.Options>
+        <Combobox.Options mah={"70vh"} style={{ overflowY: 'auto' }}>{items}</Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
   )

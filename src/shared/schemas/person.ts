@@ -42,12 +42,12 @@ export const PersonSchema = (event: TEvent) => {
   const basic = event.allParticipantEmails
     ? z.object({
         name: z.string().nonempty(),
-        dob: z.iso.datetime(),
+        dob: z.iso.datetime({error: 'Please enter a valid date of birth'}).or(z.iso.date({error: 'Please enter a valid date of birth'})),
         email: z.email(),
       })
     : z.object({
         name: z.string().nonempty(),
-        dob: z.iso.datetime(),
+        dob: z.iso.datetime({error: 'Please enter a valid date of birth'}).or(z.iso.date({error: 'Please enter a valid date of birth'})),
       })
   return z
     .object({

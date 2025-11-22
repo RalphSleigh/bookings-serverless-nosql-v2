@@ -23,6 +23,8 @@ const adjustment = z.object({
 
 export const FeeSchema = z.discriminatedUnion('type', [payment, adjustment])
 export const FeeSchemaForForm = z.union([payment.omit({ feeId: true, createdAt: true }).partial({type:true}), adjustment.omit({ feeId: true, createdAt: true }).partial({type:true})])
+export const FeeForCreateSchema = z.discriminatedUnion('type', [payment.omit({ feeId: true, createdAt: true }), adjustment.omit({ feeId: true, createdAt: true })])
+
 
 export type TFee = z.infer<typeof FeeSchema>
 export type TFeeForForm = z.infer<typeof FeeSchemaForForm>
