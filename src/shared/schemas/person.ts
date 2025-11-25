@@ -39,16 +39,19 @@ const ConsentVCamp = z.object({ photo: z.enum(['Yes', 'No']), rse: z.enum(['Yes'
 
 export const PersonSchema = (event: TEvent) => {
   const startDate = dayjs(event.startDate)
-  const basic = event.allParticipantEmails
+  let basic = event.allParticipantEmails
     ? z.object({
         name: z.string().nonempty(),
-        dob: z.iso.datetime({error: 'Please enter a valid date of birth'}).or(z.iso.date({error: 'Please enter a valid date of birth'})),
+        dob: z.iso.datetime({ error: 'Please enter a valid date of birth' }).or(z.iso.date({ error: 'Please enter a valid date of birth' })),
         email: z.email(),
       })
     : z.object({
         name: z.string().nonempty(),
-        dob: z.iso.datetime({error: 'Please enter a valid date of birth'}).or(z.iso.date({error: 'Please enter a valid date of birth'})),
+        dob: z.iso.datetime({ error: 'Please enter a valid date of birth' }).or(z.iso.date({ error: 'Please enter a valid date of birth' })),
       })
+
+  if (event.fee.feeStructure === 'vcamp') basic = basic.extend({ role: z.enum(['participant', 'volunteer']) })
+
   return z
     .object({
       personId: z.string(),
@@ -85,6 +88,7 @@ export const PersonSchemaForType = z.object({
     name: z.string().nonempty(),
     dob: z.iso.datetime(),
     email: z.email().optional(),
+    role: z.enum(['participant', 'volunteer']).optional(),
   }),
   attendance: AttendanceWhole.or(AttendanceFreeChoice),
   kp: KPBasic.or(KPLarge),

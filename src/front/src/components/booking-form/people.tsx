@@ -1,8 +1,8 @@
-import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Input, Paper, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Group, Input, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Controller, DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
 import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod/v4'
@@ -17,6 +17,7 @@ import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/s
 import { errorProps, useEvent } from '../../utils.js'
 import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
 import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
+import { CustomRadioGroup } from '../custom-inputs/customRadioGroup.js'
 import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
 import { defaultPersonData } from './defaults.js'
@@ -198,6 +199,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
            */}{' '}
         </Grid.Col>
         {email}
+        {event.fee.feeStructure === 'vcamp' ? <PersonRoleForm index={index} /> : null}
         <kp.PersonFormSection index={index} />
         <HealthElement index={index} />
 
@@ -300,6 +302,41 @@ const FirstAid: React.FC<{ index: number }> = ({ index }) => {
   if (!isAdult) return null
 
   return <CustomCheckbox mt={16} label="First Aider (18+ only)" id={`person-firstaid-${index}`} name={`people.${index}.firstAid`} m={4} />
+}
+
+const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
+  const dob = useWatch<z.infer<typeof BookingSchemaForType>>({
+    name: `people.${index}.basic.dob`,
+  })
+
+  const role = useWatch<z.infer<typeof BookingSchemaForType>>({
+    name: `people.${index}.basic.role`,
+  })
+
+  const event = useEvent()
+
+  const { setValue } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+
+  useEffect(() => {
+    if (typeof dob !== 'string') return
+    const DoBdate = dayjs(dob)
+    const EventStartDate = dayjs(event.startDate)
+
+    const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
+    if (!role) setValue(`people.${index}.basic.role`, over16 ? 'volunteer' : 'participant')
+  }, [dob, event, role, setValue, index])
+
+  return (
+    <CustomRadioGroup<TBooking<TEvent>> mt={16} name={`people.${index}.basic.role`} required>
+      <Group mt={8}>
+        <Input.Label required>
+          <b>Role on camp:</b> Is this person attending as a participant or volunteer?
+        </Input.Label>
+        <Radio value={'participant'} label="Participant" />
+        <Radio value={'volunteer'} label="Volunteer" />
+      </Group>
+    </CustomRadioGroup>
+  )
 }
 
 /* const COLLAPSE_DEFAULT_THRESHOLD = 20
