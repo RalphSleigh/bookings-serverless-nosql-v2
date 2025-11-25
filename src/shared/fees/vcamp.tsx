@@ -46,27 +46,29 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
 
     booking.people?.forEach((p) => {
       if (!p || !p.attendance?.bitMask || !p.basic?.role) return
-      const nights = bitCount32(p.attendance.bitMask || 0)
-      peopleTotals[nights - 1][p?.basic?.role] += 1
+      const nightCount = bitCount32(p.attendance.bitMask || 0)
+      if (nightCount > 0 && nightCount <= peopleTotals.length) {
+        peopleTotals[nightCount - 1][p?.basic?.role] += 1
+      }
     })
 
-    const lines = peopleTotals.reduce((lines: FeeLine[], tp, index) => {
-      if(tp.participant > 0) {
+    const finalLines = peopleTotals.reduce((lines: FeeLine[], tp, index) => {
+      if (tp.participant > 0) {
         lines.push({
           label: `${tp.participant} ${tp.participant > 1 ? 'participants' : 'participant'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.participant.a + event.fee.participant.b * (index + 1))} ${tp.participant > 1 ? 'each' : ''}`,
           amount: (event.fee.participant.a + event.fee.participant.b * (index + 1)) * tp.participant,
         })
       }
-      if(tp.volunteer > 0) {
+      if (tp.volunteer > 0) {
         lines.push({
           label: `${tp.volunteer} ${tp.volunteer > 1 ? 'volunteers' : 'volunteer'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.volunteer.a + event.fee.volunteer.b * (index + 1))} ${tp.volunteer > 1 ? 'each' : ''}`,
           amount: (event.fee.volunteer.a + event.fee.volunteer.b * (index + 1)) * tp.volunteer,
         })
       }
       return lines
-    },[])
+    }, [])
 
-    return lines
+    return finalLines
   }
 
   BookingFormDisplayElementContents: React.FC<{ people: PartialBookingType['people']; event: TEvent<any, any, any, TEventVCampFees>; user: TUser; fees: TFee[] }> = ({ people, event, user, fees }) => {
@@ -82,9 +84,15 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
     return (
       <Grid>
         <Grid.Col>
-          <Text mt={8}><b>Camp fees:</b></Text>
-          <Text mt={4}>Participants: {currency(event.fee.participant.a)} + {currency(event.fee.participant.b)} per night</Text>
-          <Text mt={4}>Volunteers: {currency(event.fee.volunteer.a)} + {currency(event.fee.volunteer.b)} per night</Text>
+          <Text mt={8}>
+            <b>Camp fees:</b>
+          </Text>
+          <Text mt={4}>
+            Participants: {currency(event.fee.participant.a)} + {currency(event.fee.participant.b)} per night
+          </Text>
+          <Text mt={4}>
+            Volunteers: {currency(event.fee.volunteer.a)} + {currency(event.fee.volunteer.b)} per night
+          </Text>
           <this.FeeTable event={event} booking={{ people }} fees={fees} />
           {outstanding !== 0 && paid !== 0 && (
             <Text fw={700} color={outstanding > 0 ? 'red' : 'green'}>
