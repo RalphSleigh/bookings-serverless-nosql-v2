@@ -562,6 +562,7 @@ const PersonAttributes = {
       name: { type: 'string', required: true },
       dob: { type: 'string', required: true },
       email: { type: 'string' },
+      role: { type: ['volunteer', 'participant'] as const },
     },
   },
   attendance: {
