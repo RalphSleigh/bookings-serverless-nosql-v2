@@ -549,7 +549,7 @@ const getPersonFromRow = (
       name: row[index('Name')],
       email: row[index('Email')],
       dob: dob,
-      role: row[index('Role')].toLowerCase(),
+      role: (row[index('Role')] || '').toLowerCase(),
     },
     /*         attendance: {
         }, */

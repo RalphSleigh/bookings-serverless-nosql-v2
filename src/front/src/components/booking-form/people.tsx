@@ -318,13 +318,13 @@ const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
   const { setValue } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   useEffect(() => {
-    if(typeof dob !== 'string') return
+    if (typeof dob !== 'string') return
     const DoBdate = dayjs(dob)
     const EventStartDate = dayjs(event.startDate)
 
     const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
     if (!role) setValue(`people.${index}.basic.role`, over16 ? 'volunteer' : 'participant')
-  }, [dob, event])
+  }, [dob, event, role, setValue, index])
 
   return (
     <CustomRadioGroup<TBooking<TEvent>> mt={16} name={`people.${index}.basic.role`} required>
