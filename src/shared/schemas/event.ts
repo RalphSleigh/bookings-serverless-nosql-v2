@@ -36,7 +36,7 @@ const ealingFee = z.object({
 })
 
 const freeFee = z.object({ feeStructure: z.literal('free') })
-const vcampFee = z.object({ feeStructure: z.literal('vcamp'), price: z.number() })
+const vcampFee = z.object({ feeStructure: z.literal('vcamp'), participant: z.object({ a: z.number(), b: z.number() }), volunteer: z.object({ a: z.number(), b: z.number() }) })
 
 const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee, vcampFee])
 
