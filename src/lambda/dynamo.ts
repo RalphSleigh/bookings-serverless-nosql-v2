@@ -219,8 +219,31 @@ export const DBEvent = new Entity(
               },
             },
           },
-          price: {
-            type: 'number',
+          participant: {
+            type: 'map',
+            properties: {
+              a: {
+                type: 'number',
+                required: true,
+              },
+              b: {
+                type: 'number',
+                required: true,
+              },
+            },
+          },
+          volunteer: {
+            type: 'map',
+            properties: {
+              a: {
+                type: 'number',
+                required: true,
+              },
+              b: {
+                type: 'number',
+                required: true,
+              },
+            },
           },
         },
       },

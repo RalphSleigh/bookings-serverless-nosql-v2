@@ -5,13 +5,14 @@ import { useFormContext } from 'react-hook-form'
 
 import { envQueryOptions } from '../../front/src/queries/env'
 import { WatchDebounce } from '../../front/src/utils'
-import { AttendanceStructureValues } from '../attendance/attendance'
+import { AttendanceStructureValues, getAttendanceType } from '../attendance/attendance'
+import { bitCount32, FreeChoiceAttendance } from '../attendance/freechoice'
 import { PartialBookingType, TBooking } from '../schemas/booking'
 import { TEvent, TEventEalingFees, TEventFeesUnion, TEventFreeFees, TEventVCampFees } from '../schemas/event'
 import { TFee } from '../schemas/fees'
 import { TUser } from '../schemas/user'
 import { currency } from '../util'
-import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
+import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
 
 export class VCampFees implements FeeStructure<TEventVCampFees> {
   typeName: 'vcamp' = 'vcamp'
@@ -28,7 +29,10 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
         </Title>
         <Grid>
           <Grid.Col span={12}>
-            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Price" {...register('fee.price', { valueAsNumber: true })} />
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Participant A" {...register('fee.participant.a', { valueAsNumber: true })} />
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Participant B" {...register('fee.participant.b', { valueAsNumber: true })} />
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Volunteer A" {...register('fee.volunteer.a', { valueAsNumber: true })} />
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Volunteer B" {...register('fee.volunteer.b', { valueAsNumber: true })} />
           </Grid.Col>
         </Grid>
       </>
@@ -36,12 +40,33 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
   }
 
   getFeeLines: GetFeeLineFunction<TEventVCampFees> = (event: TEvent<any, any, any, TEventVCampFees>, booking: PartialBookingType) => {
-    return [
-      {
-        label: `VCamp fee (£${event.fee.price} per person)`,
-        amount: (event.fee.price || 0) * ((booking.people && booking.people.length) || 0),
-      },
-    ]
+    const attendance = getAttendanceType(event) as FreeChoiceAttendance
+    const nights = attendance.getNightsFromEvent(event)
+    const peopleTotals = nights.map(() => ({ participant: 0, volunteer: 0 }))
+
+    booking.people?.forEach((p) => {
+      if (!p || !p.attendance?.bitMask || !p.basic?.role) return
+      const nights = bitCount32(p.attendance.bitMask || 0)
+      peopleTotals[nights - 1][p?.basic?.role] += 1
+    })
+
+    const lines = peopleTotals.reduce((lines: FeeLine[], tp, index) => {
+      if(tp.participant > 0) {
+        lines.push({
+          label: `${tp.participant} ${tp.participant > 1 ? 'participants' : 'participant'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.participant.a + event.fee.participant.b * (index + 1))} ${tp.participant > 1 ? 'each' : ''}`,
+          amount: (event.fee.participant.a + event.fee.participant.b * (index + 1)) * tp.participant,
+        })
+      }
+      if(tp.volunteer > 0) {
+        lines.push({
+          label: `${tp.volunteer} ${tp.volunteer > 1 ? 'volunteers' : 'volunteer'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.volunteer.a + event.fee.volunteer.b * (index + 1))} ${tp.volunteer > 1 ? 'each' : ''}`,
+          amount: (event.fee.volunteer.a + event.fee.volunteer.b * (index + 1)) * tp.volunteer,
+        })
+      }
+      return lines
+    },[])
+
+    return lines
   }
 
   BookingFormDisplayElementContents: React.FC<{ people: PartialBookingType['people']; event: TEvent<any, any, any, TEventVCampFees>; user: TUser; fees: TFee[] }> = ({ people, event, user, fees }) => {
@@ -57,7 +82,9 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
     return (
       <Grid>
         <Grid.Col>
-          <Text mt={8}>This is how much it costs</Text>
+          <Text mt={8}><b>Camp fees:</b></Text>
+          <Text mt={4}>Participants: {currency(event.fee.participant.a)} + {currency(event.fee.participant.b)} per night</Text>
+          <Text mt={4}>Volunteers: {currency(event.fee.volunteer.a)} + {currency(event.fee.volunteer.b)} per night</Text>
           <this.FeeTable event={event} booking={{ people }} fees={fees} />
           {outstanding !== 0 && paid !== 0 && (
             <Text fw={700} color={outstanding > 0 ? 'red' : 'green'}>
