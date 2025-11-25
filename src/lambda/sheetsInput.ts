@@ -49,7 +49,7 @@ const getHeadersFromEvent = (event: TEvent) => {
   const nightHeaders = nights.map((night) => `${night.start.format('DD/MM')} - ${night.end.format('DD/MM')}`)
 
   return [
-    ...['Name', 'Email', 'Date of Birth'],
+    ...['Name', 'Email', 'Date of Birth', 'Role'],
     ...nightHeaders,
     ...[
       'Dietary Requirements',
@@ -279,8 +279,22 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
           range: {
             sheetId: 0,
             startRowIndex: HEADER_ROW_INDEX + 1,
-            startColumnIndex: index('Date of Birth') + 1,
-            endColumnIndex: index('Date of Birth') + 1 + nights.length,
+            startColumnIndex: index('Role'),
+            endColumnIndex: index('Role') + 1,
+          },
+          cell: {
+            dataValidation: { condition: { type: 'ONE_OF_LIST', values: [{ userEnteredValue: 'Volunteer' }, { userEnteredValue: 'Participant' }] }, showCustomUi: true },
+          },
+          fields: ['dataValidation', 'userEnteredValue.stringValue'].join(', '),
+        },
+      },
+      {
+        repeatCell: {
+          range: {
+            sheetId: 0,
+            startRowIndex: HEADER_ROW_INDEX + 1,
+            startColumnIndex: index('Role') + 1,
+            endColumnIndex: index('Role') + 1 + nights.length,
           },
           cell: {
             dataValidation: { condition: { type: 'BOOLEAN', values: [{ userEnteredValue: 'Yes' }, { userEnteredValue: 'No' }] }, showCustomUi: true },
@@ -535,6 +549,7 @@ const getPersonFromRow = (
       name: row[index('Name')],
       email: row[index('Email')],
       dob: dob,
+      role: row[index('Role')].toLowerCase(),
     },
     /*         attendance: {
         }, */
