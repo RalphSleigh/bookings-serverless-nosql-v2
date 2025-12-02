@@ -5,7 +5,7 @@ import { UserResponseType } from '../../../lambda/endpoints/user/getUser'
 export const userQueryOptions = queryOptions({
     queryKey: ['user'],
     queryFn: () => fetchUser(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 100, // 100 ms
     refetchOnWindowFocus: true,
     refetchInterval: 1000 * 60,
   })
