@@ -31,8 +31,6 @@ export function EventList() {
   const fees = bookingsQuery.data.fees
   const applications = bookingsQuery.data.applications
 
-  console.log('bookings query state', bookingsQuery.isStale)
-
   const { auth, permission } = useRouteContext({ from: '__root__' })
   const user = auth.loggedIn ? (auth.user as TUser) : undefined
 
