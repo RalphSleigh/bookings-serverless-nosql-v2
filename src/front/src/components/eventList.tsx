@@ -1,6 +1,6 @@
 import { subject } from '@casl/ability'
 import { Button, Container, Paper, Table, Text, Title } from '@mantine/core'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query'
 import { LinkProps, useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
@@ -11,26 +11,28 @@ import { TApplication } from '../../../shared/schemas/application.js'
 import { TBooking } from '../../../shared/schemas/booking.js'
 import { TEvent } from '../../../shared/schemas/event.js'
 import { TFee } from '../../../shared/schemas/fees.js'
+import { TUser } from '../../../shared/schemas/user.js'
 import { ageGroupFromPerson } from '../../../shared/woodcraft.js'
 import { Can } from '../permissionContext'
 import { getEventsQueryOptions } from '../queries/getEvents.js'
 import { getUserBookingsQueryOptions } from '../queries/geUserBookings.js'
 import { CustomLink, toLocalDate } from '../utils.js'
 import { CustomButtonLink } from './custom-inputs/customLinkButton.js'
-import { TUser } from '../../../shared/schemas/user.js'
 
 dayjs.extend(AdvancedFormat)
 
 export function EventList() {
-  const eventsQuery = useSuspenseQuery(getEventsQueryOptions)
-  const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
+  //const eventsQuery = useSuspenseQuery(getEventsQueryOptions)
+  //const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
+  const [eventsQuery, bookingsQuery] = useSuspenseQueries({ queries: [getEventsQueryOptions, getUserBookingsQueryOptions] })
 
   const events = eventsQuery.data.events
   const bookings = bookingsQuery.data.bookings
   const fees = bookingsQuery.data.fees
   const applications = bookingsQuery.data.applications
 
-  const { permission } = useRouteContext({ from: '__root__' })
+  const { auth, permission } = useRouteContext({ from: '__root__' })
+  const user = auth.loggedIn ? (auth.user as TUser) : undefined
 
   const futureEvents = events.filter((e) => dayjs(e.endDate).isAfter(new Date()))
   const pastEventsCanManage = events.filter((e) => dayjs(e.endDate).isBefore(new Date()) && permission.can('getBackend', subject('eventId', { eventId: e.eventId })))
@@ -39,6 +41,7 @@ export function EventList() {
     .sort((a, b) => (a.startDate < b.startDate ? -1 : a.startDate > b.startDate ? 1 : 0))
     .map((e) => (
       <EventCard
+        user={user}
         event={e}
         key={e.eventId}
         booking={bookings.find((b) => b.eventId === e.eventId)}
@@ -52,6 +55,7 @@ export function EventList() {
       <EventCard
         event={e}
         key={e.eventId}
+        user={user}
         booking={bookings.find((b) => b.eventId === e.eventId)}
         fees={fees.filter((f) => f.eventId === e.eventId)}
         application={applications.find((a) => a.eventId === e.eventId)}
@@ -73,7 +77,7 @@ export function EventList() {
   )
 }
 
-function EventCard({ event, booking, fees, application }: { event: TEvent; booking?: TBooking; fees: TFee[]; application: TApplication | undefined }) {
+function EventCard({ event, booking, fees, application, user }: { event: TEvent; booking?: TBooking; fees: TFee[]; application: TApplication | undefined; user?: TUser }) {
   const startDate = toLocalDate(event.startDate)!
   const endDate = toLocalDate(event.endDate)!
 
@@ -89,7 +93,7 @@ function EventCard({ event, booking, fees, application }: { event: TEvent; booki
         {dayjs(startDate).format(startDataFormat)} - {dayjs(endDate).format('Do MMMM YYYY')}
       </Title>
       {event.description ? <Markdown>{event.description}</Markdown> : null}
-      {booking ? <YourBooking event={event} booking={booking} fees={fees} /> : null}
+      {user && booking ? <YourBooking event={event} booking={booking} fees={fees} /> : null}
       <Text ta="right" mt={8}>
         <Can I="edit" a="event">
           <CustomLink to={`/event/$eventId/edit`} params={{ eventId: event.eventId }}>
@@ -117,7 +121,14 @@ function BookingButton({ event, booking, application }: { event: TEvent; booking
     )
 
   const LoginButton = ({ to, gradFrom, gradTo, children, disabled = false }: LinkProps & { gradFrom: string; gradTo: string; disabled?: boolean; children: React.ReactNode }) => (
-    <CustomButtonLink variant="gradient" gradient={{ from: gradFrom, to: gradTo, deg: 110 }} to={to as `/event/$eventId`} params={{ eventId: event.eventId }} style={{ float: 'right' }} disabled={disabled}>
+    <CustomButtonLink
+      variant="gradient"
+      gradient={{ from: gradFrom, to: gradTo, deg: 110 }}
+      to={to as `/event/$eventId`}
+      params={{ eventId: event.eventId }}
+      style={{ float: 'right' }}
+      disabled={disabled}
+    >
       {children}
     </CustomButtonLink>
   )

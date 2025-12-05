@@ -30,6 +30,7 @@ import { PermissionForm } from './permission.js'
 import { BookingSummary } from './summary.js'
 import { MemoValidationErrors } from './validation.js'
 import { TFee } from '../../../../shared/schemas/fees.js'
+import { EmergencyContactSection } from './emergencyFields.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -117,6 +118,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               {event.bigCampMode && <ExtraContactsForm />}
               <PeopleForm event={event} userId={inputData.userId} />
               {event.bigCampMode && <CampingFormSection />}
+              <EmergencyContactSection />
               <OtherQuestionsForm />
               <Title size="h4" order={2} mt={16}>
                 Pricing

@@ -361,6 +361,8 @@ const BookingAttributes = {
       type: {
         type: ['individual', 'group'] as const,
       },
+      emergencyName: { type: 'string' },
+      emergencyTelephone: { type: 'string' },
     },
   },
   extraContacts: {
