@@ -10,10 +10,14 @@ const basicSmall = z.object({
   name: z.string().nonempty(),
   email: z.email(),
   telephone: z.string().nonempty(),
+  emergencyName: z.string().default(''),
+  emergencyTelephone: z.string().default(''),
 })
 
 const basicBigIndividual = basicSmall.extend({
   district: z.string().optional(),
+  emergencyName: z.string().default(''),
+  emergencyTelephone: z.string().default(''),
 })
 
 const basicBigIndividualWithOrg = basicBigIndividual.extend({
