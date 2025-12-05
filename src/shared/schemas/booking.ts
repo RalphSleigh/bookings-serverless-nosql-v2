@@ -6,15 +6,18 @@ import { PersonSchema, PersonSchemaForType, TPerson, TPersonKPData } from './per
 
 //Basic Information/Contact Details
 
-const basicSmall = z.object({
+const basicAll = z.object({
   name: z.string().nonempty(),
   email: z.email(),
   telephone: z.string().nonempty(),
+})
+
+const basicSmall = basicAll.extend({
   emergencyName: z.string().default(''),
   emergencyTelephone: z.string().default(''),
 })
 
-const basicBigIndividual = basicSmall.extend({
+const basicBigIndividual = basicAll.extend({
   district: z.string().optional(),
   emergencyName: z.string().default(''),
   emergencyTelephone: z.string().default(''),
@@ -24,7 +27,7 @@ const basicBigIndividualWithOrg = basicBigIndividual.extend({
   organisation: z.string().nonempty(),
 })
 
-const basicBigGroup = basicSmall.extend({
+const basicBigGroup = basicAll.extend({
   district: z.string().nonempty(),
 })
 
