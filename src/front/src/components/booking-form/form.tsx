@@ -18,19 +18,20 @@ import { getFeeType } from '../../../../shared/fees/fees.js'
 //import { consent } from "../../../shared/consents/consent.js";
 import { BookingSchema, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
+import { TFee } from '../../../../shared/schemas/fees.js'
 import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
 import { cancelBooking } from '../../mutations/cancelBooking.js'
 import { BasicFieldsBig, BasicFieldsSmall } from './basicFields.js'
 import { CampingFormSection } from './camping.js'
 import { ChangesDisplay } from './changes.js'
+import { EmergencyContactSection } from './emergencyFields.js'
 import { ExtraContactsForm } from './extraContacts.js'
 import { OtherQuestionsForm } from './otherQuestions.js'
 import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
+import { BookingStepper } from './stepper.js'
 import { BookingSummary } from './summary.js'
 import { MemoValidationErrors } from './validation.js'
-import { TFee } from '../../../../shared/schemas/fees.js'
-import { EmergencyContactSection } from './emergencyFields.js'
 
 //const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -86,7 +87,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
     const diff = validationResults.length == 0 ? generateDiscordDiff(originalData, data) : []
  */
 
-  const matches = useMediaQuery('(min-width: 62em)')
+  const shouldDisplaySummary = useMediaQuery('(min-width: 62em)')
+  const shouldDisplayStepper = useMediaQuery('(min-width: 75em)')
 
   const fees = useMemo(() => getFeeType(event), [event])
 
@@ -112,16 +114,21 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid gutter={0}>
-          <Grid.Col span={{ base: 12, md: 9 }}>
+          {shouldDisplayStepper && (
+            <Grid.Col span={{ base: 12, lg: 3 }}>
+              <BookingStepper event={event} schema={schema} checked={checked} />
+            </Grid.Col>
+          )}
+          <Grid.Col span={{ base: 12, md: 9, lg: 6 }}>
             <Paper shadow="md" radius="md" withBorder m={8} p="md">
               <BasicFields event={event} />
+              <EmergencyContactSection />
               {event.bigCampMode && <ExtraContactsForm />}
               <PeopleForm event={event} userId={inputData.userId} />
               {event.bigCampMode && <CampingFormSection />}
-              <EmergencyContactSection />
               <OtherQuestionsForm />
-              <Title size="h4" order={2} mt={16}>
-                Pricing
+              <Title size="h4" order={2} mt={16} id="step-fees">
+                Fees
               </Title>
               <fees.BookingFormDisplayElement event={event} user={user} fees={payments} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
@@ -138,7 +145,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               </Flex>
             </Paper>
           </Grid.Col>
-          {matches && (
+          {shouldDisplaySummary && (
             <Grid.Col span={{ base: 12, md: 3 }}>
               <BookingSummary />
             </Grid.Col>

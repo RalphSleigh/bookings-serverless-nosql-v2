@@ -25,7 +25,7 @@ export function OtherQuestionsForm() {
     return (
       <Grid>
         <Grid.Col>
-          <Title size="h4" order={2} mt={16}>
+          <Title size="h4" order={2} mt={16} id="step-other">
             Other Stuff
           </Title>
           <CustomRadioGroup name="other.shuttle" label="Will you need the shuttle bus to/from the station to camp?">
@@ -51,7 +51,7 @@ export function OtherQuestionsForm() {
     return (
       <Grid>
         <Grid.Col>
-          <Title size="h4" order={2} mt={16}>
+          <Title size="h4" order={2} mt={16} id="step-other">
             Other Stuff
           </Title>
           <CustomRadioGroup name="other.whatsApp" label="Do you want to be added to camp Whatsapp group?">
