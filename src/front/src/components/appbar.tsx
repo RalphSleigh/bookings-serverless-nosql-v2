@@ -43,7 +43,7 @@ export const AppToolbar = () => {
           </>
         )}
 
-        <UserStatus />
+        <UserStatus matches={matches} />
         <ActionIcon variant="default" size="input-sm" aria-label="Settings" onClick={toggleColorScheme}>
           {colorScheme === 'dark' ? <IconSun stroke={1.5} /> : <IconMoon stroke={1.5} />}
         </ActionIcon>
@@ -80,16 +80,18 @@ export const AppToolbar = () => {
   )
 }
 
-const UserStatus = () => {
+const UserStatus = ({ matches }: { matches: boolean }) => {
   const { auth } = useRouteContext({ from: '__root__' })
   const query = useSearch({ from: '__root__' })
   const user = auth.loggedIn ? auth.user : undefined
   if (user) {
     return (
       <>
-        <CustomLink underline="hover" to="/user">
-          <Text>{user.name?.replaceAll(' ', '\xa0') ?? ''}</Text>
-        </CustomLink>
+        {matches && (
+          <CustomLink underline="hover" to="/user">
+            <Text>{user.name?.replaceAll(' ', '\xa0') ?? ''}</Text>
+          </CustomLink>
+        )}
         <CustomLink to="/user" style={{ textDecoration: 'none' }}>
           <Avatar
             imageProps={{
