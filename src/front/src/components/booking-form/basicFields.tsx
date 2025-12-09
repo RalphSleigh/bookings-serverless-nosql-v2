@@ -5,16 +5,14 @@ import { useController, useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod/v4'
 
 import { organisations } from '../../../../shared/ifm'
-import { BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall, BookingSchemaForType, TBooking, PartialBookingType } from '../../../../shared/schemas/booking'
+import { BookingSchemaForType, BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall, PartialBookingType, TBooking } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
+import classes from '../../css/typeChooser.module.css'
 import { errorProps } from '../../utils'
 import { CustomSelect } from '../custom-inputs/customSelect'
 
-
-import classes from '../../css/typeChooser.module.css'
-
 const PrivateRelayWarning = () => {
-  const email = useWatch<PartialBookingType, "basic.email">({ name: 'basic.email' })
+  const email = useWatch<PartialBookingType, 'basic.email'>({ name: 'basic.email' })
   const isPrivateRelay = email && email?.includes('privaterelay.appleid.com')
   if (!isPrivateRelay) return null
   return (
@@ -45,7 +43,9 @@ export const BasicFieldsSmall: React.FC<BasicBookingFieldsProps> = ({ event }) =
 
   return (
     <>
-      <Title id="step-basic" size="h4" order={2}>{`Your details`} </Title>
+      <Title id="step-basic" size="h4" order={2}>
+        {`Your details`}{' '}
+      </Title>
       <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')} />
       <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')} />
       <PrivateRelayWarning />
@@ -57,7 +57,7 @@ export const BasicFieldsSmall: React.FC<BasicBookingFieldsProps> = ({ event }) =
 export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => {
   const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
 
-  const bookingType = useWatch<PartialBookingType, "basic.type">({ name: 'basic.type' })
+  const bookingType = useWatch<PartialBookingType, 'basic.type'>({ name: 'basic.type' })
 
   const radioController = useController({ name: 'basic.type' })
 
@@ -76,7 +76,7 @@ export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => 
 
   return (
     <>
-      <Title id="step-type"size="h4" order={2}>{`Booking Type`}</Title>
+      <Title id="step-type" size="h4" order={2}>{`Booking Type`}</Title>
       <Text mt={16}>Please select the type of booking you are making:</Text>
       <RadioGroup
         value={radioController.field.value}

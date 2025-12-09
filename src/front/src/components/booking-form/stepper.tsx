@@ -1,6 +1,5 @@
-import { Anchor, Box, Paper, Stepper, Text, Title } from '@mantine/core'
+import { Box, Stepper } from '@mantine/core'
 import { useNavigate } from '@tanstack/react-router'
-import e from 'express'
 import { useMemo, useState } from 'react'
 import z from 'zod/v4'
 
@@ -52,18 +51,18 @@ const getStateFromValid = (errors: z.core.$ZodIssue[] | undefined, event: TEvent
 
 export const BookingStepper: React.FC<{ event: TEvent; schema: ReturnType<typeof BookingSchema>; checked: boolean }> = ({ event, schema, checked }) => {
   const [booking, setBooking] = useState<PartialBookingType>({})
-  const navitage = useNavigate()
+  const navigate = useNavigate()
 
   const onStepClick = (step: number) => {
     const stepName = indexToStep(event)(step)
-    navitage({ hash: `#step-${stepName}` })
+    navigate({ hash: `#step-${stepName}` })
   }
 
   const state = useMemo(() => {
     const valid = schema.safeParse(booking)
     if (valid.success && checked) return 6
     return getStateFromValid(valid.error?.issues, event, checked)
-  }, [booking, checked])
+  }, [booking, checked, schema, event])
 
   return (
     <>
@@ -74,7 +73,7 @@ export const BookingStepper: React.FC<{ event: TEvent; schema: ReturnType<typeof
           <Stepper.Step label="Your details" description="Some basic information about you" />
           <Stepper.Step label="People" description="Details of the people you are bringing" />
           {event.bigCampMode ? <Stepper.Step label="Camping" description="Information about your camping preferences" /> : <Stepper.Step label="Other stuff" description="A couple more questions" />}
-          <Stepper.Step label="Fees" description="Details of how much your booking will cost" />
+          <Stepper.Step label="Fees" description="Fee breakdown and payment details" />
           <Stepper.Step label="Permission" description="Tick the box to continue" />
         </Stepper>
       </Box>
