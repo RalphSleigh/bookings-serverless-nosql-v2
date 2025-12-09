@@ -39,10 +39,10 @@ export const AppToolbar = () => {
                 {window.location.hostname}
               </Text>
             </CustomLink>
-            <Box component="div" flex={1} />
           </>
         )}
 
+        <Box component="div" flex={1} />
         <UserStatus matches={matches} />
         <ActionIcon variant="default" size="input-sm" aria-label="Settings" onClick={toggleColorScheme}>
           {colorScheme === 'dark' ? <IconSun stroke={1.5} /> : <IconMoon stroke={1.5} />}
