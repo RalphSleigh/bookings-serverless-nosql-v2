@@ -49,7 +49,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
 
   return (
     <>
-      <Title size="h4" order={2} mt={16}>
+      <Title size="h4" order={2} mt={16} id="step-people">
         People
       </Title>
       <SmallSuspenseWrapper>

@@ -8,7 +8,7 @@ import classes from '../../css/permissionCheckbox.module.css'
 export const PermissionForm = ({ event, checked, setChecked }: { event: TEvent; checked: boolean; setChecked: Dispatch<SetStateAction<boolean>> }) => {
   return (
     <>
-      <Title size="h4" order={2} mt={16}>
+      <Title size="h4" order={2} mt={16} id="step-permission">
         Permission
       </Title>
       <Grid onClick={() => setChecked(!checked)} style={{ cursor: 'pointer' }}>
