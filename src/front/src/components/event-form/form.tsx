@@ -54,6 +54,12 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
     }
   }
 
+
+  const emailTemplates = [
+    { value: 'default', label: 'Default' },
+    { value: 'vcamp', label: 'VCamp' },
+  ]
+
   const { isValid, errors } = formState
   return (
     <FormProvider {...formMethods}>
@@ -91,6 +97,7 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
             <CustomSelect data={ConsentsOptions} label="Consent Structure" name="consents.consentsStructure" control={control} mt={16} />
             <CustomSelect data={AttendanceOptions} label="Attendance Structure" name="attendance.attendanceStructure" control={control} mt={16} />
             <CustomSelect data={feeOptions} label="Fee Structure" name="fee.feeStructure" control={control} mt={16} disabled={!watch('attendance.attendanceStructure')} />
+            <CustomSelect label="Email Templates" name="emailTemplates" control={control} data={emailTemplates} mt={16} />
             {feeConfig ? <feeConfig.ConfigurationElement /> : null}
             <CustomQuestionsForm />
             <ValidationErrors />

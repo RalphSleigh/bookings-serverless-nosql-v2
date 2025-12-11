@@ -5,7 +5,7 @@ import { ConfigType } from '../../../getConfig.js'
 import { BookingEmailData } from '../../sendEmail.js'
 import { EmailTemplate } from '../template.js'
 
-export class BookingEditedEmail extends EmailTemplate {
+export class VCampBookingEditedEmail extends EmailTemplate {
   subject(data: BookingEmailData) {
     return `Booking updated for ${data.event.name}`
   }
@@ -43,9 +43,6 @@ export class BookingEditedEmail extends EmailTemplate {
             <b>DATE OF ISSUE: {new Date().toLocaleDateString()}</b>
           </Text>
           <Text>
-            <fees.EmailElement event={data.event} booking={data.booking} />
-          </Text>
-          <Text>
             <b>Please pay by bank transfer where possible </b>
           </Text>
           <Text>
@@ -63,8 +60,8 @@ export class BookingEditedEmail extends EmailTemplate {
             Sort code: 60 83 01
           </Text>
           <Text>
-            If for any reason you cannot add a reference, please send an email to info@camp100.org.uk and let us know how much you paid, when you paid it and who it was for so we can match up
-            payments.
+            If for any reason you cannot add a reference, please send an email to <Link href={'mailto:info@venturercamp.org.uk'}>info@venturercamp.org.uk</Link> and let us know how much you paid, when
+            you paid it and who it was for so we can match up payments.
           </Text>
           <Text>
             <b>
@@ -80,7 +77,7 @@ export class BookingEditedEmail extends EmailTemplate {
             <br />
             Please make all cheques payable to Woodcraft Folk
             <br />
-            If you are paying by cheque please email <Link href={'mailto:info@camp100.org.uk'}>info@camp100.org.uk</Link> to let us know you have sent the cheque and who it is paying for.
+            If you are paying by cheque please email <Link href={'mailto:info@venturercamp.org.uk'}>info@venturercamp.org.uk</Link> to let us know you have sent the cheque and who it is paying for.
           </Text>
           <Text>
             Post your cheque to:
@@ -96,7 +93,7 @@ export class BookingEditedEmail extends EmailTemplate {
           </Text>
           <Text>
             <b>
-              For any questions contact the Camp 100 team on <Link href={'mailto:info@camp100.org.uk'}>info@camp100.org.uk</Link> or +44 (0)7422966127
+              For any questions contact the Venturer Camp team on <Link href={'mailto:info@venturercamp.org.uk'}>info@venturercamp.org.uk</Link>
             </b>
           </Text>
         </Html>

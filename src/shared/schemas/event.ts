@@ -72,6 +72,7 @@ export const EventSchema = z.object({
   allParticipantEmails: z.boolean().default(false),
   howDidYouHear: z.boolean().default(false),
   customQuestions: z.array(customQuestion),
+  emailTemplates: z.enum(['default', 'vcamp']).default('default'),
 })
 
 export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true })
