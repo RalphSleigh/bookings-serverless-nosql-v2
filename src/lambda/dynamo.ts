@@ -319,6 +319,11 @@ export const DBEvent = new Entity(
           },
         },
       },
+      emailTemplates: {
+        type: ['default', 'vcamp'] as const,
+        required: true,
+        default: 'default',
+      },
     },
     indexes: {
       natural: {

@@ -31,6 +31,7 @@ export class BookingConfirmationEmail extends EmailTemplate {
                     <p>Blue Skies and Friendship,</p>
                     <p>Woodcraft Folk</p>
                 </Text>
+                
             </Html>)
     }
 }
