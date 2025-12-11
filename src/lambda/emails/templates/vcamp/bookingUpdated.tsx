@@ -40,7 +40,7 @@ export class VCampBookingEditedEmail extends EmailTemplate {
             <b>THIS IS YOUR INVOICE</b>
           </Text>
           <Text>
-            <b>DATE OF ISSUE: {new Date().toLocaleDateString()}</b>
+            <b>DATE OF ISSUE: {new Date().toLocaleDateString('en-GB')}</b>
           </Text>
           <Text>
             <b>Please pay by bank transfer where possible </b>
@@ -53,22 +53,21 @@ export class VCampBookingEditedEmail extends EmailTemplate {
           </Text>
           <Text>
             <b>We strongly encourage that groups pay camp fees by bank transfer where possible.</b>
-            Please transfer all payments into the following account <br />
-            Account name: Woodcraft Folk <br />
-            Account number: 2039 2756
             <br />
-            Sort code: 60 83 01
+            Please transfer all payments into the following account <br />
+            Account name: <b>Woodcraft Folk</b> <br />
+            Account number: <b>2039 2756</b>
+            <br />
+            Sort code: <b>60 83 01</b>
           </Text>
           <Text>
             If for any reason you cannot add a reference, please send an email to <Link href={'mailto:info@venturercamp.org.uk'}>info@venturercamp.org.uk</Link> and let us know how much you paid, when
             you paid it and who it was for so we can match up payments.
           </Text>
           <Text>
-            <b>
-              International bank transfer: <br />
-              IBAN Number: GB93NWBK60023571418024 <br />
-              Swift Code (BIC): NWBKGB2L
-            </b>
+            International bank transfer: <br />
+            IBAN Number: GB93NWBK60023571418024 <br />
+            Swift Code (BIC): NWBKGB2L
           </Text>
           <Text>
             <b>Cheques</b>
