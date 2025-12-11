@@ -26,7 +26,7 @@ export class VCampBookingEditedEmail extends EmailTemplate {
         <Html lang="en">
           <Text>Hi {data.recipient.name}</Text>
           <Text>
-            You have updated your booking for {data.event.name}, You have booked {data.booking.people.length} {data.booking.people.length === 1 ? 'person' : 'people'}:
+            You have updated your booking for {data.event.name}. You have booked {data.booking.people.length} {data.booking.people.length === 1 ? 'person' : 'people'}:
           </Text>
           <ul>{participantsList}</ul>
           <Text>
