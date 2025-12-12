@@ -3,7 +3,6 @@ import { UserSchema } from '../../shared/schemas/user'
 import { EmailApplicationApprovedTask } from '../asyncTasks/asyncTaskQueuer'
 import { DB, DBEvent, DBRole, DBUser } from '../dynamo'
 import { ConfigType } from '../getConfig'
-import { getBookingByIDs } from '../utils'
 import { sendEmail } from './sendEmail'
 
 export const sendApplicationApprovedEmails = async (task: EmailApplicationApprovedTask, config: ConfigType) => {

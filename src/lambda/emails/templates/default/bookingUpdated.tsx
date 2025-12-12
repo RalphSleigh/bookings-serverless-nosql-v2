@@ -43,7 +43,7 @@ export class BookingEditedEmail extends EmailTemplate {
             <b>DATE OF ISSUE: {new Date().toLocaleDateString()}</b>
           </Text>
           <Text>
-            <fees.EmailElement event={data.event} booking={data.booking} />
+            <fees.EmailElement event={data.event} booking={data.booking} fees={data.fees} />
           </Text>
           <Text>
             <b>Please pay by bank transfer where possible </b>

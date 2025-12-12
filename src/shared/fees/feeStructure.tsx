@@ -24,7 +24,7 @@ export type EventListDisplayElement<T extends TEventFeesUnion> = React.FC<{ even
 
 export type GetFeeLineFunction<T extends TEventFeesUnion> = (event: TEvent<any, any, any, T>, booking: PartialBookingType) => FeeLine[]
 
-export type EmailElement<T extends TEventFeesUnion> = React.FC<{ event: TEvent<any, any, any, T>; booking: TBookingForType }>
+export type EmailElement<T extends TEventFeesUnion> = React.FC<{ event: TEvent<any, any, any, T>; booking: TBookingForType, fees: TFee[] }>
 
 export interface FeeStructure<T extends TEventFeesUnion = TEventFeesUnion> {
   typeName: T['feeStructure']

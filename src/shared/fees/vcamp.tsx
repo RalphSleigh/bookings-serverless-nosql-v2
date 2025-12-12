@@ -220,8 +220,90 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
     )
   }
 
-  EmailElement: EmailElement<TEventVCampFees> = ({ event, booking }) => {
-    return <></>
+  EmailElement: EmailElement<TEventVCampFees> = ({ event, booking, fees }) => {
+
+    let totalOwed = 0
+    let totalPaid = 0
+
+    const feeLines = this.getFeeLines(event, booking).map((row, i) => {
+      totalOwed += row.amount
+      return (
+        <tr key={i}>
+          <td>{row.label}</td>
+          <td>{currency(row.amount)}</td>
+        </tr>
+      )
+    })
+
+    const adjustmentLines = fees
+      ?.filter((f) => f.type === 'adjustment')
+      .map((f, i) => {
+        totalOwed += f.amount
+        return (
+          <tr key={i}>
+            <td>{f.note}</td>
+            <td>{currency(f.amount)}</td>
+          </tr>
+        )
+      })
+
+    const paymentLines = fees
+      ?.filter((f) => f.type === 'payment')
+      .map((f, i) => {
+        totalPaid += f.amount
+        return (
+          <tr key={i}>
+            <td>{f.note}</td>
+            <td>{currency(f.amount)}</td>
+          </tr>
+        )
+      })
+
+    return (
+      <>
+        <table>
+          <thead>
+            <tr>
+              <th>Detail of product:</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {feeLines}
+            {adjustmentLines}
+            <tr>
+              <td>
+                <b>Total: </b>
+              </td>
+              <td>
+                <b>{currency(totalOwed)}</b>
+              </td>
+            </tr>
+            {paymentLines.length > 0 ? (
+              <>
+                <tr>
+                  <td colSpan={2} align="center">
+                    <b>Payments Received:</b>
+                  </td>
+                </tr>
+                {paymentLines}
+                <tr>
+                  <td>
+                    <b>Total: </b>
+                  </td>
+                  <td>
+                    <b>{currency(totalPaid)}</b>
+                  </td>
+                </tr>
+              </>
+            ) : null}
+          </tbody>
+        </table>
+        <p>
+          <b>Balance: {currency(totalOwed - totalPaid)}</b>
+        </p>
+      </>
+    )
   }
 
   getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventVCampFees>>): string {
