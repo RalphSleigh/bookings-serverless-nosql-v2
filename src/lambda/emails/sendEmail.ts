@@ -11,6 +11,7 @@ import { ConfigType } from '../getConfig'
 import { getAuthClientForScope } from '../googleAuthClientHack'
 import { am_in_lambda } from '../utils'
 import { getEmailTemplate } from './templates/getTemplate'
+import { TFee } from '../../shared/schemas/fees'
 
 export type BasicEmailData = {
   template: 'managerDataAccess' | 'applicationReceived' | 'applicationApproved'
@@ -30,6 +31,7 @@ export type BookingEmailData = {
   recipient: TUser
   event: TEvent
   booking: TBooking
+  fees: TFee[]
   bookingOwner: TUser
 }
 

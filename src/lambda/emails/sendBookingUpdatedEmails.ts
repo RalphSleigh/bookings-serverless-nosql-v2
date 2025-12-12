@@ -9,7 +9,7 @@ import { sendEmail } from './sendEmail'
 export const sendBookingUpdatedEmails = async (task: EmailBookingUpdatedTask, config: ConfigType) => {
   const eventFromDB = await DBEvent.get({ eventId: task.data.eventId }).go()
   const event = EventSchema.parse(eventFromDB.data)
-  const booking = await getBookingByIDs(task.data.eventId, task.data.userId)
+  const { booking, fees } = await getBookingByIDs(task.data.eventId, task.data.userId)
   const userQuery = await DB.collections.userWithRoles({ userId: task.data.userId }).go()
   const user = UserSchema.parse(userQuery.data.user[0])
   if (user) {
@@ -20,6 +20,7 @@ export const sendBookingUpdatedEmails = async (task: EmailBookingUpdatedTask, co
         event: event,
         booking: booking,
         bookingOwner: user,
+        fees: fees
       },
       config,
     )
@@ -38,6 +39,7 @@ export const sendBookingUpdatedEmails = async (task: EmailBookingUpdatedTask, co
               event: event,
               booking: booking,
               bookingOwner: user,
+              fees: fees
             },
             config,
           )

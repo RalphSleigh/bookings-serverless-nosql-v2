@@ -32,9 +32,6 @@ export class VCampBookingConfirmationEmail extends EmailTemplate {
           You can come back and edit your booking <Link href={editLink}>here</Link>.
         </Text>
         <Text>
-          <fees.EmailElement event={data.event} booking={data.booking} />
-        </Text>
-        <Text>
           <p>Blue Skies and Friendship,</p>
           <p>Woodcraft Folk</p>
         </Text>
@@ -43,6 +40,9 @@ export class VCampBookingConfirmationEmail extends EmailTemplate {
         </Text>
         <Text>
           <b>DATE OF ISSUE: {new Date().toLocaleDateString('en-GB')}</b>
+        </Text>
+        <Text>
+          <fees.EmailElement event={data.event} booking={data.booking} fees={data.fees} />
         </Text>
         <Text>
           <b>Please pay by bank transfer where possible </b>
@@ -54,7 +54,8 @@ export class VCampBookingConfirmationEmail extends EmailTemplate {
           </b>
         </Text>
         <Text>
-          <b>We strongly encourage that groups pay camp fees by bank transfer where possible.</b><br />
+          <b>We strongly encourage that groups pay camp fees by bank transfer where possible.</b>
+          <br />
           Please transfer all payments into the following account <br />
           Account name: <b>Woodcraft Folk</b> <br />
           Account number: <b>2039 2756</b>
@@ -66,21 +67,16 @@ export class VCampBookingConfirmationEmail extends EmailTemplate {
           you paid it and who it was for so we can match up payments.
         </Text>
         <Text>
-            International bank transfer: <br />
-            IBAN Number: GB93NWBK60023571418024 <br />
-            Swift Code (BIC): NWBKGB2L
-        </Text>
-        <Text>
           <b>Cheques</b>
           <br />
-          If you cannot complete the payment via BACS you can send a cheque:
+          If you cannot complete the payment via bank transfer you can send a cheque:
           <br />
           Please make all cheques payable to Woodcraft Folk
           <br />
           If you are paying by cheque please email <Link href={'mailto:info@venturercamp.org.uk'}>info@venturercamp.org.uk</Link> to let us know you have sent the cheque and who it is paying for.
         </Text>
         <Text>
-          Post your cheque to:
+          <b>Post your cheque to:</b>
           <br />
           Woodcraft Folk
           <br />
