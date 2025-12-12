@@ -29,7 +29,7 @@ export const updateBooking = HandlerWrapper(
     const existingBookingQuery = await DBBooking.find({ userId: booking.userId, eventId: event.eventId }).go()
     const existingPeopleQuery = await DBPerson.find({ userId: booking.userId, eventId: event.eventId }).go()
 
-    const existingBooking = { ...existingBookingQuery.data[0], people: existingPeopleQuery.data.filter((p) => !p.cancelled) }
+    const existingBooking = { ...existingBookingQuery.data[0], people: existingPeopleQuery.data }
 
     const { people, ...validatedBooking } = bookingSchema.parse(booking)
 
@@ -109,7 +109,9 @@ export const updateBooking = HandlerWrapper(
       }
     }
 
-    const discordDiffs = generateDiscordDiff(existingBooking as TBooking, { ...updatedBooking.data, people: people } as TBooking)
+    const existingForCompare = { ...existingBooking, people: existingPeopleQuery.data.filter((p) => !p.cancelled) }
+
+    const discordDiffs = generateDiscordDiff(existingForCompare as TBooking, { ...updatedBooking.data, people: people } as TBooking)
 
     if (discordDiffs.length > 0) {
       if (own) {
