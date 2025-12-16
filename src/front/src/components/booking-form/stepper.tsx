@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import z from 'zod/v4'
 
-import { BookingSchema, PartialBookingType } from '../../../../shared/schemas/booking'
+import { BookingSchema, BookingSchemaForClient, PartialBookingType } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { WatchDebounce } from '../../utils'
 
@@ -49,7 +49,7 @@ const getStateFromValid = (errors: z.core.$ZodIssue[] | undefined, event: TEvent
   return 6
 }
 
-export const BookingStepper: React.FC<{ event: TEvent; schema: ReturnType<typeof BookingSchema>; checked: boolean }> = ({ event, schema, checked }) => {
+export const BookingStepper: React.FC<{ event: TEvent; schema: ReturnType<typeof BookingSchemaForClient>; checked: boolean }> = ({ event, schema, checked }) => {
   const [booking, setBooking] = useState<PartialBookingType>({})
   const navigate = useNavigate()
 

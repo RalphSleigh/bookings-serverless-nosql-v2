@@ -16,7 +16,7 @@ import { getFeeType } from '../../../../shared/fees/fees.js'
 //import { MemoBookingExtraContactFields } from "./extraContacts.js";
 //import { MemoCampingFields } from "./camping.js";
 //import { consent } from "../../../shared/consents/consent.js";
-import { BookingSchema, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
+import { BookingSchema, BookingSchemaForClient, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { TFee } from '../../../../shared/schemas/fees.js'
 import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
@@ -49,7 +49,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
   const readOnly = mode === 'view'
   const own = inputData.userId === user.userId
 
-  const schema = BookingSchema(event)
+  const schema = BookingSchemaForClient(event)
   type BookingFormValues = z.infer<typeof schema>
   const formMethods = useForm({ resolver: zodResolver(schema), mode: 'onTouched', defaultValues: inputData as BookingFormValues })
   const { formState, handleSubmit } = formMethods

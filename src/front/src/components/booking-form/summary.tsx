@@ -8,11 +8,11 @@ export const BookingSummary: React.FC = ({}) => {
   ;[]
   const [people, setPeople] = useState<PartialBookingType['people']>([])
   const rows = (people || [])
-    .filter((p) => p?.basic)
-    .map((p) => {
+    .map((p, i) => {
+      if(!p?.basic?.name) return null
       return (
         <Text key={p?.personId}>
-          <Anchor href={`#${p?.personId}`}>{p?.basic?.name}</Anchor>
+          <Anchor href={`#person-${i}`}>{p?.basic?.name}</Anchor>
         </Text>
       )
     })
