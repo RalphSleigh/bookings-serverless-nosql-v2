@@ -35,6 +35,10 @@ export const updateBooking = HandlerWrapper(
     const usedIDs = new Set<string>()
 
     booking.people.forEach((person) => {
+      person.personId = undefined
+    })
+
+    booking.people.forEach((person) => {
       const matchNameAndDOB = existingPeopleQuery.data.filter((p) => p.basic?.name === person.basic?.name && p.basic?.dob === person.basic?.dob && !usedIDs.has(p.personId))
       if (matchNameAndDOB.length === 1) {
         person.personId = matchNameAndDOB[0].personId
