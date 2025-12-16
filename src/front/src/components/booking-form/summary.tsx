@@ -7,15 +7,14 @@ import { WatchDebounce } from '../../utils'
 export const BookingSummary: React.FC = ({}) => {
   ;[]
   const [people, setPeople] = useState<PartialBookingType['people']>([])
-  const rows = (people || [])
-    .map((p, i) => {
-      if(!p?.basic?.name) return null
-      return (
-        <Text key={p?.personId}>
-          <Anchor href={`#person-${i}`}>{p?.basic?.name}</Anchor>
-        </Text>
-      )
-    })
+  const rows = (people || []).map((p, i) => {
+    if (!p?.basic?.name) return null
+    return (
+      <Text key={i}>
+        <Anchor href={`#person-${i}`}>{p?.basic?.name}</Anchor>
+      </Text>
+    )
+  })
 
   return (
     <>

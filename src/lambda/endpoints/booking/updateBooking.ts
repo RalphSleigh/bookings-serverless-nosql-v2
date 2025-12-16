@@ -36,33 +36,30 @@ export const updateBooking = HandlerWrapper(
 
     booking.people.forEach((person) => {
       const matchNameAndDOB = existingPeopleQuery.data.filter((p) => p.basic?.name === person.basic?.name && p.basic?.dob === person.basic?.dob && !usedIDs.has(p.personId))
-      if (matchNameAndDOB.length == 1) {
+      if (matchNameAndDOB.length === 1) {
         person.personId = matchNameAndDOB[0].personId
         usedIDs.add(matchNameAndDOB[0].personId)
         console.log(`Matched person by name and DOB: ${person.personId} for ${person.basic?.name}`)
-        return
       }
     })
 
     booking.people.forEach((person) => {
       if (person.personId) return
       const matchName = existingPeopleQuery.data.filter((p) => p.basic?.name === person.basic?.name && !usedIDs.has(p.personId))
-      if (matchName.length == 1) {
+      if (matchName.length === 1) {
         person.personId = matchName[0].personId
         usedIDs.add(matchName[0].personId)
         console.log(`Matched person by name: ${person.personId} for ${person.basic?.name}`)
-        return
       }
     })
 
     booking.people.forEach((person) => {
       if (person.personId) return
       const matchDOB = existingPeopleQuery.data.filter((p) => p.basic?.dob === person.basic?.dob && !usedIDs.has(p.personId))
-      if (matchDOB.length == 1) {
+      if (matchDOB.length === 1) {
         person.personId = matchDOB[0].personId
         usedIDs.add(matchDOB[0].personId)
         console.log(`Matched person by DOB: ${person.personId} for ${person.basic?.name}`)
-        return
       }
     })
 
