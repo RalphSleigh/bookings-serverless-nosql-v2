@@ -79,8 +79,13 @@ export const PersonSchema = (event: TEvent) => {
     )
 }
 
+export const PersonSchemaForClient = (event: TEvent) => {
+  return PersonSchema(event).omit({ personId: true })
+}
+
+
 export const PersonSchemaForType = z.object({
-  personId: z.string(),
+  personId: z.string().optional(),
   userId: z.uuidv7(),
   eventId: z.uuidv7(),
   cancelled: z.boolean().default(false),

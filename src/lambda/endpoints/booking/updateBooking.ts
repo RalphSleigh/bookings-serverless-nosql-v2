@@ -1,6 +1,7 @@
 import { subject } from '@casl/ability'
 import { CreateEntityItem, EntityIdentifiers, UpdateEntityItem } from 'electrodb'
 import { isEqual } from 'lodash-es'
+import { v7 as uuidv7 } from 'uuid'
 
 import { generateDiscordDiff } from '../../../shared/bookingDiff'
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
@@ -30,6 +31,47 @@ export const updateBooking = HandlerWrapper(
     const existingPeopleQuery = await DBPerson.find({ userId: booking.userId, eventId: event.eventId }).go()
 
     const existingBooking = { ...existingBookingQuery.data[0], people: existingPeopleQuery.data }
+
+    const usedIDs = new Set<string>()
+
+    booking.people.forEach((person) => {
+      person.personId = undefined
+    })
+
+    booking.people.forEach((person) => {
+      const matchNameAndDOB = existingPeopleQuery.data.filter((p) => p.basic?.name === person.basic?.name && p.basic?.dob === person.basic?.dob && !usedIDs.has(p.personId))
+      if (matchNameAndDOB.length === 1) {
+        person.personId = matchNameAndDOB[0].personId
+        usedIDs.add(matchNameAndDOB[0].personId)
+        console.log(`Matched person by name and DOB: ${person.personId} for ${person.basic?.name}`)
+      }
+    })
+
+    booking.people.forEach((person) => {
+      if (person.personId) return
+      const matchName = existingPeopleQuery.data.filter((p) => p.basic?.name === person.basic?.name && !usedIDs.has(p.personId))
+      if (matchName.length === 1) {
+        person.personId = matchName[0].personId
+        usedIDs.add(matchName[0].personId)
+        console.log(`Matched person by name: ${person.personId} for ${person.basic?.name}`)
+      }
+    })
+
+    booking.people.forEach((person) => {
+      if (person.personId) return
+      const matchDOB = existingPeopleQuery.data.filter((p) => p.basic?.dob === person.basic?.dob && !usedIDs.has(p.personId))
+      if (matchDOB.length === 1) {
+        person.personId = matchDOB[0].personId
+        usedIDs.add(matchDOB[0].personId)
+        console.log(`Matched person by DOB: ${person.personId} for ${person.basic?.name}`)
+      }
+    })
+
+    booking.people.forEach((person) => {
+      if (person.personId) return
+      person.personId = uuidv7()
+      console.log(`Assigned new personId: ${person.personId} for ${person.basic?.name}`)
+    })
 
     const { people, ...validatedBooking } = bookingSchema.parse(booking)
 

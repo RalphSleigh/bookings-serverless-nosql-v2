@@ -542,7 +542,6 @@ const getPersonFromRow = (
   } catch (e) {}
 
   const result: Partial<TPerson<TEvent<TEventLargeKP, TEventVCampConsents, TEventFreeChoiceAttendance>>> = {
-    personId: `sheet-${i}-${event.eventId}-${userId}`,
     eventId: event.eventId,
     userId: userId,
     basic: {
@@ -551,8 +550,6 @@ const getPersonFromRow = (
       dob: dob,
       role: (row[index('Role')] || '').toLowerCase(),
     },
-    /*         attendance: {
-        }, */
     kp: {
       diet: (row[index('Dietary Requirements')] || '').toLowerCase(),
       details: row[index('Dietary Details')],

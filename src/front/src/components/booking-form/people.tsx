@@ -88,7 +88,7 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: num
   const valid = peopleSchema.safeParse(person).success
   if (!person) return null
   return (
-    <Paper shadow="md" radius="md" withBorder mt={16} id={person.personId} onClick={() => setCollapsed(false)} pl={8}>
+    <Paper shadow="md" radius="md" withBorder mt={16} id={`person-${index}`} onClick={() => setCollapsed(false)} pl={8}>
       <Flex justify="flex-end" m={8} align="center">
         <Title order={3} size="h4" style={{ cursor: 'pointer', flexGrow: 1 }}>
           {valid ? '✅' : '❌'} {person.basic?.name}
@@ -102,7 +102,6 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: num
 }
 
 const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEvent; index: number; remove: UseFieldArrayRemove; setCollapsed: (collapsed: boolean) => void }) => {
-  const personId = useWatch<PartialBookingType, `people.${number}.personId`>({ name: `people.${index}.personId` })
   const { register, formState, control } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
@@ -137,7 +136,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
   const consent = getConsentsType(event)
 
   return (
-    <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={personId}>
+    <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={`person-${index}`}>
       <Grid p={6} gutter={8}>
         <Grid.Col span={8}>
           <TextInput

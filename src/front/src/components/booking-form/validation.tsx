@@ -6,11 +6,11 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 import { z } from 'zod/v4'
 
-import { BookingSchema, BookingSchemaForType, PartialBookingType, TBookingForType } from '../../../../shared/schemas/booking'
+import { BookingSchema, BookingSchemaForClient, BookingSchemaForType, PartialBookingType, TBookingForType } from '../../../../shared/schemas/booking'
 import { WatchDebounce } from '../../utils'
 
 type ValidationErrorsProps = {
-  schema: ReturnType<typeof BookingSchema>
+  schema: ReturnType<typeof BookingSchemaForClient>
 }
 
 const mapValidationError = (data: PartialBookingType | undefined) => (issue: z.core.$ZodIssue) => {
@@ -66,7 +66,7 @@ const ValidationMessages: React.FC<{ messages: string[] }> = ({ messages }) => {
 
 const MemoValidationMessages = React.memo(ValidationMessages)
 
-const MessageCalculator = ({ schema, formstate }: { schema: ReturnType<typeof BookingSchema>; formstate: z.input<typeof BookingSchemaForType> | undefined }) => {
+const MessageCalculator = ({ schema, formstate }: { schema: ReturnType<typeof BookingSchemaForClient>; formstate: z.input<typeof BookingSchemaForType> | undefined }) => {
   console.log('rendering validation')
   const messages = useMemo(() => {
     const valid = schema.safeParse(formstate)
