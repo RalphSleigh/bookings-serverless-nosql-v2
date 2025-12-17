@@ -82,7 +82,7 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
   PersonFields = (event: TEvent<TEventBasicKP>) => {
     class Diet extends PersonField<TEvent<TEventBasicKP>, TPersonResponse<TEvent<TEventBasicKP>>> {
       name = 'Diet'
-      accessor = 'kp.diet'
+      accessor = (p: TPersonResponse<TEvent<TEventBasicKP>>) => 'kp' in p ? p.kp.diet || '' : ''
       size: number = 100
     }
 

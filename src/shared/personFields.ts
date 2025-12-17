@@ -23,7 +23,7 @@ export abstract class PersonField<T extends TEvent = TEvent, R extends TPersonRe
   filterVariant: 'text' | 'date-range' = 'text'
   Cell?: MRT_ColumnDef<R>['Cell']
   size: number = 100
-  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer', 'comms', 'finance']
   available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role))
   titleForDrive: () => string = () => this.name
   valueForDrive: (p: R) => string = (p) => {
@@ -119,6 +119,7 @@ class Age extends PersonField {
 
 class Medical extends PersonField {
   name = 'Medical'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   accessor = (p: TPersonResponse) => ('health' in p ? p.health?.medical || '' : '')
 }
 
