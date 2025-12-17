@@ -11,6 +11,7 @@ import { TEvent, TEventBasicKP, TEventLargeKP } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { ageGroupFromPerson } from '../woodcraft'
 import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
+import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export class LargeKP implements KPStructure<TEventLargeKP> {
   typeName: 'large' = 'large'
@@ -183,68 +184,68 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
 
     class DietDetails extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diet Details'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => p.kp.details || ''
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? p.kp?.details || '' : ''
     }
 
     class DietPreferences extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diet Preferences'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => p.kp.preferences || ''
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? p.kp.preferences || '' : ''
     }
 
     class DietNut extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Nut Free'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.nut ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.nut ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
 
     class DietGluten extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Gluten Free'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.gluten ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.gluten ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
 
     class DietSoya extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Soya Free'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.soya ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.soya ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
     class DietDairy extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Dairy/Lactose Free'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.dairy ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.dairy ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
     class DietEgg extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Egg Free'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.egg ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.egg ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
     class DietPork extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Pork Free'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.pork ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.pork ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
     class DietChickpea extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Chickpea Free'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.chickpea ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.chickpea ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
     class DietDiabetic extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diabetic'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.diabetic ? '❌' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.diabetic ? '❌' : '') : ''
       size: number = 80
       hideByDefault = true
     }
 
     class DietContactMe extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Contact Me'
-      accessor = (p: TPerson<TEvent<TEventLargeKP>>) => (p.kp.contactMe ? '✅' : '')
+      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.contactMe ? '✅' : '') : ''
       size: number = 80
       hideByDefault = true
     }

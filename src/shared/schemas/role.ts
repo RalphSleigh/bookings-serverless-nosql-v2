@@ -3,7 +3,7 @@ import { z } from 'zod/v4'
 export const EventRoleSchema = z.object({
   roleId: z.uuidv7(),
   userId: z.uuidv7(),
-  role: z.enum(['owner', 'manager', 'viewer']),
+  role: z.enum(['owner', 'manager', 'viewer', 'comms', 'finance']),
   eventId: z.uuidv7(),
 })
 

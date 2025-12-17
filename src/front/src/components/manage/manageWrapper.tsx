@@ -24,7 +24,7 @@ export const ManageWrapper = () => {
           <Box h="calc(100dvh - var(--modal-y-offset) * 2 - var(--mantine-spacing-md) * 2)">
             <Stack h="100%" gap={0}>
               <ScrollArea pr={16}>
-                <Markdown >{POLICY_MARKDPOWN}</Markdown>
+                <Markdown>{POLICY_MARKDPOWN}</Markdown>
               </ScrollArea>
               <Box>
                 <Button mt="md" onClick={() => setHasSeenPolicy(true)}>
@@ -41,7 +41,9 @@ export const ManageWrapper = () => {
             <Tabs.List>
               <Tabs.Tab value="campers">Campers</Tabs.Tab>
               <Tabs.Tab value="bookings">Bookings</Tabs.Tab>
-              <Tabs.Tab value="kp">KP</Tabs.Tab>
+              <Can I="getSensitiveFields" this={subject('eventId', { eventId })}>
+                <Tabs.Tab value="kp">KP</Tabs.Tab>
+              </Can>
               {event.applicationsRequired && (
                 <Can I="getApplications" this={subject('eventId', { eventId })}>
                   <Tabs.Tab value="applications">Applications</Tabs.Tab>

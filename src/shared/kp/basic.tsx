@@ -9,6 +9,7 @@ import { TEvent, TEventBasicKP } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { ageGroupFromPerson } from '../woodcraft'
 import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
+import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export class BasicKP implements KPStructure<TEventBasicKP> {
   typeName: 'basic' = 'basic'
@@ -79,15 +80,15 @@ export class BasicKP implements KPStructure<TEventBasicKP> {
   }
 
   PersonFields = (event: TEvent<TEventBasicKP>) => {
-    class Diet extends PersonField<TEvent<TEventBasicKP>> {
+    class Diet extends PersonField<TEvent<TEventBasicKP>, TPersonResponse<TEvent<TEventBasicKP>>> {
       name = 'Diet'
       accessor = 'kp.diet'
       size: number = 100
     }
 
-    class DietDetails extends PersonField<TEvent<TEventBasicKP>> {
+    class DietDetails extends PersonField<TEvent<TEventBasicKP>, TPersonResponse<TEvent<TEventBasicKP>>> {
       name = 'Diet Details'
-      accessor = (p: TPerson) => p.kp?.details || ''
+      accessor = (p: TPersonResponse<TEvent<TEventBasicKP>>) => 'kp' in p ? p.kp.details || '' : ''
     }
 
     return [new Diet(event), new DietDetails(event)]

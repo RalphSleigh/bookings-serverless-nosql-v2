@@ -34,6 +34,8 @@ export const ManageRoles = () => {
     { value: 'owner', label: 'Owner' },
     { value: 'manager', label: 'Manager' },
     { value: 'viewer', label: 'Viewer' },
+    { value: 'comms', label: 'Communications' },
+    { value: 'finance', label: 'Finance' },
   ]
 
   const createMutation = createRoleMuation(eventId)

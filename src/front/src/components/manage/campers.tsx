@@ -21,6 +21,7 @@ import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson, ageGroups, campersInAgeGroup } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { useEvent } from '../../utils'
+import { TPersonResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 
 export const ManageCampers = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -36,7 +37,7 @@ export const ManageCampers = () => {
 
   const campers = useMemo(
     () =>
-      bookingsQuery.data.bookings.reduce<TPerson[]>((acc, booking) => {
+      bookingsQuery.data.bookings.reduce<TPersonResponse[]>((acc, booking) => {
         return [...acc, ...booking.people]
       }, []),
     [bookingsQuery.data],
@@ -54,11 +55,11 @@ export const ManageCampers = () => {
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-campers-column-visibility-default`, { defaultValue: visibilityDefault })
   const [columnSize, setColumnSize] = useLocalStorageState<{ [key: string]: number }>(`event-${eventId}-campers-column-size`, { defaultValue: {} })
 
-  const columns = useMemo<MRT_ColumnDef<TPerson>[]>(() => fields.map((f) => f.personTableDef()), [])
+  const columns = useMemo<MRT_ColumnDef<TPersonResponse>[]>(() => fields.map((f) => f.personTableDef()), [])
 
   const [selected, setSelected] = useState<string | undefined>(undefined)
 
-  const handleExportRows = (rows: MRT_Row<TPerson>[]) => {
+  const handleExportRows = (rows: MRT_Row<TPersonResponse>[]) => {
     const rowData = rows.map((row) => row.original)
     const fields = personFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
     const columnNames = fields.map((f) => f.titleForDrive())
@@ -146,7 +147,7 @@ export const ManageCampers = () => {
 
 //initialState={{ columnVisibility: { address: false } }}
 
-const PersonDetails = ({ event, person }: { event: TEvent; person: TPerson }) => {
+const PersonDetails = ({ event, person }: { event: TEvent; person: TPersonResponse }) => {
   const age = dayjs(event.endDate).diff(dayjs(person.basic.dob), 'year')
   const group = ageGroupFromPerson(event)(person)
   const kp = getKPType(event)
@@ -162,9 +163,9 @@ const PersonDetails = ({ event, person }: { event: TEvent; person: TPerson }) =>
           <a href={`mailto:${person.basic.email}`}>{person.basic.email}</a>
         </Text>
       )}
-      <kp.PersonCardSection person={person} />
+      {'kp' in person && <kp.PersonCardSection person={person} />}
       <attendance.PersonCardElement event={event} person={person} />
-      <Text>{person.health.medical}</Text>
+      {'health' in person && <Text>{person.health.medical}</Text>}
     </>
   )
 }
