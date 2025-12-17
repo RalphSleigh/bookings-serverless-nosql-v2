@@ -20,6 +20,7 @@ import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { CustomLink, useEvent } from '../../utils'
+import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 
 export const ManageBookings = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -40,11 +41,11 @@ export const ManageBookings = () => {
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-booking-column-visibility-default`, { defaultValue: visibilityDefault })
 
-  const columns = useMemo<MRT_ColumnDef<TBooking>[]>(() => fields.map((f) => f.bookingTableDef()), [])
+  const columns = useMemo<MRT_ColumnDef<TBookingResponse>[]>(() => fields.map((f) => f.bookingTableDef()), [])
 
   const [selected, setSelected] = useState<string | undefined>(undefined)
 
-  const handleExportRows = (rows: MRT_Row<TBooking>[]) => {
+  const handleExportRows = (rows: MRT_Row<TBookingResponse>[]) => {
     const rowData = rows.map((row) => row.original)
     const fields = bookingFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
     const columnNames = fields.map((f) => f.titleForDrive())
@@ -116,7 +117,7 @@ export const ManageBookings = () => {
 
 //initialState={{ columnVisibility: { address: false } }}
 
-const basicDetailsSmall = (event: TEvent, booking: TBooking) => (
+const basicDetailsSmall = (event: TEvent, booking: TBookingResponse) => (
   <>
     <Title order={4}>{booking.basic.name}</Title>
     <Text>
@@ -128,7 +129,7 @@ const basicDetailsSmall = (event: TEvent, booking: TBooking) => (
   </>
 )
 
-const basicDetailsLargeIndvidual = (event: TEvent, booking: TBooking) => (
+const basicDetailsLargeIndvidual = (event: TEvent, booking: TBookingResponse) => (
   <>
     <Title order={4}>{booking.basic.name}&nbsp;-&nbsp;Indvidiual</Title>
     {'district' in booking.basic ? (
@@ -145,7 +146,7 @@ const basicDetailsLargeIndvidual = (event: TEvent, booking: TBooking) => (
   </>
 )
 
-const basicDetailsLargeGroup = (event: TEvent, booking: TBooking) => (
+const basicDetailsLargeGroup = (event: TEvent, booking: TBookingResponse) => (
   <>
     <Title order={4}>{booking.basic.name}&nbsp;-&nbsp;Group</Title>
     {'district' in booking.basic ? (
@@ -162,7 +163,7 @@ const basicDetailsLargeGroup = (event: TEvent, booking: TBooking) => (
   </>
 )
 
-const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBooking }) => {
+const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingResponse }) => {
   const basic = event.bigCampMode
     ? 'type' in booking.basic && booking.basic.type === 'individual'
       ? basicDetailsLargeIndvidual(event, booking)

@@ -11,6 +11,7 @@ import { TBooking } from '../schemas/booking'
 import { TEvent, TEventFreeChoiceAttendance } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { AttendanceBookingFormDisplayElement, AttendanceIsWholeAttendanceFunction, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
+import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 dayjs.extend(AdvancedFormat)
 
@@ -92,20 +93,20 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
     const defaultDataFn = this.getDefaultData.bind(this)
     class Mask extends PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>> {
       name = 'Attendance Mask'
-      accessor = (p: TPerson<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => p.attendance?.bitMask || defaultDataFn(event).bitMask
+      accessor = (p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => p.attendance?.bitMask || defaultDataFn(event).bitMask
       hideByDefault = true
     }
 
     class NightsAttending extends PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>> {
       name = 'Nights Attending'
-      accessor = (p: TPerson<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => bitCount32(p.attendance?.bitMask || 0).toString()
+      accessor = (p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => bitCount32(p.attendance?.bitMask || 0).toString()
       size = 40
     }
 
     const nights: PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>>[] = this.getNightsFromEvent(event).map((n, i) => {
       class NightField extends PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>> {
         name = `${n.start.format('Do MMM')} - ${n.end.format('Do MMM')}`
-        accessor = (p: TPerson<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => ((p.attendance?.bitMask || 0) & (1 << i) ? '1' : '0')
+        accessor = (p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => ((p.attendance?.bitMask || 0) & (1 << i) ? '1' : '0')
         hideByDefault = true
         size = 40
       }
