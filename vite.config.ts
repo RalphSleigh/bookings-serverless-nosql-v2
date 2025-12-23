@@ -1,6 +1,7 @@
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import favicons from '@peterek/vite-plugin-favicons'
 
 
 // https://vitejs.dev/config/
@@ -16,6 +17,7 @@ export default defineConfig({
       autoCodeSplitting: true,
     }),
     react({}),
+    favicons('assets/logo.png')
   ],
   server: {
     //  hmr: false,

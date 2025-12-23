@@ -13,7 +13,7 @@ import { ageGroupFromPerson } from './woodcraft'
 
 dayjs.extend(relativeTime)
 
-export abstract class PersonField<T extends TEvent = TEvent, R extends TPersonResponse<T> = TPersonResponse<T>> {
+export abstract class PersonField<T extends TEvent = TEvent> {
   event: TEvent
   abstract name: string
   enabledForDrive: (event: TEvent) => boolean = () => true
@@ -21,12 +21,12 @@ export abstract class PersonField<T extends TEvent = TEvent, R extends TPersonRe
   abstract accessor: string | ((p: TPersonResponse<T>) => string | Date | boolean | number)
   hideByDefault: boolean = false
   filterVariant: 'text' | 'date-range' = 'text'
-  Cell?: MRT_ColumnDef<R>['Cell']
+  Cell?: MRT_ColumnDef<TPersonResponse<T>>['Cell']
   size: number = 100
   roles: TRole['role'][] = ['owner', 'manager', 'viewer', 'comms', 'finance']
   available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role))
   titleForDrive: () => string = () => this.name
-  valueForDrive: (p: R) => string = (p) => {
+  valueForDrive: (p: TPersonResponse<T>) => string = (p) => {
     if (typeof this.accessor === 'function') {
       const v = this.accessor(p)
       switch (typeof v) {
@@ -44,7 +44,7 @@ export abstract class PersonField<T extends TEvent = TEvent, R extends TPersonRe
       return v
     }
   }
-  sortingFn?: MRT_ColumnDef<R>['sortingFn']
+  sortingFn?: MRT_ColumnDef<TPersonResponse<T>>['sortingFn']
 
   constructor(event: TEvent) {
     this.event = event
@@ -56,7 +56,7 @@ export abstract class PersonField<T extends TEvent = TEvent, R extends TPersonRe
       filterVariant: this.filterVariant,
       size: this.size,
       minSize: 20,
-    } as MRT_ColumnDef<R>
+    } as MRT_ColumnDef<TPersonResponse<T>>
 
     if (this.sortingFn) {
       def.sortingFn = this.sortingFn
@@ -142,7 +142,7 @@ export class Current extends PersonField {
   accessor = (p: TPersonResponse) => !p.cancelled
 }
 
-export const personFields = <E extends TEvent>(event: E): PersonField[] => {
+export const personFields = <E extends TEvent>(event: E): PersonField<E>[] => {
   const attendance = getAttendanceType(event)
   const kp = getKPType(event)
   return [
