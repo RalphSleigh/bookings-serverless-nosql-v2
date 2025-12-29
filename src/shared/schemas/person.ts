@@ -80,9 +80,20 @@ export const PersonSchema = (event: TEvent) => {
 }
 
 export const PersonSchemaForClient = (event: TEvent) => {
-  return PersonSchema(event).omit({ personId: true })
+  const startDate = dayjs(event.startDate)
+  return PersonSchema(event)
+    .omit({ personId: true })
+    .refine(
+      (data) => {
+        const dob = dayjs(data.basic.dob)
+        return !(event.consents.consentsStructure === 'vcamp' && dob.add(12, 'years').isBefore(startDate) && dob.add(18, 'years').isAfter(startDate) && !data.consents.rse)
+      },
+      {
+        path: ['consents', 'rse'],
+        error: `RSE Consent is required for those aged 12 - 17`,
+      },
+    )
 }
-
 
 export const PersonSchemaForType = z.object({
   personId: z.string().optional(),
