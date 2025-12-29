@@ -269,7 +269,7 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
         autoComplete={`section-person-${index} health-accessibility`}
         id={`person-health-accessibility-${index}`}
         data-form-type="other"
-        label="Details of relevant medical conditions, medication taken or addtional needs"
+        label="Accessibility requirements"
         {...register(`people.${index}.health.accessibility` as const)}
         {...e(`people.${index}.health.accessibility`)}
         autosize
