@@ -41,8 +41,8 @@ const mapValidationError = (data: PartialBookingType | undefined) => (issue: z.c
     }
   }
 
-  if(issue.path[0] === 'other') {
-    if(issue.path[1] === 'whatsApp') return `Please answer the WhatsApp question`
+  if (issue.path[0] === 'other') {
+    if (issue.path[1] === 'whatsApp') return `Please answer the WhatsApp question`
   }
 
   return `${issue.path.join('.')} - ${issue.message}`

@@ -39,7 +39,7 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
       })
       return
     }
-    if (['version', 'createdAt', 'updatedAt', 'cancelled'].includes(updateItem.key)) return
+    if (['version', 'createdAt', 'updatedAt', 'cancelled', 'personId'].includes(updateItem.key)) return
 
     const capitalise = (string: string) => {
       return string[0].toUpperCase() + string.slice(1).toLowerCase()
