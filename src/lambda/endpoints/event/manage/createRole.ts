@@ -45,9 +45,10 @@ export const createRole = HandlerWrapperLoggedIn<{}, TCreateRoleData>(
           } catch (e) {
             throw new Error('User is not a Woodcraft GSuite account')
           }
-          if (user.data.isEnrolledIn2Sv === false) throw new Error('User does not have 2FA enabled on account')
-        } catch (e) {
-          res.status(400).json({ message: 'In big camp mode, users must have 2FA enabled on their Woodcraft GSuite account to be assigned roles.' })
+          if (!(config.BIG_ROLE_OU_ALLOWLIST && config.BIG_ROLE_OU_ALLOWLIST.includes(user.data.orgUnitPath || ''))) throw new Error('User is not in an allowed OU for big camp role assignment')
+          if (user.data.isEnrolledIn2Sv === false) throw new Error('Users must have 2FA enabled on their Woodcraft GSuite account to be assigned roles.')
+        } catch (e: any) {
+          res.status(400).json({ message: e.message ?? 'Error checking account in WCF Directory' })
           return
         }
       }
@@ -62,12 +63,12 @@ export const createRole = HandlerWrapperLoggedIn<{}, TCreateRoleData>(
       })
 
       await enqueueAsyncTask({
-            type: 'emailManagerDataAccess',
-            data: {
-              eventId: event.eventId,
-              userId: targetUser.userId,
-            },
-          })
+        type: 'emailManagerDataAccess',
+        data: {
+          eventId: event.eventId,
+          userId: targetUser.userId,
+        },
+      })
 
       res.json({ role: validatedRole })
     } catch (error) {

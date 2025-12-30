@@ -20,6 +20,7 @@ export type ConfigType = {
   DISCORD_WEBHOOK_URL: string,
   STRIPE_SECRET_KEY: string,
   STRIPE_WEBHOOK_SECRET: string,
+  BIG_ROLE_OU_ALLOWLIST: string[],
 }
 
 let configData: ConfigType
