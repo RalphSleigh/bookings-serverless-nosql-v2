@@ -53,14 +53,16 @@ class AWSLogger implements Logger {
       })()
     }
 
-    const logTask = seeLogStreams[logStreamName].then(() => {
-      return cloudWatchLogsClient.send(
+    const logTask = seeLogStreams[logStreamName].then(async () => {
+      console.log('Logging to CloudWatch:', message)
+      await cloudWatchLogsClient.send(
         new PutLogEventsCommand({
           logGroupName: 'bookings_system_request_logs',
           logStreamName,
           logEvents: [{ message, timestamp: Date.now() }],
         }),
       )
+      console.log('Logged to CloudWatch')
     })
 
     this.tasks.push(logTask)
@@ -83,7 +85,7 @@ class AWSLogger implements Logger {
 
   async flush() {
     this.logToPath(`Request finished with status ${this.res?.statusCode} at ${new Date().toISOString()}`)
-    console.log('Flushing logs')
+    console.log('Flushing logs', this.tasks.length, 'tasks')
     await Promise.all(this.tasks)
     console.log('Flushed logs')
   }
