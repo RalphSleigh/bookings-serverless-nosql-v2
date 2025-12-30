@@ -146,8 +146,12 @@ export const loggerMiddleware: RequestHandler = async (req, res, next) => {
 export const requestLoggerMiddleware: RequestHandler = async (req, res, next) => {
   if (res.locals.user) {
     res.locals.logger.logToSystem(`User ${res.locals.user.name} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+    res.locals.logger.logToPath(`User ${res.locals.user.name} ${res.locals.user.userId} called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+    res.locals.logger.logToPath(`User agent: ${req.headers['user-agent']}`)
   } else {
     res.locals.logger.logToSystem(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+    res.locals.logger.logToPath(`Anonymous user called ${req.method}: ${req.path} (${req.headers['x-forwarded-for']})`)
+    res.locals.logger.logToPath(`User agent: ${req.headers['user-agent']}`)
   }
   next()
 }
