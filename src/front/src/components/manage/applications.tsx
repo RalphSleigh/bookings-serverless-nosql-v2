@@ -52,10 +52,10 @@ export const ManageApplications = () => {
     return (
       <Table.Tr key={app.userId}>
         <Table.Td>{Avatars(app.type)}</Table.Td>
+        <Table.Td>{app.name}</Table.Td>
         <Table.Td>
           <a href={`mailto:${app.email}`}>{app.email}</a>
         </Table.Td>
-        <Table.Td>{app.email}</Table.Td>
         <Table.Td>{app.district}</Table.Td>
         <Table.Td>{app.minPredicted === app.maxPredicted ? app.minPredicted : `${app.minPredicted} - ${app.maxPredicted}`}</Table.Td>
         <Table.Td>{booking ? booking.people.filter(p => !p.cancelled).length : ''}</Table.Td>
