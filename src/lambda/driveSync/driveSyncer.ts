@@ -38,7 +38,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
 
     for (const user of users.data) {
       console.log(`Syncing drive for user ${user.name}`)
-      const rolesQuery = await DBRole.find({ userId: user.userId, eventId }).go()
+      const rolesQuery = await DBRole.match({ userId: user.userId, eventId }).go()
 
       if (!rolesQuery.data || rolesQuery.data.length === 0) {
         console.log(`User ${user.name} has no roles for event ${event.name}, skipping`)

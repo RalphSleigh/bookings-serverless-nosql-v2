@@ -25,7 +25,7 @@ abstract class BookingField {
   Cell?: CellType
   size: number = 100
   roles: TRole['role'][] = ['owner']
-  available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role))
+  available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role) && role.eventId === this.event.eventId)
   titleForDrive: () => string = () => this.name
   valueForDrive: (b: TBookingResponse) => string = (b) => {
     if (typeof this.accessor === 'function') {
