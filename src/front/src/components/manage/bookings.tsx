@@ -14,13 +14,13 @@ import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import useLocalStorageState from 'use-local-storage-state'
 
+import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { bookingFields } from '../../../../shared/bookingFields'
 import { TBooking } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { CustomLink, useEvent } from '../../utils'
-import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 
 export const ManageBookings = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -164,21 +164,29 @@ const basicDetailsLargeGroup = (event: TEvent, booking: TBookingResponse) => (
   </>
 )
 
-const campingDetailsLarge= (event: TEvent, booking: TBookingResponse) => (
+const campingDetailsLarge = (event: TEvent, booking: TBookingResponse) => (
   <>
     <Title order={4}>Camping Details</Title>
-    <Text><b>Shuttle:</b> { 'shuttle' in booking.other ? booking.other.shuttle : 'N/A' }</Text>
-    <Text><b>Anything else:</b> {booking.other.anythingElse}</Text>
-  </>)
+    <Text>
+      <b>Shuttle:</b> {'shuttle' in booking.other ? booking.other.shuttle : 'N/A'}
+    </Text>
+    <Text>
+      <b>Anything else:</b> {booking.other.anythingElse}
+    </Text>
+  </>
+)
 
-  const campingDetailsSmall= (event: TEvent, booking: TBookingResponse) => (
-   <>
+const campingDetailsSmall = (event: TEvent, booking: TBookingResponse) => (
+  <>
     <Title order={4}>Camping Details</Title>
-    <Text><b>WhatsApp:</b> { 'whatsApp' in booking.other ? booking.other.whatsApp : 'N/A' }</Text>
-    <Text><b>Anything else:</b> {booking.other.anythingElse}</Text>
-  </>  
-  )
-
+    <Text>
+      <b>WhatsApp:</b> {'whatsApp' in booking.other ? booking.other.whatsApp : 'N/A'}
+    </Text>
+    <Text>
+      <b>Anything else:</b> {booking.other.anythingElse}
+    </Text>
+  </>
+)
 
 const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingResponse }) => {
   const basic = event.bigCampMode
