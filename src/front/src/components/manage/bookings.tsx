@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
+import { getRouteApi, useRouteContext } from '@tanstack/react-router'
 import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
@@ -26,11 +26,12 @@ import { Can } from '../../permissionContext'
 
 export const ManageBookings = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
+  const { user } = useRouteContext({ from: '/_user' })
   const { eventId } = route.useParams()
   const bookingsQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
   const event = useEvent()
 
-  const fields = useMemo(() => bookingFields(event).filter((f) => f.enabled(event)), [])
+  const fields = useMemo(() => bookingFields(event).filter((f) => f.enabled(event) && f.available(user.roles)), [])
   const visibilityDefault = fields.reduce(
     (acc, f) => {
       acc[f.name] = !f.hideByDefault
