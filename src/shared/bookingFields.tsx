@@ -3,12 +3,12 @@ import relativeTime from 'dayjs/plugin/relativeTime.js'
 import { getProperty } from 'dot-prop'
 import { MRT_ColumnDef } from 'mantine-react-table'
 
+import { TBookingResponse } from '../lambda/endpoints/event/manage/getEventBookings'
 import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { ageGroupFromPerson } from './woodcraft'
-import { TBookingResponse } from '../lambda/endpoints/event/manage/getEventBookings'
 
 dayjs.extend(relativeTime)
 
@@ -85,6 +85,20 @@ class PeopleCount extends BookingField {
   accessor = (b: TBookingResponse) => b.people.filter((p) => !p.cancelled).length.toString()
 }
 
+class Shuttle extends BookingField {
+  name = 'Shuttle'
+  size = 20
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => ('shuttle' in b.other ? b.other.shuttle : 'N/A')
+}
+
+class AnythingElse extends BookingField {
+  name = 'Anything Else'
+  size = 150
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => b.other.anythingElse || ''
+}
+
 class EditLink extends BookingField {
   name = 'Edit'
   size = 50
@@ -108,5 +122,5 @@ class Updated extends BookingField {
 }
 
 export const bookingFields: (event: TEvent) => BookingField[] = (event) => {
-  return [new Name(event), new Email(event), new Phone(event), new PeopleCount(event), new EditLink(event), new Created(event), new Updated(event)]
+  return [new Name(event), new Email(event), new Phone(event), new PeopleCount(event), new Shuttle(event), new AnythingElse(event), new EditLink(event), new Created(event), new Updated(event)]
 }

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
-import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
+import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
 import { TPerson } from '../../../../shared/schemas/person'
@@ -14,13 +14,13 @@ import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import useLocalStorageState from 'use-local-storage-state'
 
+import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { bookingFields } from '../../../../shared/bookingFields'
 import { TBooking } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { CustomLink, useEvent } from '../../utils'
-import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 
 export const ManageBookings = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -90,6 +90,7 @@ export const ManageBookings = () => {
           <IconDownload />
         </ActionIcon>
         {/* along-side built-in buttons in whatever order you want them */}
+        <MRT_ShowHideColumnsButton table={table} />
         <MRT_ToggleDensePaddingButton table={table} />
         <MRT_ToggleFullScreenButton table={table} />
       </Flex>
@@ -163,6 +164,30 @@ const basicDetailsLargeGroup = (event: TEvent, booking: TBookingResponse) => (
   </>
 )
 
+const campingDetailsLarge = (event: TEvent, booking: TBookingResponse) => (
+  <>
+    <Title order={4}>Camping Details</Title>
+    <Text>
+      <b>Shuttle:</b> {'shuttle' in booking.other ? booking.other.shuttle : 'N/A'}
+    </Text>
+    <Text>
+      <b>Anything else:</b> {booking.other.anythingElse}
+    </Text>
+  </>
+)
+
+const campingDetailsSmall = (event: TEvent, booking: TBookingResponse) => (
+  <>
+    <Title order={4}>Camping Details</Title>
+    <Text>
+      <b>WhatsApp:</b> {'whatsApp' in booking.other ? booking.other.whatsApp : 'N/A'}
+    </Text>
+    <Text>
+      <b>Anything else:</b> {booking.other.anythingElse}
+    </Text>
+  </>
+)
+
 const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingResponse }) => {
   const basic = event.bigCampMode
     ? 'type' in booking.basic && booking.basic.type === 'individual'
@@ -170,12 +195,15 @@ const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingRe
       : basicDetailsLargeGroup(event, booking)
     : basicDetailsSmall(event, booking)
 
+  const camping = event.bigCampMode ? campingDetailsLarge(event, booking) : campingDetailsSmall(event, booking)
+
   const peopleList = booking.people.map((p) => <li key={p.personId}>{p.basic.name}</li>)
 
   return (
     <Flex>
       <Box>
         {basic}
+        {camping}
         <Text>
           <b>Booked:</b> {booking.people.length}
         </Text>
