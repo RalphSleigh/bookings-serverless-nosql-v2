@@ -164,6 +164,22 @@ const basicDetailsLargeGroup = (event: TEvent, booking: TBookingResponse) => (
   </>
 )
 
+const campingDetailsLarge= (event: TEvent, booking: TBookingResponse) => (
+  <>
+    <Title order={4}>Camping Details</Title>
+    <Text><b>Shuttle:</b> { 'shuttle' in booking.other ? booking.other.shuttle : 'N/A' }</Text>
+    <Text><b>Anything else:</b> {booking.other.anythingElse}</Text>
+  </>)
+
+  const campingDetailsSmall= (event: TEvent, booking: TBookingResponse) => (
+   <>
+    <Title order={4}>Camping Details</Title>
+    <Text><b>WhatsApp:</b> { 'whatsApp' in booking.other ? booking.other.whatsApp : 'N/A' }</Text>
+    <Text><b>Anything else:</b> {booking.other.anythingElse}</Text>
+  </>  
+  )
+
+
 const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingResponse }) => {
   const basic = event.bigCampMode
     ? 'type' in booking.basic && booking.basic.type === 'individual'
@@ -171,12 +187,15 @@ const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingRe
       : basicDetailsLargeGroup(event, booking)
     : basicDetailsSmall(event, booking)
 
+  const camping = event.bigCampMode ? campingDetailsLarge(event, booking) : campingDetailsSmall(event, booking)
+
   const peopleList = booking.people.map((p) => <li key={p.personId}>{p.basic.name}</li>)
 
   return (
     <Flex>
       <Box>
         {basic}
+        {camping}
         <Text>
           <b>Booked:</b> {booking.people.length}
         </Text>
