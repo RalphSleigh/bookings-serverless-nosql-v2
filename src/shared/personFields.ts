@@ -24,7 +24,7 @@ export abstract class PersonField<T extends TEvent = TEvent> {
   Cell?: MRT_ColumnDef<TPersonResponse<T>>['Cell']
   size: number = 100
   roles: TRole['role'][] = ['owner', 'manager', 'viewer', 'comms', 'finance']
-  available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role))
+  available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role) && role.eventId === this.event.eventId)
   titleForDrive: () => string = () => this.name
   valueForDrive: (p: TPersonResponse<T>) => string = (p) => {
     if (typeof this.accessor === 'function') {
