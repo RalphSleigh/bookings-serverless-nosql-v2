@@ -8,6 +8,7 @@ import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
 import 'mantine-react-table/styles.css'
 
+import { subject } from '@casl/ability'
 import { ActionIcon, Anchor, Box, Container, Flex, Modal, Paper, ScrollArea, Stack, Text, Title } from '@mantine/core'
 import { IconDownload } from '@tabler/icons-react'
 import dayjs from 'dayjs'
@@ -21,6 +22,7 @@ import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { CustomLink, useEvent } from '../../utils'
+import { Can } from '../../permissionContext'
 
 export const ManageBookings = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -207,9 +209,11 @@ const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingRe
         <Text>
           <b>Booked:</b> {booking.people.length}
         </Text>
-        <CustomLink to={`/event/$eventId/manage/booking/$userId/history`} params={{ eventId: event.eventId, userId: booking.userId }} style={{ float: 'right', marginTop: 10, marginRight: 10 }}>
-          History
-        </CustomLink>
+        <Can I="getSensitiveFields" this={subject('eventId', { eventId: event.eventId })}>
+          <CustomLink to={`/event/$eventId/manage/booking/$userId/history`} params={{ eventId: event.eventId, userId: booking.userId }} style={{ float: 'right', marginTop: 10, marginRight: 10 }}>
+            History
+          </CustomLink>
+        </Can>
       </Box>
       <Box h="calc(100dvh - var(--modal-y-offset) * 2 - var(--mantine-spacing-md) * 2)">
         <Stack h="100%" gap={0}>
