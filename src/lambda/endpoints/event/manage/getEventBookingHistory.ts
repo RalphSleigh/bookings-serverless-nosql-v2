@@ -11,7 +11,7 @@ export type GetEventBookingHistoryResponseType = { data:  CollectionResponse<
 >["data"]  }
 
 export const getEventBookingHistory = HandlerWrapperLoggedIn<{ userId: string, eventId: string }>(
-  (req, res) => ['getBackend', subject('eventId', { eventId: res.locals.event.eventId })],
+  (req, res) => ['getSensitiveFields', subject('eventId', { eventId: res.locals.event.eventId })],
   async (req, res) => {
     try {
       const event = res.locals.event
