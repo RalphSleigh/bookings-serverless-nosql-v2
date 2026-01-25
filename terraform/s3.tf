@@ -43,7 +43,7 @@ resource "aws_s3_bucket_acl" "public_static_acl" {
 
 data "aws_iam_policy_document" "s3_policy_public_static" {
   statement {
-    actions   = ["s3:GetObject", "s3:ListBucket"]
+    actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.public_static.arn}/*"]
 
     principals {
