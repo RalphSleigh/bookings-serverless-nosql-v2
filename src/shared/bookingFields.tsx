@@ -103,6 +103,7 @@ class EditLink extends BookingField {
   name = 'Edit'
   size = 50
   enabledForDrive = () => false
+  roles: TRole['role'][] = ['owner', 'manager']
   accessor = (b: TBookingResponse) => `/event/${b.eventId}/booking/${b.userId}/update`
   Cell: CellType = ({ cell }) => <a href={cell.getValue<string>()}>Edit</a>
 }
