@@ -24,7 +24,7 @@ abstract class BookingField {
   filterVariant: 'text' | 'date-range' = 'text'
   Cell?: CellType
   size: number = 100
-  roles: TRole['role'][] = ['owner']
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer', 'comms', 'finance']
   available: (roles: TRole[]) => boolean = (roles) => roles.some((role) => this.roles.includes(role.role) && role.eventId === this.event.eventId)
   titleForDrive: () => string = () => this.name
   valueForDrive: (b: TBookingResponse) => string = (b) => {
