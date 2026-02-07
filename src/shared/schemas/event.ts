@@ -73,6 +73,7 @@ export const EventSchema = z.object({
   howDidYouHear: z.boolean().default(false),
   customQuestions: z.array(customQuestion),
   emailTemplates: z.enum(['default', 'vcamp']).default('default'),
+  dobInput: z.enum(['date', 'dropdown']).default('date'),
 })
 
 export const EventSchemaWhenCreating = EventSchema.partial({ eventId: true })

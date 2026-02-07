@@ -60,6 +60,11 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
     { value: 'vcamp', label: 'VCamp' },
   ]
 
+  const dobInputs = [
+    { value: 'date', label: 'Date Input' },
+    { value: 'dropdown', label: 'Dropdown' },
+  ]
+
   const { isValid, errors } = formState
   return (
     <FormProvider {...formMethods}>
@@ -98,6 +103,7 @@ export function EventForm({ inputData, mode, mutation }: { inputData: DefaultVal
             <CustomSelect data={AttendanceOptions} label="Attendance Structure" name="attendance.attendanceStructure" control={control} mt={16} />
             <CustomSelect data={feeOptions} label="Fee Structure" name="fee.feeStructure" control={control} mt={16} disabled={!watch('attendance.attendanceStructure')} />
             <CustomSelect label="Email Templates" name="emailTemplates" control={control} data={emailTemplates} mt={16} />
+            <CustomSelect label="DoB Input Type" name="dobInput" control={control} data={dobInputs} mt={16} />
             {feeConfig ? <feeConfig.ConfigurationElement /> : null}
             <CustomQuestionsForm />
             <ValidationErrors />
