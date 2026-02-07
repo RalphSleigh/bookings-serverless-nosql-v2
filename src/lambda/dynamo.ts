@@ -324,6 +324,11 @@ export const DBEvent = new Entity(
         required: true,
         default: 'default',
       },
+      dobInput: {
+        type: ['date', 'dropdown'] as const,
+        required: true,
+        default: 'date',
+      },
     },
     indexes: {
       natural: {
