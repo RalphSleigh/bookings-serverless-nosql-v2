@@ -1,9 +1,9 @@
-import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Paper, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Group, Input, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import React, { useMemo, useState } from 'react'
-import { DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Control, Controller, DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
 import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod/v4'
 
@@ -17,6 +17,7 @@ import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/s
 import { errorProps, useEvent } from '../../utils.js'
 import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
 import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
+import { CustomRadioGroup } from '../custom-inputs/customRadioGroup.js'
 import { CustomSelect } from '../custom-inputs/customSelect.js'
 import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
 import { defaultPersonData } from './defaults.js'
@@ -43,12 +44,12 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
 
   const appendFn = () => {
     const newPerson = defaultPersonData(user, event)
-    append(newPerson as TPerson)
+    append(newPerson as TPerson, { focusName: `people.${fields.length}.basic.name` })
   }
 
   return (
     <>
-      <Title size="h4" order={2} mt={16}>
+      <Title size="h4" order={2} mt={16} id="step-people">
         People
       </Title>
       <SmallSuspenseWrapper>
@@ -87,7 +88,7 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: num
   const valid = peopleSchema.safeParse(person).success
   if (!person) return null
   return (
-    <Paper shadow="md" radius="md" withBorder mt={16} id={person.personId} onClick={() => setCollapsed(false)} pl={8}>
+    <Paper shadow="md" radius="md" withBorder mt={16} id={`person-${index}`} onClick={() => setCollapsed(false)} pl={8}>
       <Flex justify="flex-end" m={8} align="center">
         <Title order={3} size="h4" style={{ cursor: 'pointer', flexGrow: 1 }}>
           {valid ? '✅' : '❌'} {person.basic?.name}
@@ -101,8 +102,7 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: num
 }
 
 const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEvent; index: number; remove: UseFieldArrayRemove; setCollapsed: (collapsed: boolean) => void }) => {
-  const personId = useWatch<PartialBookingType, `people.${number}.personId`>({ name: `people.${index}.personId` })
-  const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const { register, formState, control } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
   const e = errorProps(errors)
@@ -136,7 +136,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
   const consent = getConsentsType(event)
 
   return (
-    <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={personId}>
+    <Paper shadow="md" radius="md" withBorder mt={16} pl={8} pr={8} id={`person-${index}`}>
       <Grid p={6} gutter={8}>
         <Grid.Col span={8}>
           <TextInput
@@ -150,9 +150,10 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           />
         </Grid.Col>
         <Grid.Col span={4}>
-          <CustomDatePicker label="Date of Birth" id={`person-dob-${index}`} name={`people.${index}.basic.dob`} autoComplete={`section-person-${index} dob`} required />
+          <DoBInput event={event} index={index} control={control} e={e} />
         </Grid.Col>
         {email}
+        {event.fee.feeStructure === 'vcamp' ? <PersonRoleForm index={index} /> : null}
         <kp.PersonFormSection index={index} />
         <HealthElement index={index} />
 
@@ -223,7 +224,7 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
         autoComplete={`section-person-${index} health-accessibility`}
         id={`person-health-accessibility-${index}`}
         data-form-type="other"
-        label="Details of relevant medical conditions, medication taken or addtional needs"
+        label="Accessibility requirements"
         {...register(`people.${index}.health.accessibility` as const)}
         {...e(`people.${index}.health.accessibility`)}
         autosize
@@ -255,6 +256,99 @@ const FirstAid: React.FC<{ index: number }> = ({ index }) => {
   if (!isAdult) return null
 
   return <CustomCheckbox mt={16} label="First Aider (18+ only)" id={`person-firstaid-${index}`} name={`people.${index}.firstAid`} m={4} />
+}
+
+const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
+  const dob = useWatch<z.infer<typeof BookingSchemaForType>>({
+    name: `people.${index}.basic.dob`,
+  })
+
+  const role = useWatch<z.infer<typeof BookingSchemaForType>>({
+    name: `people.${index}.basic.role`,
+  })
+
+  const event = useEvent()
+
+  const { setValue } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+
+  useEffect(() => {
+    if (typeof dob !== 'string') return
+    const DoBdate = dayjs(dob)
+    const EventStartDate = dayjs(event.startDate)
+
+    const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
+    if (!role) setValue(`people.${index}.basic.role`, over16 ? 'volunteer' : 'participant')
+  }, [dob, event, role, setValue, index])
+
+  return (
+    <CustomRadioGroup<TBooking<TEvent>> mt={16} name={`people.${index}.basic.role`} required>
+      <Group mt={8}>
+        <Input.Label required>
+          <b>Role on camp:</b> Is this person attending as a participant or volunteer?
+        </Input.Label>
+        <Radio value={'participant'} label="Participant" />
+        <Radio value={'volunteer'} label="Volunteer" />
+      </Group>
+    </CustomRadioGroup>
+  )
+}
+
+const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infer<typeof BookingSchemaForType>>; e: ReturnType<typeof errorProps> }> = ({ event, index, control, e }) => {
+  if (event.dobInput === 'date')
+    return (
+      <Controller
+        control={control}
+        name={`people.${index}.basic.dob`}
+        render={
+          (props) => {
+            console.log('value', props.field.value)
+            //const formatted = props.field.value.split('T')[0]
+            //console.log('formatted', formatted)
+            return (
+              <TextInput
+                required
+                autoComplete={`section-person-${index} dob`}
+                id={`person-dob-${index}`}
+                data-form-type="other"
+                label="Date of Birth"
+                /* {...register(`people.${index}.basic.dob` as const)} */
+                {...e(`people.${index}.basic.dob`)}
+                type="date"
+                onChange={(e) => {
+                  /*                   props.field.onChange(e.target.value)
+                  return */
+                  /* console.log('event', e.target.value)
+                      const parsed = new Date(e.target.value)
+                      console.log("Setting parsed date", parsed, parsed.toISOString())
+                      props.field.onChange(parsed.toISOString())
+                      return
+                      parsed.isValid() ? props.field.onChange(parsed.toISOString()) :  */
+                  props.field.onChange(e.target.value)
+                }}
+                value={props.field.value}
+                /* value={props.field.value ? dayjs(props.field.value).format('YYYY-MM-DD') : ''} */
+                onBlur={props.field.onBlur}
+                ref={props.field.ref}
+              />
+            )
+          }
+          /*               <ReactDatePicker
+                className="input"
+                placeholderText="Select date"
+                onChange={(e) => props.onChange(e)}
+                selected={props.value}
+              /> */
+        }
+      />
+    )
+  else {
+    const dates = Array(19).fill(null).map((_, i) => { 
+      const year = dayjs(event.startDate).startOf('year').subtract(i, 'years')
+      return { value: year.toISOString(), label: dayjs(event.startDate).diff(year, 'year').toString()}
+    })
+    dates[18].label = '18+'
+    return <CustomSelect required label="Age" name={`people.${index}.basic.dob`} control={control} data={dates} {...e(`people.${index}.basic.dob`)} />
+  }
 }
 
 /* const COLLAPSE_DEFAULT_THRESHOLD = 20

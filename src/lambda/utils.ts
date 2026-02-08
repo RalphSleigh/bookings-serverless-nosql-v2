@@ -10,6 +10,7 @@ import { ContextUser, TUser } from '../shared/schemas/user'
 import { DB } from './dynamo'
 import { ConfigType } from './getConfig'
 import { Logger } from './middleware/logger'
+import { TFee } from '../shared/schemas/fees'
 
 export function am_in_lambda(): boolean {
   return process.env.LOCAL_SERVER !== 'true'
@@ -30,6 +31,7 @@ interface BasicLocals {
   event: TEvent
   booking: TBooking
   logger: Logger
+  fees: TFee[]
 }
 
 export const HandlerWrapper: THandlerWrapper<BasicLocals> = (permissionFn, fn) => async (req, res, next) => {
@@ -110,10 +112,10 @@ export const HandlerWrapper: HandlerWrapperType = <TPost, TResult>([action, subj
   });
 }; */
 
-export const getBookingByIDs: (eventId: string, userId: string) => Promise<TBooking> = async (eventId, userId) => {
-  const bookingsResult = await DB.collections.booking({ eventId, userId }).go()
+export const getBookingByIDs: (eventId: string, userId: string) => Promise<{ booking: TBooking, fees: TFee[] }> = async (eventId, userId) => {
+  const bookingsResult = await DB.collections.bookingByUserId({ eventId, userId }).go()
   if (!bookingsResult.data.booking[0]) throw new Error('Booking not found')
   const booking = bookingsResult.data.booking[0] as TBooking
   booking.people = bookingsResult.data.person.filter((p) => !p.cancelled).sort((a, b) => a.createdAt - b.createdAt) as TPerson[]
-  return booking
+  return  { booking, fees: bookingsResult.data.fee as TFee[] }
 }

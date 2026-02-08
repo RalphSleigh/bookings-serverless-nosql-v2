@@ -16,17 +16,20 @@ import { getFeeType } from '../../../../shared/fees/fees.js'
 //import { MemoBookingExtraContactFields } from "./extraContacts.js";
 //import { MemoCampingFields } from "./camping.js";
 //import { consent } from "../../../shared/consents/consent.js";
-import { BookingSchema, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
+import { BookingSchema, BookingSchemaForClient, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
+import { TFee } from '../../../../shared/schemas/fees.js'
 import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
 import { cancelBooking } from '../../mutations/cancelBooking.js'
 import { BasicFieldsBig, BasicFieldsSmall } from './basicFields.js'
 import { CampingFormSection } from './camping.js'
 import { ChangesDisplay } from './changes.js'
+import { EmergencyContactSection } from './emergencyFields.js'
 import { ExtraContactsForm } from './extraContacts.js'
 import { OtherQuestionsForm } from './otherQuestions.js'
 import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
+import { BookingStepper } from './stepper.js'
 import { BookingSummary } from './summary.js'
 import { MemoValidationErrors } from './validation.js'
 
@@ -37,15 +40,16 @@ type BookingFormProps = {
   event: TEvent
   inputData: DefaultValues<TBooking> & { userId: string; eventId: string }
   mutation: UseMutationResult<any, any, any, any>
+  payments: TFee[]
 }
 
-export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData, mutation }) => {
+export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData, mutation, payments }) => {
   // export function BookingForm({ data, originalData, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, originalData: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: (notify) => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
   const { user } = useRouteContext({ from: '/_user' })
   const readOnly = mode === 'view'
   const own = inputData.userId === user.userId
 
-  const schema = BookingSchema(event)
+  const schema = BookingSchemaForClient(event)
   type BookingFormValues = z.infer<typeof schema>
   const formMethods = useForm({ resolver: zodResolver(schema), mode: 'onTouched', defaultValues: inputData as BookingFormValues })
   const { formState, handleSubmit } = formMethods
@@ -83,7 +87,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
     const diff = validationResults.length == 0 ? generateDiscordDiff(originalData, data) : []
  */
 
-  const matches = useMediaQuery('(min-width: 62em)')
+  const shouldDisplaySummary = useMediaQuery('(min-width: 62em)')
+  const shouldDisplayStepper = useMediaQuery('(min-width: 75em)')
 
   const fees = useMemo(() => getFeeType(event), [event])
 
@@ -109,17 +114,23 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid gutter={0}>
-          <Grid.Col span={{ base: 12, md: 9 }}>
+          {shouldDisplayStepper && (
+            <Grid.Col span={{ base: 12, lg: 3 }}>
+              <BookingStepper event={event} schema={schema} checked={checked} />
+            </Grid.Col>
+          )}
+          <Grid.Col span={{ base: 12, md: 9, lg: 6 }}>
             <Paper shadow="md" radius="md" withBorder m={8} p="md">
               <BasicFields event={event} />
+              <EmergencyContactSection />
               {event.bigCampMode && <ExtraContactsForm />}
               <PeopleForm event={event} userId={inputData.userId} />
               {event.bigCampMode && <CampingFormSection />}
               <OtherQuestionsForm />
-              <Title size="h4" order={2} mt={8}>
-                Pricing
+              <Title size="h4" order={2} mt={16} id="step-fees">
+                Fees
               </Title>
-              <fees.BookingFormDisplayElement event={event} />
+              <fees.BookingFormDisplayElement event={event} user={user} fees={payments} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
               {itemToDisplay}
               <Flex gap={8} mt={16}>
@@ -134,7 +145,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               </Flex>
             </Paper>
           </Grid.Col>
-          {matches && (
+          {shouldDisplaySummary && (
             <Grid.Col span={{ base: 12, md: 3 }}>
               <BookingSummary />
             </Grid.Col>

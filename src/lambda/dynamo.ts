@@ -112,7 +112,7 @@ export const DBRole = new Entity(
         required: true,
       },
       role: {
-        type: ['admin', 'owner', 'manager', 'viewer'] as const,
+        type: ['admin', 'owner', 'manager', 'viewer', 'comms', 'finance'] as const,
         required: true,
       },
       eventId: {
@@ -191,7 +191,7 @@ export const DBEvent = new Entity(
         required: true,
         properties: {
           feeStructure: {
-            type: ['free', 'ealing', 'vcamp'] as const,
+            type: ['free', 'ealing', 'ealing2026', 'vcamp'] as const,
             required: true,
           },
           ealingData: {
@@ -215,6 +215,57 @@ export const DBEvent = new Entity(
               },
               paymentInstructions: {
                 type: 'string',
+                required: true,
+              },
+            },
+          },
+          ealingData2026: {
+            type: 'map',
+            properties: {
+              adult: {
+                type: 'number',
+                required: true,
+              },
+              child: {
+                type: 'number',
+                required: true,
+              },
+              adultDiscount: {
+                type: 'number',
+                required: true,
+              },
+              childDiscount: {
+                type: 'number',
+                required: true,
+              },
+              paymentInstructions: {
+                type: 'string',
+                required: true,
+              },
+            },
+          },
+          participant: {
+            type: 'map',
+            properties: {
+              a: {
+                type: 'number',
+                required: true,
+              },
+              b: {
+                type: 'number',
+                required: true,
+              },
+            },
+          },
+          volunteer: {
+            type: 'map',
+            properties: {
+              a: {
+                type: 'number',
+                required: true,
+              },
+              b: {
+                type: 'number',
                 required: true,
               },
             },
@@ -293,6 +344,16 @@ export const DBEvent = new Entity(
           },
         },
       },
+      emailTemplates: {
+        type: ['default', 'vcamp'] as const,
+        required: true,
+        default: 'default',
+      },
+      dobInput: {
+        type: ['date', 'dropdown'] as const,
+        required: true,
+        default: 'date',
+      },
     },
     indexes: {
       natural: {
@@ -335,6 +396,8 @@ const BookingAttributes = {
       type: {
         type: ['individual', 'group'] as const,
       },
+      emergencyName: { type: 'string' },
+      emergencyTelephone: { type: 'string' },
     },
   },
   extraContacts: {
@@ -536,6 +599,7 @@ const PersonAttributes = {
       name: { type: 'string', required: true },
       dob: { type: 'string', required: true },
       email: { type: 'string' },
+      role: { type: ['volunteer', 'participant'] as const },
     },
   },
   attendance: {

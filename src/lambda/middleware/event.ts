@@ -15,12 +15,17 @@ export const eventMiddleware: RequestHandler = async (req, res, next) => {
       throw new Error('Event ID is required in the request parameters')
     }
 
+    //don't validate if we are editing the event as we are probably fixing broken data
+    if(req.params.splat[0] === 'edit'){
+      next()
+      return
+    }
+
     const event = await DBEvent.get({ eventId }).go()
 
     if (!event.data) {
       throw new Error(`Event with ID ${eventId} not found`)
     }
-
     res.locals.event = EventSchema.parse(event.data)
     next()
   } catch (error) {

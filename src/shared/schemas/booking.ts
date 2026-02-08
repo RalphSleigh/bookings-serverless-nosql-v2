@@ -2,25 +2,32 @@ import { PartialDeep } from 'type-fest'
 import { z, ZodType } from 'zod/v4'
 
 import { TEvent } from './event'
-import { PersonSchema, PersonSchemaForType, TPerson, TPersonKPData } from './person'
+import { PersonSchema, PersonSchemaForClient, PersonSchemaForType, TPerson, TPersonKPData } from './person'
 
 //Basic Information/Contact Details
 
-const basicSmall = z.object({
+const basicAll = z.object({
   name: z.string().nonempty(),
   email: z.email(),
   telephone: z.string().nonempty(),
 })
 
-const basicBigIndividual = basicSmall.extend({
+const basicSmall = basicAll.extend({
+  emergencyName: z.string().default(''),
+  emergencyTelephone: z.string().default(''),
+})
+
+const basicBigIndividual = basicAll.extend({
   district: z.string().optional(),
+  emergencyName: z.string().default(''),
+  emergencyTelephone: z.string().default(''),
 })
 
 const basicBigIndividualWithOrg = basicBigIndividual.extend({
   organisation: z.string().nonempty(),
 })
 
-const basicBigGroup = basicSmall.extend({
+const basicBigGroup = basicAll.extend({
   district: z.string().nonempty(),
 })
 
@@ -75,6 +82,11 @@ export const BookingSchema = (event: TEvent) =>
     other: event.bigCampMode ? otherBig : otherSmall,
     createdAt: z.number().optional(),
     updatedAt: z.number().optional(),
+  })
+
+export const BookingSchemaForClient = (event: TEvent) =>
+  BookingSchema(event).extend({
+    people: z.array(PersonSchemaForClient(event)).min(1),
   })
 
 //Schemas used for types, these don't depend on the event, but are used for type checking:

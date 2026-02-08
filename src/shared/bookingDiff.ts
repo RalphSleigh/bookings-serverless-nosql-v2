@@ -1,6 +1,7 @@
 import { diff, IChange } from 'json-diff-ts'
 
 import { TBooking } from './schemas/booking'
+import { em } from '@mantine/core'
 
 export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) => string[] = (oldBooking, newBooking) => {
   const replacements: Record<string, string> = {
@@ -26,6 +27,8 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
     dob: 'Date of Birth',
     accessibilityNeeds: 'Accessibility Needs',
     firstAid: 'First Aid',
+    emergencyName: 'Emergency Contact Name',
+    emergencyTelephone: 'Emergency Contact Telephone',
   }
 
   const updateString = (updateItem: IChange, stack: IChange[]) => {
@@ -36,7 +39,7 @@ export const generateDiscordDiff: (oldBooking: TBooking, newBooking: TBooking) =
       })
       return
     }
-    if (['version', 'createdAt', 'updatedAt', 'cancelled'].includes(updateItem.key)) return
+    if (['version', 'createdAt', 'updatedAt', 'cancelled', 'personId'].includes(updateItem.key)) return
 
     const capitalise = (string: string) => {
       return string[0].toUpperCase() + string.slice(1).toLowerCase()

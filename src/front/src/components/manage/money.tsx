@@ -18,6 +18,7 @@ import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { getEventFeesQueryOptions } from '../../queries/getEventFees'
 import { useEvent } from '../../utils'
 import { CustomNumberInput } from '../custom-inputs/customNumberInput'
+import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 
 export const ManageMoney = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -93,7 +94,7 @@ export const ManageMoney = () => {
   )
 }
 
-const MoneyDetails = ({ feeStructure, event, booking, fees }: { feeStructure: FeeStructure<any>; event: TEvent; booking: TBooking; fees: TFee[] }) => {
+const MoneyDetails = ({ feeStructure, event, booking, fees }: { feeStructure: FeeStructure<any>; event: TEvent; booking: TBookingResponse; fees: TFee[] }) => {
   const feeRows = feeStructure.getFeeLines(event, booking)
 
   const calculatedRows = feeRows.map((line, index) => (

@@ -14,7 +14,7 @@ export const CampingFormSection: React.FC = () => {
 
   return (
     <Grid.Col span={12}>
-      <Title size="h4" order={2} mt={16}>Camping</Title>
+      <Title size="h4" order={2} mt={16} id="step-camping">Camping</Title>
       <Textarea
         mt={8}
         label="Which other districts or groups do you want to camp with:"

@@ -11,7 +11,7 @@ import { TUser } from '../../../../shared/schemas/user'
 export const defaultPersonData = (user: TUser, event: TEvent): DefaultValues<TPerson<TEvent>> => {
   const attendanceStructure = getAttendanceType(event)
 
-  return { personId: uuidv7(), eventId: event.eventId, userId: user.userId, cancelled: false, attendance: attendanceStructure.getDefaultData(event) }
+  return { eventId: event.eventId, userId: user.userId, cancelled: false, attendance: attendanceStructure.getDefaultData(event) }
 }
 
 export const defaultBookingData = (user: TUser, event: TEvent): DefaultValues<TBooking> & { userId: string; eventId: string } => {

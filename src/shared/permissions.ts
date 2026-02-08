@@ -16,7 +16,7 @@ export type Abilities =
   | ['book' | 'apply', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
-  | ['getBackend' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
+  | ['getBackend' | 'getSensitiveFields' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
   | ['delete', 'role' | (TRole & ForcedSubject<'role'>)]
@@ -70,6 +70,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('create', 'event')
     can('edit', 'event')
     can('getBackend', 'eventId', (e) => true)
+    can('getSensitiveFields', 'eventId', (e) => true)
     can('viewRoles', 'eventId', (e) => true)
     can('get', 'users')
     can('create', 'role', (r) => true)
@@ -86,6 +87,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
   },
   owner: (can, role) => {
     can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+    can('getSensitiveFields', 'eventId', (e) => e.eventId === role.eventId)
     can('viewRoles', 'eventId', (e) => e.eventId === role.eventId)
     can('get', 'users')
     can('create', 'role', (r) => r.eventId === role.eventId)
@@ -102,6 +104,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
   },
   manager: (can, role) => {
     can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+    can('getSensitiveFields', 'eventId', (e) => e.eventId === role.eventId)
     can('viewRoles', 'eventId', (e) => e.eventId === role.eventId)
     can('get', 'users')
     can('create', 'role', (r) => r.eventId === role.eventId && r.role !== 'owner')
@@ -118,5 +121,14 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
   },
   viewer: (can, role) => {
     can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+    can('getSensitiveFields', 'eventId', (e) => e.eventId === role.eventId)
+  },
+  comms: (can, role) => {
+    can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+  },
+  finance: (can, role) => {
+    can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
+    can('getFees', 'eventId', (e) => e.eventId === role.eventId)
+    can('createFee', 'eventId', (e) => e.eventId === role.eventId)
   }
 }

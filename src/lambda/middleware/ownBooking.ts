@@ -14,6 +14,12 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
   try {
     const event = res.locals.event
     const user = res.locals.user
+
+    if(req.params.splat[0] === 'edit'){
+      next()
+      return
+    }
+
     if (!event || !user) {
       res.status(401).send('Event not Found or User not authenticated')
       return
@@ -25,7 +31,8 @@ export const ownBookingMiddleware: RequestHandler = async (req, res, next) => {
     if (!booking) {
       next()
     } else {
-      res.locals.booking = { ...booking, people: bookingResult.data.person.filter((p) => p.eventId === booking.eventId) } as TBooking
+      res.locals.booking = { ...booking, people: bookingResult.data.person.filter((p) => p.eventId === booking.eventId && !p.cancelled) } as TBooking
+      res.locals.fees = bookingResult.data.fee.filter((f) => f.eventId === event.eventId)
       next()
     }
   } catch (error) {

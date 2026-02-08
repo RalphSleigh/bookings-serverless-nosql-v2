@@ -49,7 +49,7 @@ const getHeadersFromEvent = (event: TEvent) => {
   const nightHeaders = nights.map((night) => `${night.start.format('DD/MM')} - ${night.end.format('DD/MM')}`)
 
   return [
-    ...['Name', 'Email', 'Date of Birth'],
+    ...['Name', 'Email', 'Date of Birth', 'Role'],
     ...nightHeaders,
     ...[
       'Dietary Requirements',
@@ -279,8 +279,22 @@ export async function createSheetForBooking(config: ConfigType, event: TEvent, u
           range: {
             sheetId: 0,
             startRowIndex: HEADER_ROW_INDEX + 1,
-            startColumnIndex: index('Date of Birth') + 1,
-            endColumnIndex: index('Date of Birth') + 1 + nights.length,
+            startColumnIndex: index('Role'),
+            endColumnIndex: index('Role') + 1,
+          },
+          cell: {
+            dataValidation: { condition: { type: 'ONE_OF_LIST', values: [{ userEnteredValue: 'Volunteer' }, { userEnteredValue: 'Participant' }] }, showCustomUi: true },
+          },
+          fields: ['dataValidation', 'userEnteredValue.stringValue'].join(', '),
+        },
+      },
+      {
+        repeatCell: {
+          range: {
+            sheetId: 0,
+            startRowIndex: HEADER_ROW_INDEX + 1,
+            startColumnIndex: index('Role') + 1,
+            endColumnIndex: index('Role') + 1 + nights.length,
           },
           cell: {
             dataValidation: { condition: { type: 'BOOLEAN', values: [{ userEnteredValue: 'Yes' }, { userEnteredValue: 'No' }] }, showCustomUi: true },
@@ -524,20 +538,18 @@ const getPersonFromRow = (
   try {
     if (typeof row[2] !== 'number') throw 'Invalid date'
     const dateObj = ValueToDate(row[index('Date of Birth')])
-    dob = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString()
+    dob = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split('T')[0]
   } catch (e) {}
 
   const result: Partial<TPerson<TEvent<TEventLargeKP, TEventVCampConsents, TEventFreeChoiceAttendance>>> = {
-    personId: `sheet-${i}-${event.eventId}-${userId}`,
     eventId: event.eventId,
     userId: userId,
     basic: {
       name: row[index('Name')],
       email: row[index('Email')],
       dob: dob,
+      role: (row[index('Role')] || '').toLowerCase(),
     },
-    /*         attendance: {
-        }, */
     kp: {
       diet: (row[index('Dietary Requirements')] || '').toLowerCase(),
       details: row[index('Dietary Details')],

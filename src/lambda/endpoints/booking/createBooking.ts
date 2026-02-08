@@ -1,5 +1,6 @@
 import { subject } from '@casl/ability'
 import { CreateEntityItem } from 'electrodb'
+import { v7 as uuidv7 } from 'uuid'
 
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
@@ -19,6 +20,10 @@ export const createBooking = HandlerWrapperLoggedIn(
 
     if (booking.eventId !== event.eventId) throw new Error('Event ID in path and body do not match')
     if (booking.userId !== user.userId) throw new Error('User ID in booking does not match authenticated user')
+
+    booking.people.forEach((person) => {
+      person.personId = uuidv7()
+    })
 
     const bookingSchema = BookingSchema(event)
 

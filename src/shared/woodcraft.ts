@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 
 import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
+import { TPersonResponse } from '../lambda/endpoints/event/manage/getEventBookings'
 
 export class AgeGroup {
   singular: string
@@ -57,13 +58,16 @@ export const ageGroups: AgeGroupFilter[] = [
 
 export const ageGroupFromPerson =
   (event: TEvent) =>
-  (person: TPerson): AgeGroup => {
+  (person: TPersonResponse): AgeGroup => {
     const age = dayjs(event.endDate).diff(dayjs(person.basic.dob), 'year')
     const ageGroupFilter = ageGroups.find((ag) => ag.filter(age))
     return ageGroupFilter ? ageGroupFilter.construct(age) : ageGroups[ageGroups.length - 1].construct(age)
   }
 
-  export const campersInAgeGroup = (event: TEvent) => (ageGroup: AgeGroupFilter) => (person: TPerson): boolean => {
+export const campersInAgeGroup =
+  (event: TEvent) =>
+  (ageGroup: AgeGroupFilter) =>
+  (person: TPersonResponse): boolean => {
     const age = dayjs(event.endDate).diff(dayjs(person.basic.dob), 'year')
     return ageGroup.filter(age)
   }

@@ -20,9 +20,7 @@ export const deleteFeeItem = HandlerWrapperLoggedIn<any, { eventId: string; feeI
       }
       if (res.locals.permissions.can('createFee', subject('eventId', { eventId: fee.data[0].eventId }))) {
         await DBFee.delete(fee.data[0]).go()
-        return res.status(204).send()
-      }
-      const booking = await DBBooking.get({
+        const booking = await DBBooking.get({
         userId: fee.data[0].userId,
         eventId: fee.data[0].eventId,
       }).go()
@@ -33,6 +31,9 @@ export const deleteFeeItem = HandlerWrapperLoggedIn<any, { eventId: string; feeI
           message: `${res.locals.user.name} deleted a ${fee.data[0].type} from booking ${booking.data.basic!.district || booking.data.basic!.name} of ${currency(fee.data[0].amount)} (${fee.data[0].note})`,
         },
       })
+        return res.status(204).send()
+      }
+      return res.status(401).send()
     } catch (error) {
       res.locals.logger.logToPath('Delete Fee Failed')
       res.locals.logger.logToPath(error)

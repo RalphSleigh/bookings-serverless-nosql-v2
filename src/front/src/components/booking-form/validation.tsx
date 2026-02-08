@@ -6,11 +6,11 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { PartialDeep } from 'type-fest'
 import { z } from 'zod/v4'
 
-import { BookingSchema, BookingSchemaForType, PartialBookingType, TBookingForType } from '../../../../shared/schemas/booking'
+import { BookingSchema, BookingSchemaForClient, BookingSchemaForType, PartialBookingType, TBookingForType } from '../../../../shared/schemas/booking'
 import { WatchDebounce } from '../../utils'
 
 type ValidationErrorsProps = {
-  schema: ReturnType<typeof BookingSchema>
+  schema: ReturnType<typeof BookingSchemaForClient>
 }
 
 const mapValidationError = (data: PartialBookingType | undefined) => (issue: z.core.$ZodIssue) => {
@@ -29,6 +29,7 @@ const mapValidationError = (data: PartialBookingType | undefined) => (issue: z.c
     if (name) {
       if (issue.path[2] === 'basic' && issue.path[3] === 'email') return `Please enter an email address for ${name}`
       if (issue.path[2] === 'basic' && issue.path[3] === 'dob') return `Please enter a DoB for ${name}`
+      if (issue.path[2] === 'basic' && issue.path[3] === 'role') return `Please select a role for ${name}`
       if (issue.path[2] === 'kp' && issue.path[3] === 'diet') return `Please select a diet for ${name}`
       if (issue.path[2] === 'attendance' && issue.path[3] === 'bitMask') return `Please select at least one night for ${name}`
       if (issue.path[2] === 'consents' && issue.path[3] === 'photo') return `Please answer the photo consent question for ${name}`
@@ -40,8 +41,8 @@ const mapValidationError = (data: PartialBookingType | undefined) => (issue: z.c
     }
   }
 
-  if(issue.path[0] === 'other') {
-    if(issue.path[1] === 'whatsApp') return `Please answer the WhatsApp question`
+  if (issue.path[0] === 'other') {
+    if (issue.path[1] === 'whatsApp') return `Please answer the WhatsApp question`
   }
 
   return `${issue.path.join('.')} - ${issue.message}`
@@ -65,7 +66,7 @@ const ValidationMessages: React.FC<{ messages: string[] }> = ({ messages }) => {
 
 const MemoValidationMessages = React.memo(ValidationMessages)
 
-const MessageCalculator = ({ schema, formstate }: { schema: ReturnType<typeof BookingSchema>; formstate: z.input<typeof BookingSchemaForType> | undefined }) => {
+const MessageCalculator = ({ schema, formstate }: { schema: ReturnType<typeof BookingSchemaForClient>; formstate: z.input<typeof BookingSchemaForType> | undefined }) => {
   console.log('rendering validation')
   const messages = useMemo(() => {
     const valid = schema.safeParse(formstate)

@@ -39,16 +39,19 @@ const ConsentVCamp = z.object({ photo: z.enum(['Yes', 'No']), rse: z.enum(['Yes'
 
 export const PersonSchema = (event: TEvent) => {
   const startDate = dayjs(event.startDate)
-  const basic = event.allParticipantEmails
+  let basic = event.allParticipantEmails
     ? z.object({
         name: z.string().nonempty(),
-        dob: z.iso.datetime(),
+        dob: z.iso.datetime({ error: 'Please enter a valid date of birth' }).or(z.iso.date({ error: 'Please enter a valid date of birth' })),
         email: z.email(),
       })
     : z.object({
         name: z.string().nonempty(),
-        dob: z.iso.datetime(),
+        dob: z.iso.datetime({ error: 'Please enter a valid date of birth' }).or(z.iso.date({ error: 'Please enter a valid date of birth' })),
       })
+
+  if (event.fee.feeStructure === 'vcamp') basic = basic.extend({ role: z.enum(['participant', 'volunteer']) })
+
   return z
     .object({
       personId: z.string(),
@@ -76,8 +79,24 @@ export const PersonSchema = (event: TEvent) => {
     )
 }
 
+export const PersonSchemaForClient = (event: TEvent) => {
+  const startDate = dayjs(event.startDate)
+  return PersonSchema(event)
+    .omit({ personId: true })
+    .refine(
+      (data) => {
+        const dob = dayjs(data.basic.dob)
+        return !(event.consents.consentsStructure === 'vcamp' && dob.add(12, 'years').isBefore(startDate) && dob.add(18, 'years').isAfter(startDate) && !data.consents.rse)
+      },
+      {
+        path: ['consents', 'rse'],
+        error: `RSE Consent is required for those aged 12 - 17`,
+      },
+    )
+}
+
 export const PersonSchemaForType = z.object({
-  personId: z.string(),
+  personId: z.string().optional(),
   userId: z.uuidv7(),
   eventId: z.uuidv7(),
   cancelled: z.boolean().default(false),
@@ -85,6 +104,7 @@ export const PersonSchemaForType = z.object({
     name: z.string().nonempty(),
     dob: z.iso.datetime(),
     email: z.email().optional(),
+    role: z.enum(['participant', 'volunteer']).optional(),
   }),
   attendance: AttendanceWhole.or(AttendanceFreeChoice),
   kp: KPBasic.or(KPLarge),
