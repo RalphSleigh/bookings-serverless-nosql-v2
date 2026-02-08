@@ -163,7 +163,7 @@ export class EalingFees implements FeeStructure<TEventEalingFees> {
           <Table.Thead>
             <Table.Tr>
               <Table.Td>
-                <Text fw={700}>Descripion</Text>
+                <Text fw={700}>Description</Text>
               </Table.Td>
               <Table.Td>
                 <Text fw={700}>Standard</Text>

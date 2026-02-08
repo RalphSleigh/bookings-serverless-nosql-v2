@@ -35,15 +35,28 @@ const ealingFee = z.object({
   }),
 })
 
+const ealingFees2026 = z.object({
+  feeStructure: z.literal('ealing2026'),
+  ealingData2026: z.object({
+    adult: z.number(),
+    child: z.number(),
+    adultDiscount: z.number(),
+    childDiscount: z.number(),
+    paymentInstructions: z.string().nonempty(),
+  }),
+})
+
 const freeFee = z.object({ feeStructure: z.literal('free') })
 const vcampFee = z.object({ feeStructure: z.literal('vcamp'), participant: z.object({ a: z.number(), b: z.number() }), volunteer: z.object({ a: z.number(), b: z.number() }) })
 
-const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee, vcampFee])
+const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee, ealingFees2026, vcampFee])
 
 export type TEventFeesUnion = z.infer<typeof feeOptions>
 export type TEventEalingFees = z.infer<typeof ealingFee>
+export type TEventEalingFees2026 = z.infer<typeof ealingFees2026>
 export type TEventFreeFees = z.infer<typeof freeFee>
 export type TEventVCampFees = z.infer<typeof vcampFee>
+
 
 const customQuestion = z.object({
   questionType: z.enum(['yesnochoice', 'text', 'longtext']),
