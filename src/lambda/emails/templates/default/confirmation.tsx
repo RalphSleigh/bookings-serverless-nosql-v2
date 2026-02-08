@@ -32,7 +32,7 @@ export class BookingConfirmationEmail extends EmailTemplate {
           You can come back and edit your booking <Link href={editLink}>here</Link>.
         </Text>
         <Text>
-          <fees.EmailElement event={data.event} booking={data.booking} />
+          <fees.EmailElement event={data.event} booking={data.booking} fees={data.fees} />
         </Text>
         <Text>
           <p>Blue Skies and Friendship,</p>

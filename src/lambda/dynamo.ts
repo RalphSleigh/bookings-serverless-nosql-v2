@@ -191,7 +191,7 @@ export const DBEvent = new Entity(
         required: true,
         properties: {
           feeStructure: {
-            type: ['free', 'ealing', 'vcamp'] as const,
+            type: ['free', 'ealing', 'ealing2026', 'vcamp'] as const,
             required: true,
           },
           ealingData: {
@@ -210,6 +210,31 @@ export const DBEvent = new Entity(
                 required: true,
               },
               unaccompaniedDiscount: {
+                type: 'number',
+                required: true,
+              },
+              paymentInstructions: {
+                type: 'string',
+                required: true,
+              },
+            },
+          },
+          ealingData2026: {
+            type: 'map',
+            properties: {
+              adult: {
+                type: 'number',
+                required: true,
+              },
+              child: {
+                type: 'number',
+                required: true,
+              },
+              adultDiscount: {
+                type: 'number',
+                required: true,
+              },
+              childDiscount: {
                 type: 'number',
                 required: true,
               },
