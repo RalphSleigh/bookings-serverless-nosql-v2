@@ -1,18 +1,16 @@
 import { Grid, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { Markdown as EmailMarkdown } from '@react-email/markdown'
-import { useDebounce } from '@react-hook/debounce'
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 
 import { WatchDebounce } from '../../front/src/utils'
 import { AttendanceStructureValues } from '../attendance/attendance'
 import { PartialBookingType, TBooking } from '../schemas/booking'
 import { TEvent, TEventEalingFees, TEventEalingFees2026 } from '../schemas/event'
 import { TFee } from '../schemas/fees'
-import { TPerson } from '../schemas/person'
 import { currency } from '../util'
-import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
+import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
 
 export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
   typeName: 'ealing2026' = 'ealing2026'
@@ -265,7 +263,7 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
           <Table.Thead>
             <Table.Tr>
               <Table.Td>
-                <Text fw={700}>Descripion</Text>
+                <Text fw={700}>Description</Text>
               </Table.Td>
               <Table.Td>
                 <Text fw={700}>Standard</Text>
@@ -386,7 +384,7 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
     )
   }
 
-  getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventEalingFees>>): string {
+  getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventEalingFees2026>>): string {
     return `EALING${booking.userId.split('-')[0].toUpperCase()}`
   }
 }
