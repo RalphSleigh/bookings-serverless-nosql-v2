@@ -30,7 +30,7 @@ export const PermissionForm = ({ event, checked, setChecked }: { event: TEvent; 
           <Text m={8} ml={16}>
             I agree this information will be stored electronically and shared only with individuals who need this information to engage your child safely in Woodcraft Folk activities. Based on the
             needs of your child we may also share any relevant information with medical or child protection professionals. For more information please visit 
-            <a href="https://www.woodcraft.org.uk/privacy">www.woodcraft.org.uk/privacy</a> or contact <a href="mailto:data@woodcraft.org.uk">data@woodcraft.org.uk</a>
+            {' '}<a href="https://www.woodcraft.org.uk/privacy">www.woodcraft.org.uk/privacy</a> or contact <a href="mailto:data@woodcraft.org.uk">data@woodcraft.org.uk</a>
           </Text>
         </Grid.Col>
       </Grid>

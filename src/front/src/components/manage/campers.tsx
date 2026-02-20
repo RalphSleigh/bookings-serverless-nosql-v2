@@ -163,7 +163,7 @@ const PersonDetails = ({ event, person, booking }: { event: TEvent; person: TPer
         </Text>
       )}
       <Text>
-        <b>Booked by:</b> {booking.basic.name} ({'district' in booking.basic ? ` - ${booking.basic.district}` : ''})
+        <b>Booked by:</b> {booking.basic.name}{'district' in booking.basic ? ` - ${booking.basic.district}` : ''}
       </Text>
       {'kp' in person && <kp.PersonCardSection person={person} />}
       <attendance.PersonCardElement event={event} person={person} />
