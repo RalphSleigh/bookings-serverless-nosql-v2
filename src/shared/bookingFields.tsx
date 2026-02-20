@@ -30,7 +30,7 @@ abstract class BookingField {
   valueForDrive: (b: TBookingResponse) => string = (b) => {
     if (typeof this.accessor === 'function') {
       const v = this.accessor(b)
-      return typeof v === 'string' ? v : v.toLocaleDateString()
+      return typeof v === 'string' ? v : v.toLocaleString("en-GB")
     } else {
       const v = getProperty<TBookingResponse, string, string>(b, this.accessor, '')
       return v
