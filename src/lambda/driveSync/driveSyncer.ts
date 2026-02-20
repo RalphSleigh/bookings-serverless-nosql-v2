@@ -27,7 +27,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
     .where(({ preferences }, { contains }) => {
       return contains(preferences.driveSyncList, eventId)
     })
-    .go({pages: "all"})
+    .go({ pages: 'all' })
 
   const bookingsQuery = await DB.collections.booking({ eventId }).go()
   if (bookingsQuery.data) {
@@ -57,9 +57,14 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
 
       const filteredBookingFields = bookingFields(event).filter((f) => f.enabledForDrive(event) && f.available(roles))
 
-      const people = bookingsQuery.data.person.sort((a, b) => a.createdAt - b.createdAt).map((p) => PersonSchema(event).parse(p))
+      const people = bookingsQuery.data.person
+        .sort((a, b) => a.createdAt - b.createdAt)
+        .map((p) => ({
+          p: PersonSchema(event).parse(p),
+          b: BookingSchema(event).parse(bookingsQuery.data.booking.find((b) => b.userId === p.userId && b.eventId === p.eventId))!,
+        }))
 
-      const bookings = bookingsQuery.data.booking.sort((a, b) => a.createdAt - b.createdAt).map((b) => BookingSchema(event).parse({ ...b, people: people.filter((p) => p.userId === b.userId) }))
+      const bookings = bookingsQuery.data.booking.sort((a, b) => a.createdAt - b.createdAt).map((b) => BookingSchema(event).parse({ ...b, people: people.filter((p) => p.p.userId === b.userId) }))
 
       const camperDataForDrive = [
         filteredPersonFields.map((f) => f.titleForDrive()),
