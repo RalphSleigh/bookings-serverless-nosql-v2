@@ -44,7 +44,7 @@ export const BasicFieldsSmall: React.FC<BasicBookingFieldsProps> = ({ event }) =
   return (
     <>
       <Title id="step-basic" size="h4" order={2}>
-        {`Your details`}{' '}
+        {`Your details`}
       </Title>
       <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')} />
       <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')} />

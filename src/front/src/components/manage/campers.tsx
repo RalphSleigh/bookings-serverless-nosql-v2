@@ -14,7 +14,7 @@ import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import useLocalStorageState from 'use-local-storage-state'
 
-import { TPersonResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
+import { TBookingResponse, TPersonResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { getAttendanceType } from '../../../../shared/attendance/attendance'
 import { getKPType } from '../../../../shared/kp/kp'
 import { personFields } from '../../../../shared/personFields'
@@ -130,7 +130,7 @@ export const ManageCampers = () => {
     <>
       <Modal opened={selectedPerson !== undefined} onClose={() => setSelected(undefined)} size="auto" withCloseButton={false}>
         <Modal.CloseButton style={{ float: 'right' }} />
-        {selectedPerson !== undefined && <PersonDetails event={event} person={selectedPerson.p} />}
+        {selectedPerson !== undefined && <PersonDetails event={event} person={selectedPerson.p} booking={selectedPerson.b} />}
       </Modal>
       <Container strategy="grid" fluid mt={8}>
         <Box data-breakout>
@@ -146,7 +146,7 @@ export const ManageCampers = () => {
 
 //initialState={{ columnVisibility: { address: false } }}
 
-const PersonDetails = ({ event, person }: { event: TEvent; person: TPersonResponse<TEvent> }) => {
+const PersonDetails = ({ event, person, booking }: { event: TEvent; person: TPersonResponse<TEvent>; booking: TBookingResponse }) => {
   const age = dayjs(event.endDate).diff(dayjs(person.basic.dob), 'year')
   const group = ageGroupFromPerson(event)(person)
   const kp = getKPType(event)
@@ -162,6 +162,9 @@ const PersonDetails = ({ event, person }: { event: TEvent; person: TPersonRespon
           <a href={`mailto:${person.basic.email}`}>{person.basic.email}</a>
         </Text>
       )}
+      <Text>
+        <b>Booked by:</b> {booking.basic.name}{'district' in booking.basic ? ` - ${booking.basic.district}` : ''}
+      </Text>
       {'kp' in person && <kp.PersonCardSection person={person} />}
       <attendance.PersonCardElement event={event} person={person} />
       {'health' in person && <Text>{person.health.medical}</Text>}

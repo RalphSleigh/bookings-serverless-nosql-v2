@@ -57,25 +57,29 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
 
       const filteredBookingFields = bookingFields(event).filter((f) => f.enabledForDrive(event) && f.available(roles))
 
-      const people = bookingsQuery.data.person
+      const parsedPeople = bookingsQuery.data?.person.map((p) => PersonSchema(event).parse(p))
+      const parsedBookings = bookingsQuery.data?.booking.map((b) => BookingSchema(event).parse({ ...b, people: parsedPeople?.filter((p) => p.userId === b.userId && p.eventId === b.eventId) }))
+
+      /* const people = bookingsQuery.data.person
         .sort((a, b) => a.createdAt - b.createdAt)
         .map((p) => ({
           p: PersonSchema(event).parse(p),
           b: BookingSchema(event).parse(bookingsQuery.data.booking.find((b) => b.userId === p.userId && b.eventId === p.eventId))!,
-        }))
+        })) */
 
-      const bookings = bookingsQuery.data.booking.sort((a, b) => a.createdAt - b.createdAt).map((b) => BookingSchema(event).parse({ ...b, people: people.filter((p) => p.p.userId === b.userId) }))
+      //const bookings = bookingsQuery.data.booking.sort((a, b) => a.createdAt - b.createdAt).map((b) => BookingSchema(event).parse({ ...b, people: people.filter((p) => p.p.userId === b.userId) }))
 
       const camperDataForDrive = [
         filteredPersonFields.map((f) => f.titleForDrive()),
-        ...people.map((p) => {
-          return filteredPersonFields.map((f) => f.valueForDrive(p))
+        ...parsedPeople.map((p) => {
+          const booking = parsedBookings?.find((b) => b.userId === p.userId && b.eventId === p.eventId)
+          return filteredPersonFields.map((f) => f.valueForDrive({ p, b: booking! }))
         }),
       ]
 
       const bookingDataForDrive = [
         filteredBookingFields.map((f) => f.titleForDrive()),
-        ...bookings.map((b) => {
+        ...parsedBookings.map((b) => {
           return filteredBookingFields.map((f) => f.valueForDrive(b))
         }),
       ]
