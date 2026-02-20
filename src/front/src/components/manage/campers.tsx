@@ -14,15 +14,15 @@ import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import useLocalStorageState from 'use-local-storage-state'
 
+import { TPersonResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { getAttendanceType } from '../../../../shared/attendance/attendance'
 import { getKPType } from '../../../../shared/kp/kp'
 import { personFields } from '../../../../shared/personFields'
+import { TBooking } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson, ageGroups, campersInAgeGroup } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { useEvent } from '../../utils'
-import { TPersonResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
-import { TBooking } from '../../../../shared/schemas/booking'
 
 export const ManageCampers = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -33,7 +33,7 @@ export const ManageCampers = () => {
 
   const campers = useMemo(
     () =>
-      bookingsQuery.data.bookings.reduce<{p: TPersonResponse<TEvent>, b: TBooking<TEvent>}[]>((acc, booking) => {
+      bookingsQuery.data.bookings.reduce<{ p: TPersonResponse<TEvent>; b: TBooking<TEvent> }[]>((acc, booking) => {
         return [...acc, ...booking.people.map((p) => ({ p, b: booking as TBooking<TEvent> }))]
       }, []),
     [bookingsQuery.data],
@@ -51,11 +51,11 @@ export const ManageCampers = () => {
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-campers-column-visibility-default`, { defaultValue: visibilityDefault })
   const [columnSize, setColumnSize] = useLocalStorageState<{ [key: string]: number }>(`event-${eventId}-campers-column-size`, { defaultValue: {} })
 
-  const columns = useMemo<MRT_ColumnDef<{p: TPersonResponse<TEvent>, b: TBooking<TEvent>}>[]>(() => fields.map((f) => f.personTableDef()), [])
+  const columns = useMemo<MRT_ColumnDef<{ p: TPersonResponse<TEvent>; b: TBooking<TEvent> }>[]>(() => fields.map((f) => f.personTableDef()), [])
 
   const [selected, setSelected] = useState<string | undefined>(undefined)
 
-  const handleExportRows = (rows: MRT_Row<{p: TPersonResponse<TEvent>, b: TBooking<TEvent>}>[]) => {
+  const handleExportRows = (rows: MRT_Row<{ p: TPersonResponse<TEvent>; b: TBooking<TEvent> }>[]) => {
     const rowData = rows.map((row) => row.original)
     const fields = personFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
     const columnNames = fields.map((f) => f.titleForDrive())
@@ -80,17 +80,18 @@ export const ManageCampers = () => {
     download(csvConfig)(csv)
   }
 
-  const totals = ageGroups.map((ag) => {
-    const campersInGroup = campersInAgeGroup(event)(ag)
-    const count = campers.filter(campersInGroup).length
-    if (count === 0) {
-      return null
-    }
-    const agInstance = ag.construct(0);
-    return `${agInstance.plural}: ${count}`; 
-  })
-  .filter((s) => s !== null)
-  .join(', ');
+  const totals = ageGroups
+    .map((ag) => {
+      const campersInGroup = campersInAgeGroup(event)(ag)
+      const count = campers.filter(campersInGroup).length
+      if (count === 0) {
+        return null
+      }
+      const agInstance = ag.construct(0)
+      return `${agInstance.plural}: ${count}`
+    })
+    .filter((s) => s !== null)
+    .join(', ')
 
   const table = useMantineReactTable({
     columns,
@@ -133,7 +134,9 @@ export const ManageCampers = () => {
       </Modal>
       <Container strategy="grid" fluid mt={8}>
         <Box data-breakout>
-          <Text mt={4} mb={4}><b>Total: {campers.length}</b>, {totals}</Text>
+          <Text mt={4} mb={4}>
+            <b>Total: {campers.length}</b>, {totals}
+          </Text>
           <MantineReactTable table={table} />
         </Box>
       </Container>
