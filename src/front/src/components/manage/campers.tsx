@@ -60,10 +60,6 @@ export const ManageCampers = () => {
     const fields = personFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
     const columnNames = fields.map((f) => f.titleForDrive())
     let data = rowData.map((row) => {
-      const booking = bookingsQuery.data.bookings.find((b) => b.people.some((p) => p.personId === row.p.personId))
-      if (!booking) {
-        throw new Error(`No booking found for personId ${row.p.personId}`)
-      }
       return fields.reduce(
         (acc, f) => {
           acc[f.name] = f.valueForDrive(row)
