@@ -41,7 +41,7 @@ export abstract class PersonField<T extends TEvent = TEvent> {
           return v.toString()
       }
     } else {
-      const v = getProperty<TPersonResponse<T>, string, string>(p, this.accessor, '')
+      const v = getProperty<{ p: TPersonResponse<T>; b: TBooking<T> }, string, string>({ p, b }, this.accessor, '')
       return v
     }
   }
