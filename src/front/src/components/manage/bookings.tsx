@@ -21,8 +21,8 @@ import { TBooking } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
-import { CustomLink, useEvent } from '../../utils'
 import { Can } from '../../permissionContext'
+import { CustomLink, useEvent } from '../../utils'
 
 export const ManageBookings = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -43,6 +43,7 @@ export const ManageBookings = () => {
   const bookings = useMemo(() => bookingsQuery.data.bookings, [bookingsQuery.data])
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-booking-column-visibility-default`, { defaultValue: visibilityDefault })
+  const [sorting, setSorting] = useLocalStorageState<Array<{ id: string; desc: boolean }>>(`event-${eventId}-bookings-sorting`, { defaultValue: [] })
 
   const columns = useMemo<MRT_ColumnDef<TBookingResponse>[]>(() => fields.map((f) => f.bookingTableDef()), [])
 
@@ -79,8 +80,9 @@ export const ManageBookings = () => {
     mantineTableProps: {
       className: styles.table,
     },
-    state: { columnVisibility: columnVisibility },
+    state: { columnVisibility: columnVisibility, sorting: sorting },
     onColumnVisibilityChange: setColumnVisibility,
+    onSortingChange: setSorting,
     mantineTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
         setSelected(row.original.userId)
