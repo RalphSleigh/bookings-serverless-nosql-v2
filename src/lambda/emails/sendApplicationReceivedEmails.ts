@@ -3,6 +3,7 @@ import { UserSchema } from '../../shared/schemas/user'
 import { EmailApplicationReceivedTask, EmailBookingCreatedTask } from '../asyncTasks/asyncTaskQueuer'
 import { DB, DBEvent, DBRole, DBUser } from '../dynamo'
 import { ConfigType } from '../getConfig'
+import { getManagementRoles } from './getManagementRoles'
 import { sendEmail } from './sendEmail'
 
 export const sendApplicationReceivedEmails = async (task: EmailApplicationReceivedTask, config: ConfigType) => {
@@ -20,9 +21,9 @@ export const sendApplicationReceivedEmails = async (task: EmailApplicationReceiv
       config,
     )
 
-    const roles = await DBRole.find({ eventId: event.eventId }).go()
+    const roles = await getManagementRoles(event.eventId)
 
-    roles.data?.forEach(async (role) => {
+    roles.forEach(async (role) => {
       if (role.role === 'owner') {
         const userQuery = await DBUser.find({ userId: role.userId }).go()
         const manageUser = UserSchema.parse(userQuery.data[0])

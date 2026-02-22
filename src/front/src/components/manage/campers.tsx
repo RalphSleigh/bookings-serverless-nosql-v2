@@ -50,6 +50,7 @@ export const ManageCampers = () => {
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-campers-column-visibility-default`, { defaultValue: visibilityDefault })
   const [columnSize, setColumnSize] = useLocalStorageState<{ [key: string]: number }>(`event-${eventId}-campers-column-size`, { defaultValue: {} })
+  const [sorting, setSorting] = useLocalStorageState<Array<{ id: string; desc: boolean }>>(`event-${eventId}-campers-sorting`, { defaultValue: [] })
 
   const columns = useMemo<MRT_ColumnDef<{ p: TPersonResponse<TEvent>; b: TBooking<TEvent> }>[]>(() => fields.map((f) => f.personTableDef()), [])
 
@@ -99,8 +100,9 @@ export const ManageCampers = () => {
     mantineTableProps: {
       className: styles.table,
     },
-    state: { columnVisibility: columnVisibility, columnSizing: columnSize },
+    state: { columnVisibility: columnVisibility, columnSizing: columnSize, sorting: sorting },
     onColumnVisibilityChange: setColumnVisibility,
+    onSortingChange: setSorting,
     mantineTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
         setSelected(row.original.p.personId)
@@ -163,7 +165,8 @@ const PersonDetails = ({ event, person, booking }: { event: TEvent; person: TPer
         </Text>
       )}
       <Text>
-        <b>Booked by:</b> {booking.basic.name}{'district' in booking.basic ? ` - ${booking.basic.district}` : ''}
+        <b>Booked by:</b> {booking.basic.name}
+        {'district' in booking.basic ? ` - ${booking.basic.district}` : ''}
       </Text>
       {'kp' in person && <kp.PersonCardSection person={person} />}
       <attendance.PersonCardElement event={event} person={person} />

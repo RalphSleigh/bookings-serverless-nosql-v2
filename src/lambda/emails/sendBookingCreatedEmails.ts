@@ -4,6 +4,7 @@ import { EmailBookingCreatedTask, EmailBookingUpdatedTask } from '../asyncTasks/
 import { DB, DBBooking, DBEvent, DBRole, DBUser } from '../dynamo'
 import { ConfigType } from '../getConfig'
 import { getBookingByIDs } from '../utils'
+import { getManagementRoles } from './getManagementRoles'
 import { sendEmail } from './sendEmail'
 
 export const sendBookingCreatedEmails = async (task: EmailBookingCreatedTask, config: ConfigType) => {
@@ -20,14 +21,14 @@ export const sendBookingCreatedEmails = async (task: EmailBookingCreatedTask, co
         event: event,
         booking: booking,
         bookingOwner: user,
-        fees: fees
+        fees: fees,
       },
       config,
     )
 
-    const roles = await DBRole.find({ eventId: event.eventId }).go()
+    const roles = await getManagementRoles(event.eventId)
 
-    roles.data?.forEach(async (role) => {
+    roles.forEach(async (role) => {
       if (role.role === 'owner') {
         const userQuery = await DBUser.find({ userId: role.userId }).go()
         const manageUser = UserSchema.parse(userQuery.data[0])
@@ -39,7 +40,7 @@ export const sendBookingCreatedEmails = async (task: EmailBookingCreatedTask, co
               event: event,
               booking: booking,
               bookingOwner: user,
-              fees: fees
+              fees: fees,
             },
             config,
           )
