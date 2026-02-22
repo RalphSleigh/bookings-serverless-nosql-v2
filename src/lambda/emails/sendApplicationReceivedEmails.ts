@@ -24,22 +24,20 @@ export const sendApplicationReceivedEmails = async (task: EmailApplicationReceiv
     const roles = await getManagementRoles(event.eventId)
 
     roles.forEach(async (role) => {
-      if (role.role === 'owner') {
-        const userQuery = await DBUser.find({ userId: role.userId }).go()
-        const manageUser = UserSchema.parse(userQuery.data[0])
-        if (manageUser && !manageUser.preferences.emailNopeList.includes(event.eventId)) {
-          await sendEmail(
-            {
-              template: 'managerApplicationReceived',
-              recipient: manageUser,
-              event: event,
-              bookingOwner: user,
-            },
-            config,
-          )
-        } else {
-          console.log(`User ${manageUser.userId} has opted out of emails for event ${event.eventId}`)
-        }
+      const userQuery = await DBUser.find({ userId: role.userId }).go()
+      const manageUser = UserSchema.parse(userQuery.data[0])
+      if (manageUser && !manageUser.preferences.emailNopeList.includes(event.eventId)) {
+        await sendEmail(
+          {
+            template: 'managerApplicationReceived',
+            recipient: manageUser,
+            event: event,
+            bookingOwner: user,
+          },
+          config,
+        )
+      } else {
+        console.log(`User ${manageUser.userId} has opted out of emails for event ${event.eventId}`)
       }
     })
   }

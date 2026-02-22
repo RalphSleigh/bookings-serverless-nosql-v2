@@ -29,24 +29,22 @@ export const sendBookingCreatedEmails = async (task: EmailBookingCreatedTask, co
     const roles = await getManagementRoles(event.eventId)
 
     roles.forEach(async (role) => {
-      if (role.role === 'owner') {
-        const userQuery = await DBUser.find({ userId: role.userId }).go()
-        const manageUser = UserSchema.parse(userQuery.data[0])
-        if (manageUser && !manageUser.preferences.emailNopeList.includes(event.eventId)) {
-          await sendEmail(
-            {
-              template: 'managerConfirmation',
-              recipient: manageUser,
-              event: event,
-              booking: booking,
-              bookingOwner: user,
-              fees: fees,
-            },
-            config,
-          )
-        } else {
-          console.log(`User ${manageUser.userId} has opted out of emails for event ${event.eventId}`)
-        }
+      const userQuery = await DBUser.find({ userId: role.userId }).go()
+      const manageUser = UserSchema.parse(userQuery.data[0])
+      if (manageUser && !manageUser.preferences.emailNopeList.includes(event.eventId)) {
+        await sendEmail(
+          {
+            template: 'managerConfirmation',
+            recipient: manageUser,
+            event: event,
+            booking: booking,
+            bookingOwner: user,
+            fees: fees,
+          },
+          config,
+        )
+      } else {
+        console.log(`User ${manageUser.userId} has opted out of emails for event ${event.eventId}`)
       }
     })
   }
