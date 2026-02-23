@@ -118,6 +118,13 @@ class Age extends PersonField {
   }
 }
 
+class Role extends PersonField {
+  name = 'Role'
+  accessor = ({ p }: { p: TPersonResponse }) => ('role' in p.basic ? p.basic.role || '' : '')
+  enabled = (event: TEvent) => event.fee.feeStructure === 'vcamp'
+}
+
+
 class Medical extends PersonField {
   name = 'Medical'
   roles: TRole['role'][] = ['owner', 'manager', 'viewer']
@@ -165,6 +172,7 @@ export const personFields = <E extends TEvent>(event: E): PersonField<E>[] => {
     new Email(event),
     new Dob(event),
     new Age(event),
+    new Role(event),
     ...kp.PersonFields(event),
     new Medical(event),
     ...attendance.PersonFields(event),
