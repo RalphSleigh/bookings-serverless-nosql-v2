@@ -572,9 +572,14 @@ const getPersonFromRow = (
     firstAid: row[index('First Aid')] === 'Yes',
     consents: {
       photo: row[index('Photo Consent')],
-      rse: row[index('RSE Consent (12 - 17 only)')],
       activities: row[index('Activities Consent')],
     },
+  }
+
+  const consent = row[index('RSE Consent (12 - 17 only)')]
+
+  if (consent === 'Yes' || consent === 'No') {
+    result.consents!.rse = consent
   }
 
   const attendance = getAttendanceType(event) as FreeChoiceAttendance
@@ -584,7 +589,7 @@ const getPersonFromRow = (
 
   let bitMask = 0
   for (let nightIndex = 0; nightIndex < nights.length; nightIndex++) {
-    if (row[index('Date of Birth') + 1 + nightIndex] === 'Yes') bitMask += 2 ** nightIndex
+    if (row[index('Role') + 1 + nightIndex] === 'Yes') bitMask += 2 ** nightIndex
   }
 
   result.attendance = { bitMask }
