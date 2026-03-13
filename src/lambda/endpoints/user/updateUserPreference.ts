@@ -27,7 +27,7 @@ export const updateUserPreference = HandlerWrapperLoggedIn<{}, TUserPreferenceUp
           list.push(eventId)
           const validatedUser = UserSchema.parse({ ...user, preferences: { ...user.preferences, emailNopeList: list } })
           await DBUser.patch({ sub: validatedUser.sub })
-            .set({ preferences: { emailNopeList: validatedUser.preferences.emailNopeList } })
+            .set({ preferences: { ...validatedUser.preferences, emailNopeList: validatedUser.preferences.emailNopeList } })
             .go()
         }
       } else {
@@ -35,7 +35,7 @@ export const updateUserPreference = HandlerWrapperLoggedIn<{}, TUserPreferenceUp
           const newList = list.filter((e) => e !== eventId)
           const validatedUser = UserSchema.parse({ ...user, preferences: { ...user.preferences, emailNopeList: newList } })
           await DBUser.patch({ sub: validatedUser.sub })
-            .set({ preferences: { emailNopeList: validatedUser.preferences.emailNopeList } })
+            .set({ preferences: { ...validatedUser.preferences, emailNopeList: validatedUser.preferences.emailNopeList } })
             .go()
         } else {
           //not in list
@@ -50,7 +50,7 @@ export const updateUserPreference = HandlerWrapperLoggedIn<{}, TUserPreferenceUp
           list.push(eventId)
           const validatedUser = UserSchema.parse({ ...user, preferences: { ...user.preferences, driveSyncList: list } })
           await DBUser.patch({ sub: validatedUser.sub })
-            .set({ preferences: { driveSyncList: validatedUser.preferences.driveSyncList } })
+            .set({ preferences: { ...validatedUser.preferences, driveSyncList: validatedUser.preferences.driveSyncList } })
             .go()
 
           await enqueueAsyncTask({
@@ -65,7 +65,7 @@ export const updateUserPreference = HandlerWrapperLoggedIn<{}, TUserPreferenceUp
           const newList = list.filter((e) => e !== eventId)
           const validatedUser = UserSchema.parse({ ...user, preferences: { ...user.preferences, driveSyncList: newList } })
           await DBUser.patch({ sub: validatedUser.sub })
-            .set({ preferences: { driveSyncList: validatedUser.preferences.driveSyncList } })
+            .set({ preferences: { ...validatedUser.preferences, driveSyncList: validatedUser.preferences.driveSyncList } })
             .go()
         } else {
           //not in list

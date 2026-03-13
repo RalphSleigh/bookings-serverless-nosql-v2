@@ -140,7 +140,6 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
 
         return (
           <Table.Tr key={f.feeId}>
-            {' '}
             <Table.Td>{f.note}</Table.Td>
             <Table.Td>{currency(f.amount)}</Table.Td>
             <Table.Td>{currency(f.amount)}</Table.Td>
@@ -245,7 +244,6 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
 
         return (
           <Table.Tr key={f.feeId}>
-            {' '}
             <Table.Td>{f.note}</Table.Td>
             <Table.Td>{currency(f.amount)}</Table.Td>
             <Table.Td>{currency(f.amount)}</Table.Td>

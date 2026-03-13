@@ -4,15 +4,15 @@ import { useFormContext } from 'react-hook-form'
 import { CustomCheckbox } from '../../front/src/components/custom-inputs/customCheckbox'
 import { CustomSelect } from '../../front/src/components/custom-inputs/customSelect'
 import { errorProps } from '../../front/src/utils'
+import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 import { getAttendanceType } from '../attendance/attendance'
 import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
 import { TEvent, TEventBasicKP, TEventLargeKP } from '../schemas/event'
 import { TPerson } from '../schemas/person'
+import { TRole } from '../schemas/role'
 import { ageGroupFromPerson } from '../woodcraft'
 import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
-import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
-import { TRole } from '../schemas/role'
 
 export class LargeKP implements KPStructure<TEventLargeKP> {
   typeName: 'large' = 'large'
@@ -149,7 +149,6 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
     return (
       <>
         <Text>
-          {' '}
           <b>Diet:</b> {person.kp.diet}
         </Text>
         {person.kp.details && (
@@ -180,26 +179,26 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
     class Diet extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diet'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? p.kp.diet || '' : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? p.kp.diet || '' : '')
       size: number = 100
     }
 
     class DietDetails extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diet Details'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? p.kp?.details || '' : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? p.kp?.details || '' : '')
     }
 
     class DietPreferences extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diet Preferences'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? p.kp.preferences || '' : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? p.kp.preferences || '' : '')
     }
 
     class DietNut extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Nut Free'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.nut ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.nut ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
@@ -207,7 +206,7 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
     class DietGluten extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Gluten Free'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.gluten ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.gluten ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
@@ -215,42 +214,42 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
     class DietSoya extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Soya Free'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.soya ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.soya ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
     class DietDairy extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Dairy/Lactose Free'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.dairy ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.dairy ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
     class DietEgg extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Egg Free'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.egg ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.egg ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
     class DietPork extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Pork Free'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.pork ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.pork ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
     class DietChickpea extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Chickpea Free'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.chickpea ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.chickpea ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
     class DietDiabetic extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Diabetic'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.diabetic ? '❌' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.diabetic ? '❌' : '') : '')
       size: number = 80
       hideByDefault = true
     }
@@ -258,7 +257,7 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
     class DietContactMe extends PersonField<TEvent<TEventLargeKP>> {
       name = 'Contact Me'
       roles: TRole['role'][] = ['owner', 'manager', 'viewer']
-      accessor = (p: TPersonResponse<TEvent<TEventLargeKP>>) => 'kp' in p ? (p.kp.contactMe ? '✅' : '') : ''
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<TEventLargeKP>>; b: TBooking<TEvent<TEventLargeKP>> }) => ('kp' in p ? (p.kp.contactMe ? '✅' : '') : '')
       size: number = 80
       hideByDefault = true
     }

@@ -8,7 +8,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { WatchDebounce } from '../../front/src/utils'
 import { AttendanceStructureValues } from '../attendance/attendance'
 import { PartialBookingType, TBooking } from '../schemas/booking'
-import { TEvent, TEventEalingFees,} from '../schemas/event'
+import { TEvent, TEventEalingFees } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
@@ -146,7 +146,6 @@ export class EalingFees implements FeeStructure<TEventEalingFees> {
       .filter((f) => f.type === 'adjustment')
       .map((f) => (
         <Table.Tr key={f.feeId}>
-          {' '}
           <Table.Td>{f.note}</Table.Td>
           <Table.Td>{currency(f.amount)}</Table.Td>
           <Table.Td>{currency(f.amount)}</Table.Td>
@@ -240,7 +239,7 @@ export class EalingFees implements FeeStructure<TEventEalingFees> {
       </>
     )
   }
-  
+
   getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventEalingFees>>): string {
     return `EALING${booking.userId.split('-')[0].toUpperCase()}`
   }

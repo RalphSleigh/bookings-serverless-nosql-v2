@@ -221,7 +221,6 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
   }
 
   EmailElement: EmailElement<TEventVCampFees> = ({ event, booking, fees }) => {
-
     let totalOwed = 0
     let totalPaid = 0
 

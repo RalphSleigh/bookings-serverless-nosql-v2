@@ -6,6 +6,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 
+import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { getFeeType } from '../../../../shared/fees/fees'
 import { FeeStructure } from '../../../../shared/fees/feeStructure'
 import { TBooking } from '../../../../shared/schemas/booking'
@@ -18,7 +19,6 @@ import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { getEventFeesQueryOptions } from '../../queries/getEventFees'
 import { useEvent } from '../../utils'
 import { CustomNumberInput } from '../custom-inputs/customNumberInput'
-import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 
 export const ManageMoney = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -62,7 +62,6 @@ export const ManageMoney = () => {
 
   return (
     <>
-      {' '}
       <Modal opened={selectedBooking !== undefined} onClose={() => setSelected(undefined)} size="auto" withCloseButton={false}>
         <Modal.CloseButton style={{ float: 'right' }} />
         {selectedBooking !== undefined && <MoneyDetails feeStructure={feeStructure} event={event} booking={selectedBooking!} fees={feesForSelectedBooking} />}

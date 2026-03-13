@@ -112,6 +112,10 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
       remove(index)
     }
   }
+
+  const DoB = useWatch<PartialBookingType, `people.${number}.basic.dob`>({ name: `people.${index}.basic.dob` })
+  const adult = typeof DoB === 'string' && dayjs(DoB).isValid() && dayjs(DoB).add(16, 'years').isBefore(dayjs(event.startDate))
+
   const email = event.allParticipantEmails ? (
     <>
       <Grid.Col span={12}>
@@ -120,7 +124,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           autoComplete={`section-person-${index} email`}
           id={`person-email-${index}`}
           data-form-type="other"
-          label="Email"
+          label={adult ? 'Email' : 'Parent/Guardian Email'}
           {...register(`people.${index}.basic.email` as const)}
           {...e(`people.${index}.basic.email`)}
         />
@@ -301,7 +305,6 @@ const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infe
         name={`people.${index}.basic.dob`}
         render={
           (props) => {
-            console.log('value', props.field.value)
             //const formatted = props.field.value.split('T')[0]
             //console.log('formatted', formatted)
             return (
@@ -342,10 +345,12 @@ const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infe
       />
     )
   else {
-    const dates = Array(19).fill(null).map((_, i) => { 
-      const year = dayjs(event.startDate).startOf('year').subtract(i, 'years')
-      return { value: year.toISOString(), label: dayjs(event.startDate).diff(year, 'year').toString()}
-    })
+    const dates = Array(19)
+      .fill(null)
+      .map((_, i) => {
+        const year = dayjs(event.startDate).startOf('year').subtract(i, 'years')
+        return { value: year.toISOString(), label: dayjs(event.startDate).diff(year, 'year').toString() }
+      })
     dates[18].label = '18+'
     return <CustomSelect required label="Age" name={`people.${index}.basic.dob`} control={control} data={dates} {...e(`people.${index}.basic.dob`)} />
   }

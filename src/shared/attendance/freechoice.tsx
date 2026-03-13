@@ -6,12 +6,12 @@ import { get } from 'lodash'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import styles from '../../front/src/css/attendenceButtons.module.css'
+import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
 import { TEvent, TEventFreeChoiceAttendance } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { AttendanceBookingFormDisplayElement, AttendanceIsWholeAttendanceFunction, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
-import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 dayjs.extend(AdvancedFormat)
 
@@ -24,7 +24,7 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
   name = 'Free choice event'
   BookingFormDisplayElement: AttendanceBookingFormDisplayElement<TEventFreeChoiceAttendance> = ({ index, event }) => {
     const { control } = useFormContext<TBooking<TEvent<any, any, TEventFreeChoiceAttendance>>>()
-    const value = useWatch({name: `people.${index}.attendance.bitMask`, control})
+    const value = useWatch({ name: `people.${index}.attendance.bitMask`, control })
 
     const {
       field,
@@ -93,20 +93,23 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
     const defaultDataFn = this.getDefaultData.bind(this)
     class Mask extends PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>> {
       name = 'Attendance Mask'
-      accessor = (p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => p.attendance?.bitMask || defaultDataFn(event).bitMask
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>; b: TBooking<TEvent<any, any, TEventFreeChoiceAttendance, any>> }) =>
+        p.attendance?.bitMask || defaultDataFn(event).bitMask
       hideByDefault = true
     }
 
     class NightsAttending extends PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>> {
       name = 'Nights Attending'
-      accessor = (p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => bitCount32(p.attendance?.bitMask || 0).toString()
+      accessor = ({ p, b }: { p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>; b: TBooking<TEvent<any, any, TEventFreeChoiceAttendance, any>> }) =>
+        bitCount32(p.attendance?.bitMask || 0).toString()
       size = 40
     }
 
     const nights: PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>>[] = this.getNightsFromEvent(event).map((n, i) => {
       class NightField extends PersonField<TEvent<any, any, TEventFreeChoiceAttendance, any>> {
         name = `${n.start.format('Do MMM')} - ${n.end.format('Do MMM')}`
-        accessor = (p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>) => ((p.attendance?.bitMask || 0) & (1 << i) ? '1' : '0')
+        accessor = ({ p, b }: { p: TPersonResponse<TEvent<any, any, TEventFreeChoiceAttendance, any>>; b: TBooking<TEvent<any, any, TEventFreeChoiceAttendance, any>> }) =>
+          (p.attendance?.bitMask || 0) & (1 << i) ? '1' : '0'
         hideByDefault = true
         size = 40
       }
@@ -130,7 +133,10 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
   PersonCardElement: AttendancePersonCardElement<TEventFreeChoiceAttendance> = ({ person, event }) => {
     return (
       <Text>
-        <b>Attendance</b>:  <Text span c="green">{this.circles(person.attendance?.bitMask || 0, event)}</Text>
+        <b>Attendance</b>:{' '}
+        <Text span c="green">
+          {this.circles(person.attendance?.bitMask || 0, event)}
+        </Text>
       </Text>
     )
   }

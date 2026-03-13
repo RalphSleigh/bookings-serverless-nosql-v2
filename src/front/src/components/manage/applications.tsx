@@ -45,7 +45,7 @@ export const ManageApplications = () => {
     </Table.Tr>
   ))
 
-  const approved = useMemo(() => applicationsQuery.data.applications.filter((a) => a.status === 'approved').sort((a, b) => b.createdAt - a.createdAt), [applicationsQuery.data])
+  const approved = useMemo(() => applicationsQuery.data.applications.filter((a) => a.status === 'approved').sort((a, b) => ((b.maxPredicted + b.minPredicted) / 2) - ((a.maxPredicted + a.minPredicted) / 2)), [applicationsQuery.data])
 
   const approvedRows = approved.map((app) => {
     const booking = bookings.find((b) => b.userId === app.userId)
