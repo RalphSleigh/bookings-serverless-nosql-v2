@@ -1,5 +1,5 @@
 import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Group, Input, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
-import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
+import { IconChevronDown, IconChevronUp, IconPlus, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -56,7 +56,8 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
         <SheetsInput event={event} userId={userId} replace={replace} />
       </SmallSuspenseWrapper>
       {people}
-      <Button onClick={appendFn} mt={16} variant="outline">
+      <Button onClick={appendFn} mt={16} variant="gradient" gradient={{ from: 'blue', to: 'violet', deg: 110 }}
+      leftSection={<IconPlus size={18} />}>
         Add person
       </Button>
     </>
