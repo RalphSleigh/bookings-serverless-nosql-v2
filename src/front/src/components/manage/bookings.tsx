@@ -43,6 +43,7 @@ export const ManageBookings = () => {
   const bookings = useMemo(() => bookingsQuery.data.bookings, [bookingsQuery.data])
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-booking-column-visibility-default`, { defaultValue: visibilityDefault })
+  const [columnSize, setColumnSize] = useLocalStorageState<{ [key: string]: number }>(`event-${eventId}-booking-column-size`, { defaultValue: {} })
   const [sorting, setSorting] = useLocalStorageState<Array<{ id: string; desc: boolean }>>(`event-${eventId}-bookings-sorting`, { defaultValue: [] })
 
   const columns = useMemo<MRT_ColumnDef<TBookingResponse>[]>(() => fields.map((f) => f.bookingTableDef()), [])
@@ -80,9 +81,11 @@ export const ManageBookings = () => {
     mantineTableProps: {
       className: styles.table,
     },
-    state: { columnVisibility: columnVisibility, sorting: sorting },
+    state: { columnVisibility: columnVisibility, sorting: sorting, columnSizing: columnSize },
+    enableColumnResizing: true,
     onColumnVisibilityChange: setColumnVisibility,
     onSortingChange: setSorting,
+    onColumnSizingChange: setColumnSize,
     mantineTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
         setSelected(row.original.userId)
@@ -172,6 +175,15 @@ const basicDetailsLargeGroup = (event: TEvent, booking: TBookingResponse) => (
 const campingDetailsLarge = (event: TEvent, booking: TBookingResponse) => (
   <>
     <Title order={4}>Camping Details</Title>
+    <Text>
+      <b>Camps With:</b> {booking.camping && 'who' in booking.camping ? booking.camping.who : ''}
+    </Text>
+      <Text>
+      <b>Equipment:</b> {booking.camping && 'equipment' in booking.camping ? booking.camping.equipment : ''}
+    </Text>
+    <Text>
+      <b>Accessibility Requirements:</b> {booking.camping && 'accessibility' in booking.camping ? booking.camping.accessibility : ''}
+    </Text>
     <Text>
       <b>Shuttle:</b> {'shuttle' in booking.other ? booking.other.shuttle : 'N/A'}
     </Text>
