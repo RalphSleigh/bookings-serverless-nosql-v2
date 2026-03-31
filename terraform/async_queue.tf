@@ -51,7 +51,7 @@ resource "aws_lambda_function" "async_task_lambda" {
   architectures                  = ["arm64"]
   memory_size                    = 1024
   timeout                        = 900
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 5
 
   environment {
     variables = {
