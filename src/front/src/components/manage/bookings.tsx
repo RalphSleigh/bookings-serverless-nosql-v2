@@ -103,6 +103,7 @@ export const ManageBookings = () => {
         <MRT_ToggleFullScreenButton table={table} />
       </Flex>
     ),
+    layoutMode: 'grid',
     initialState: { density: 'xs', pagination: { pageSize: 100, pageIndex: 0 } },
   })
 
