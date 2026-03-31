@@ -92,8 +92,9 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema, event }: { ind
     if (typeof person?.basic?.dob !== 'string') return
     const DoBdate = dayjs(person.basic.dob)
     const EventStartDate = dayjs(event.startDate)
-    const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
-    setDisplayWarning((over16 && person.basic.role === 'participant') || (!over16 && person.basic.role === 'volunteer'))
+    const over17 = DoBdate && DoBdate.add(17, 'years').isBefore(EventStartDate)
+    const under16 = DoBdate && DoBdate.add(16, 'years').isAfter(EventStartDate)
+    setDisplayWarning((over17 && person.basic.role === 'participant') || (under16 && person.basic.role === 'volunteer'))
   }, [person, event, index])
 
   const valid = peopleSchema.safeParse(person).success
@@ -291,8 +292,9 @@ const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
     if (typeof dob !== 'string') return
     const DoBdate = dayjs(dob)
     const EventStartDate = dayjs(event.startDate)
-    const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
-    setDisplayWarning((over16 && role === 'participant') || (!over16 && role === 'volunteer'))
+    const over17 = DoBdate && DoBdate.add(17, 'years').isBefore(EventStartDate)
+    const under16 = DoBdate && DoBdate.add(16, 'years').isAfter(EventStartDate)
+    setDisplayWarning((over17 && role === 'participant') || (under16 && role === 'volunteer'))
   }, [role, dob, event, index])
 
   return (
