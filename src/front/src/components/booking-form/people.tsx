@@ -307,7 +307,7 @@ const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
         </Group>
       </CustomRadioGroup>
       {displayWarning && (
-        <Alert mt={16} variant="light" color="yellow" title="This person's role is unexpected based on their date of birth, please make sure this is intentional" icon={<IconInfoCircle />}></Alert>
+        <Alert mt={16} variant="light" color="yellow" title="This person's role is unexpected based on their date of birth, please make sure this is intentional." icon={<IconInfoCircle />}></Alert>
       )}
     </>
   )
