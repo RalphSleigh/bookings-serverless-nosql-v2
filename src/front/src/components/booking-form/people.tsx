@@ -77,21 +77,34 @@ const PersonForm = ({
 }) => {
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   if (collapsed) {
-    return <CollapsedPersonForm index={index} setCollapsed={setCollapsed} peopleSchema={peopleSchema} />
+    return <CollapsedPersonForm index={index} setCollapsed={setCollapsed} peopleSchema={peopleSchema} event={event} />
   } else {
     return <ExpandedPersonForm event={event} index={index} remove={remove} setCollapsed={setCollapsed} />
   }
 }
 
-const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: number; setCollapsed: (collapsed: boolean) => void; peopleSchema: z.ZodSchema<TPerson> }) => {
+const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema, event }: { index: number; setCollapsed: (collapsed: boolean) => void; peopleSchema: z.ZodSchema<TPerson>; event: TEvent }) => {
   const person = useWatch<PartialBookingType, `people.${number}`>({ name: `people.${index}` })
+
+  const [displayWarning, setDisplayWarning] = useState(false)
+
+  useEffect(() => {
+    if (typeof person?.basic?.dob !== 'string') return
+    const DoBdate = dayjs(person.basic.dob)
+    const EventStartDate = dayjs(event.startDate)
+    const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
+    setDisplayWarning((over16 && person.basic.role === 'participant') || (!over16 && person.basic.role === 'volunteer'))
+  }, [person, event, index])
+
   const valid = peopleSchema.safeParse(person).success
   if (!person) return null
+
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} id={`person-${index}`} onClick={() => setCollapsed(false)} pl={8}>
       <Flex justify="flex-end" m={8} align="center">
         <Title order={3} size="h4" style={{ cursor: 'pointer', flexGrow: 1 }}>
-          {valid ? '✅' : '❌'} {person.basic?.name}
+          {valid ? '✅' : '❌'}
+          {displayWarning && ' ⚠️'} {person.basic?.name}
         </Title>
         <ActionIcon variant="default" size="input-sm" onClick={() => setCollapsed(true)} ml={8}>
           <IconChevronDown size={16} stroke={3} />
