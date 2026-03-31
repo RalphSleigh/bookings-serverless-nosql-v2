@@ -34,7 +34,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
     name: 'people', // unique name for your Field Array
   })
 
-  const defaultCollapsed = fields.length > 10
+  const defaultCollapsed = fields.length > 6
 
   const peopleSchema = useMemo(() => PersonSchema(event), [event])
 
