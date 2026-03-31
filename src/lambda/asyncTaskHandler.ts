@@ -7,10 +7,11 @@ import { am_in_lambda } from './utils'
 
 export const handler = async (event: SQSEvent, context: Context): Promise<SQSBatchResponse> => {
   const batchItemFailures: SQSBatchItemFailure[] = []
-
+  console.log(`Received ${event.Records.length} records`)
   for (const record of event.Records) {
     try {
       const data = JSON.parse(record.body)
+      console.log(`Processing record ${data.type}`)
       await asyncTasksExecutor(data)
     } catch (error) {
       console.error(`Error processing record ${record.messageId}:`, error)
