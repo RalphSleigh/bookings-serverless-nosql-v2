@@ -1,5 +1,5 @@
-import { ActionIcon, Anchor, Button, Divider, Flex, Grid, Group, Input, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
-import { IconChevronDown, IconChevronUp, IconX } from '@tabler/icons-react'
+import { ActionIcon, Alert, Anchor, Button, Divider, Flex, Grid, Group, Input, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { IconChevronDown, IconChevronUp, IconInfoCircle, IconPlus, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -56,7 +56,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
         <SheetsInput event={event} userId={userId} replace={replace} />
       </SmallSuspenseWrapper>
       {people}
-      <Button onClick={appendFn} mt={16} variant="outline">
+      <Button onClick={appendFn} mt={16} variant="gradient" gradient={{ from: 'blue', to: 'violet', deg: 110 }} leftSection={<IconPlus size={18} />}>
         Add person
       </Button>
     </>
@@ -77,21 +77,34 @@ const PersonForm = ({
 }) => {
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   if (collapsed) {
-    return <CollapsedPersonForm index={index} setCollapsed={setCollapsed} peopleSchema={peopleSchema} />
+    return <CollapsedPersonForm index={index} setCollapsed={setCollapsed} peopleSchema={peopleSchema} event={event} />
   } else {
     return <ExpandedPersonForm event={event} index={index} remove={remove} setCollapsed={setCollapsed} />
   }
 }
 
-const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema }: { index: number; setCollapsed: (collapsed: boolean) => void; peopleSchema: z.ZodSchema<TPerson> }) => {
+const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema, event }: { index: number; setCollapsed: (collapsed: boolean) => void; peopleSchema: z.ZodSchema<TPerson>; event: TEvent }) => {
   const person = useWatch<PartialBookingType, `people.${number}`>({ name: `people.${index}` })
+
+  const [displayWarning, setDisplayWarning] = useState(false)
+
+  useEffect(() => {
+    if (typeof person?.basic?.dob !== 'string') return
+    const DoBdate = dayjs(person.basic.dob)
+    const EventStartDate = dayjs(event.startDate)
+    const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
+    setDisplayWarning((over16 && person.basic.role === 'participant') || (!over16 && person.basic.role === 'volunteer'))
+  }, [person, event, index])
+
   const valid = peopleSchema.safeParse(person).success
   if (!person) return null
+
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} id={`person-${index}`} onClick={() => setCollapsed(false)} pl={8}>
       <Flex justify="flex-end" m={8} align="center">
         <Title order={3} size="h4" style={{ cursor: 'pointer', flexGrow: 1 }}>
-          {valid ? '✅' : '❌'} {person.basic?.name}
+          {valid ? '✅' : '❌'}
+          {displayWarning && ' ⚠️'} {person.basic?.name}
         </Title>
         <ActionIcon variant="default" size="input-sm" onClick={() => setCollapsed(true)} ml={8}>
           <IconChevronDown size={16} stroke={3} />
@@ -272,32 +285,37 @@ const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
   })
 
   const event = useEvent()
-
-  const { setValue } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const [displayWarning, setDisplayWarning] = useState(false)
 
   useEffect(() => {
     if (typeof dob !== 'string') return
     const DoBdate = dayjs(dob)
     const EventStartDate = dayjs(event.startDate)
-
     const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
-    if (!role) setValue(`people.${index}.basic.role`, over16 ? 'volunteer' : 'participant')
-  }, [dob, event, role, setValue, index])
+    setDisplayWarning((over16 && role === 'participant') || (!over16 && role === 'volunteer'))
+  }, [role, dob, event, index])
 
   return (
-    <CustomRadioGroup<TBooking<TEvent>> mt={16} name={`people.${index}.basic.role`} required>
-      <Group mt={8}>
-        <Input.Label required>
-          <b>Role on camp:</b> Is this person attending as a participant or volunteer?
-        </Input.Label>
-        <Radio value={'participant'} label="Participant" />
-        <Radio value={'volunteer'} label="Volunteer" />
-      </Group>
-    </CustomRadioGroup>
+    <>
+      <CustomRadioGroup<TBooking<TEvent>> mt={16} name={`people.${index}.basic.role`} required>
+        <Group mt={8}>
+          <Input.Label required>
+            <b>Role on camp:</b> Is this person attending as a participant or volunteer?
+          </Input.Label>
+          <Radio value={'participant'} label="Participant" />
+          <Radio value={'volunteer'} label="Volunteer" />
+        </Group>
+      </CustomRadioGroup>
+      {displayWarning && (
+        <Alert mt={16} variant="light" color="yellow" title="This person's role is unexpected based on their date of birth, please make sure this is intentional." icon={<IconInfoCircle />}></Alert>
+      )}
+    </>
   )
 }
 
 const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infer<typeof BookingSchemaForType>>; e: ReturnType<typeof errorProps> }> = ({ event, index, control, e }) => {
+  const { setValue } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+
   if (event.dobInput === 'date')
     return (
       <Controller
@@ -318,6 +336,11 @@ const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infe
                 {...e(`people.${index}.basic.dob`)}
                 type="date"
                 onChange={(e) => {
+                  const DoBdate = dayjs(e.target.value)
+                  const EventStartDate = dayjs(event.startDate)
+                  const over16 = DoBdate && DoBdate.add(16, 'years').isBefore(EventStartDate)
+                  setValue(`people.${index}.basic.role`, over16 ? 'volunteer' : 'participant')
+
                   /*                   props.field.onChange(e.target.value)
                   return */
                   /* console.log('event', e.target.value)

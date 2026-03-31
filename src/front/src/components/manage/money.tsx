@@ -47,7 +47,7 @@ export const ManageMoney = () => {
 
     return (
       <Table.Tr key={b.userId} style={{ cursor: 'pointer' }} onClick={() => setSelected(b.userId)}>
-        <Table.Td>{b.basic.name}</Table.Td>
+        <Table.Td>{'district' in b.basic && b.basic.district? `${b.basic.district} (${b.basic.name})` : b.basic.name}</Table.Td>
         <Table.Td>{currency(totalWithAdjustments)}</Table.Td>
         <Table.Td>{currency(totalPaid)}</Table.Td>
         <Table.Td>
