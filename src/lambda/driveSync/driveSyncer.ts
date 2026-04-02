@@ -111,6 +111,13 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
         console.log(`Created new spreadsheet for ${user.name} (${fileId})`)
       }
 
+      const permissions = await drive_instance.permissions.list({
+        fileId,
+        fields: 'permissions(id, type, emailAddress)',
+      })
+
+      console.log(`Current permissions for ${user.name}'s spreadsheet:`, JSON.stringify(permissions.data.permissions, null, 2))
+
       const sheets_instance = sheets({ version: 'v4', auth })
 
       const sheetsData = await sheets_instance.spreadsheets.get({ spreadsheetId: fileId, fields: 'sheets.properties' })
