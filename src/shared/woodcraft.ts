@@ -36,11 +36,11 @@ export const ageGroups: AgeGroupFilter[] = [
     construct: (age: number) => new AgeGroup('Elfin', 'Elfins', age),
   },
   {
-    filter: (age: number) => age >= 10 && age < 13,
+    filter: (age: number) => age >= 10 && age < 12,
     construct: (age: number) => new AgeGroup('Pioneer', 'Pioneers', age),
   },
   {
-    filter: (age: number) => age >= 13 && age < 16,
+    filter: (age: number) => age >= 12 && age < 16,
     construct: (age: number) => new AgeGroup('Venturer', 'Venturers', age),
   },
   {
