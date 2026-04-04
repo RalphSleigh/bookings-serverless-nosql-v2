@@ -4,6 +4,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { getEventGraphDataQueryOptions } from '../../queries/getEventGraphData'
+import { start } from 'react-email/src/commands/start';
 
 export const ManageGraphs: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -14,11 +15,17 @@ export const ManageGraphs: React.FC = () => {
     return { total: d.count, time: Date.parse(d.date) }
   })
 
+  const ticks = [] as number[]
+
+  for(let month =dayjs(graphData[0].time).startOf('month'); month.isBefore(dayjs(graphData[graphData.length - 1].time)); month = month.add(1, 'month')) {
+    ticks.push(month.valueOf())
+  }
+
   return (
     <Container strategy="grid" fluid>
       <Grid mt={16}>
         <Grid.Col span={12}>
-          <Title order={3}>Bookings Over Time</Title>
+          <Title order={3}>People Booked Over Time</Title>
           <AspectRatio ratio={3} mt={16}>
             <ResponsiveContainer aspect={3}>
               <LineChart
@@ -31,7 +38,7 @@ export const ManageGraphs: React.FC = () => {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" domain={['auto', 'auto']} name="Time" tickFormatter={(unixTime) => dayjs(unixTime).format('DD/MM/YYYY')} type="number" />
+                <XAxis dataKey="time" domain={['dataMin', 'dataMax']} name="Time" tickFormatter={(unixTime) => dayjs(unixTime).format('MMM YYYY')} type="number" ticks={ticks} />
                 <YAxis />
                 <Tooltip labelFormatter={(label) => `Date: ${dayjs(label).format('DD/MM/YYYY')}`} />
                 <Legend />
