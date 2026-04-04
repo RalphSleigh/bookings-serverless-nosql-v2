@@ -17,7 +17,7 @@ export const ManageGraphs: React.FC = () => {
 
   const ticks = [] as number[]
 
-  for(let month =dayjs(graphData[0].time).startOf('month'); month.isBefore(dayjs(graphData[graphData.length - 1].time)); month = month.add(1, 'month')) {
+  for(let month =dayjs(graphData[0].time).endOf('month'); month.isBefore(dayjs(graphData[graphData.length - 1].time)); month = month.add(1, 'month')) {
     ticks.push(month.valueOf())
   }
 
