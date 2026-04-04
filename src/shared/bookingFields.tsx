@@ -30,7 +30,7 @@ abstract class BookingField {
   valueForDrive: (b: TBookingResponse) => string = (b) => {
     if (typeof this.accessor === 'function') {
       const v = this.accessor(b)
-      return typeof v === 'string' ? v : v.toLocaleString("en-GB")
+      return typeof v === 'string' ? v : v.toLocaleString('en-GB')
     } else {
       const v = getProperty<TBookingResponse, string, string>(b, this.accessor, '')
       return v
@@ -79,6 +79,18 @@ class Phone extends BookingField {
   accessor = 'basic.telephone'
 }
 
+class BookingType extends BookingField {
+  name = 'Booking Type'
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => ('type' in b.basic ? b.basic.type : '')
+}
+
+class District extends BookingField {
+  name = 'District'
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => ('district' in b.basic ? b.basic.district || '' : '')
+}
+
 class PeopleCount extends BookingField {
   name = 'People'
   size = 20
@@ -88,7 +100,7 @@ class PeopleCount extends BookingField {
 class Shuttle extends BookingField {
   name = 'Shuttle'
   size = 20
-  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+
   accessor = (b: TBookingResponse) => ('shuttle' in b.other ? b.other.shuttle : 'N/A')
 }
 
@@ -103,21 +115,21 @@ class CampsWith extends BookingField {
   name = 'Camps With'
   size = 150
   enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
-  accessor = (b: TBookingResponse) => ((b.camping && 'who' in b.camping) ? b.camping.who ?? '' : '')
+  accessor = (b: TBookingResponse) => (b.camping && 'who' in b.camping ? (b.camping.who ?? '') : '')
 }
 
 class Equipment extends BookingField {
   name = 'Equipment'
   size = 150
   enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
-  accessor = (b: TBookingResponse) => (b.camping && 'equipment' in b.camping ? b.camping.equipment ?? '' : '')
+  accessor = (b: TBookingResponse) => (b.camping && 'equipment' in b.camping ? (b.camping.equipment ?? '') : '')
 }
 
 class AccessibilityRequirements extends BookingField {
   name = 'Accessibility Requirements'
   size = 150
   enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
-  accessor = (b: TBookingResponse) => (b.camping && 'accessibility' in b.camping ? b.camping.accessibility ?? '' : '')
+  accessor = (b: TBookingResponse) => (b.camping && 'accessibility' in b.camping ? (b.camping.accessibility ?? '') : '')
 }
 
 class EditLink extends BookingField {
@@ -144,5 +156,20 @@ class Updated extends BookingField {
 }
 
 export const bookingFields: (event: TEvent) => BookingField[] = (event) => {
-  return [new Name(event), new Email(event), new Phone(event), new PeopleCount(event), new Shuttle(event), new AnythingElse(event), new CampsWith(event), new Equipment(event), new AccessibilityRequirements(event), new EditLink(event), new Created(event), new Updated(event)]
+  return [
+    new BookingType(event),
+    new Name(event),
+    new District(event),
+    new Email(event),
+    new Phone(event),
+    new PeopleCount(event),
+    new Shuttle(event),
+    new AnythingElse(event),
+    new CampsWith(event),
+    new Equipment(event),
+    new AccessibilityRequirements(event),
+    new EditLink(event),
+    new Created(event),
+    new Updated(event),
+  ]
 }
