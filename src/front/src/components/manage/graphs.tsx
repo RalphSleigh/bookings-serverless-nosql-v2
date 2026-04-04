@@ -1,22 +1,14 @@
-import { AspectRatio, Box, Container, Grid, Table, Title } from '@mantine/core'
+import { AspectRatio, Container, Grid, Title } from '@mantine/core'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-
-import { getKPType, KPBasicOptions } from '../../../../shared/kp/kp'
-import { TPerson } from '../../../../shared/schemas/person'
-import { AgeGroup, ageGroupFromPerson, ageGroups } from '../../../../shared/woodcraft'
-import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { getEventGraphDataQueryOptions } from '../../queries/getEventGraphData'
-import { useEvent } from '../../utils'
 
 export const ManageGraphs: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
   const { eventId } = route.useParams()
   const graphQuery = useSuspenseQuery(getEventGraphDataQueryOptions(eventId))
-  const event = useEvent()
 
   const graphData = graphQuery.data.data.map((d) => {
     return { total: d.count, time: Date.parse(d.date) }

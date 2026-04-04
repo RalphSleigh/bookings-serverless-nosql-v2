@@ -1,7 +1,6 @@
 import { subject } from '@casl/ability'
 import { DBPersonHistory } from '../../../dynamo'
-import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../../utils'
-import { CollectionItem, CollectionResponse, ElectroEvent } from 'electrodb'
+import { HandlerWrapperLoggedIn } from '../../../utils'
 import dayjs from 'dayjs'
 
 
@@ -13,7 +12,7 @@ export const getGraphData = HandlerWrapperLoggedIn<{ eventId: string }>(
     try {
       const event = res.locals.event
       const people = await DBPersonHistory.match({ eventId: event.eventId }).go({pages: "all"})
-      if (people.data) {
+      if (people.data && people.data.length > 0) {
         const earliestDate = people.data.reduce((earliest, person) => {
           return person.createdAt < earliest ? person.createdAt : earliest
         }, people.data[0].createdAt)
