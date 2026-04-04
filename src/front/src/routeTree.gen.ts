@@ -27,6 +27,7 @@ import { Route as UserEventEventIdManageSettingsImport } from './routes/_user/ev
 import { Route as UserEventEventIdManageRolesImport } from './routes/_user/event/$eventId/manage/roles'
 import { Route as UserEventEventIdManageMoneyImport } from './routes/_user/event/$eventId/manage/money'
 import { Route as UserEventEventIdManageKpImport } from './routes/_user/event/$eventId/manage/kp'
+import { Route as UserEventEventIdManageGraphsImport } from './routes/_user/event/$eventId/manage/graphs'
 import { Route as UserEventEventIdManageCampersImport } from './routes/_user/event/$eventId/manage/campers'
 import { Route as UserEventEventIdManageBookingsImport } from './routes/_user/event/$eventId/manage/bookings'
 import { Route as UserEventEventIdManageApplicationsImport } from './routes/_user/event/$eventId/manage/applications'
@@ -133,6 +134,13 @@ const UserEventEventIdManageKpRoute = UserEventEventIdManageKpImport.update({
   path: '/kp',
   getParentRoute: () => UserEventEventIdManageRoute,
 } as any)
+
+const UserEventEventIdManageGraphsRoute =
+  UserEventEventIdManageGraphsImport.update({
+    id: '/graphs',
+    path: '/graphs',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
 
 const UserEventEventIdManageCampersRoute =
   UserEventEventIdManageCampersImport.update({
@@ -250,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserEventEventIdManageCampersImport
       parentRoute: typeof UserEventEventIdManageImport
     }
+    '/_user/event/$eventId/manage/graphs': {
+      id: '/_user/event/$eventId/manage/graphs'
+      path: '/graphs'
+      fullPath: '/event/$eventId/manage/graphs'
+      preLoaderRoute: typeof UserEventEventIdManageGraphsImport
+      parentRoute: typeof UserEventEventIdManageImport
+    }
     '/_user/event/$eventId/manage/kp': {
       id: '/_user/event/$eventId/manage/kp'
       path: '/kp'
@@ -329,6 +344,7 @@ interface UserEventEventIdManageRouteChildren {
   UserEventEventIdManageApplicationsRoute: typeof UserEventEventIdManageApplicationsRoute
   UserEventEventIdManageBookingsRoute: typeof UserEventEventIdManageBookingsRoute
   UserEventEventIdManageCampersRoute: typeof UserEventEventIdManageCampersRoute
+  UserEventEventIdManageGraphsRoute: typeof UserEventEventIdManageGraphsRoute
   UserEventEventIdManageKpRoute: typeof UserEventEventIdManageKpRoute
   UserEventEventIdManageMoneyRoute: typeof UserEventEventIdManageMoneyRoute
   UserEventEventIdManageRolesRoute: typeof UserEventEventIdManageRolesRoute
@@ -343,6 +359,7 @@ const UserEventEventIdManageRouteChildren: UserEventEventIdManageRouteChildren =
       UserEventEventIdManageApplicationsRoute,
     UserEventEventIdManageBookingsRoute: UserEventEventIdManageBookingsRoute,
     UserEventEventIdManageCampersRoute: UserEventEventIdManageCampersRoute,
+    UserEventEventIdManageGraphsRoute: UserEventEventIdManageGraphsRoute,
     UserEventEventIdManageKpRoute: UserEventEventIdManageKpRoute,
     UserEventEventIdManageMoneyRoute: UserEventEventIdManageMoneyRoute,
     UserEventEventIdManageRolesRoute: UserEventEventIdManageRolesRoute,
@@ -407,6 +424,7 @@ export interface FileRoutesByFullPath {
   '/event/$eventId/manage/applications': typeof UserEventEventIdManageApplicationsRoute
   '/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
   '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/event/$eventId/manage/graphs': typeof UserEventEventIdManageGraphsRoute
   '/event/$eventId/manage/kp': typeof UserEventEventIdManageKpRoute
   '/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
@@ -430,6 +448,7 @@ export interface FileRoutesByTo {
   '/event/$eventId/manage/applications': typeof UserEventEventIdManageApplicationsRoute
   '/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
   '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/event/$eventId/manage/graphs': typeof UserEventEventIdManageGraphsRoute
   '/event/$eventId/manage/kp': typeof UserEventEventIdManageKpRoute
   '/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
@@ -455,6 +474,7 @@ export interface FileRoutesById {
   '/_user/event/$eventId/manage/applications': typeof UserEventEventIdManageApplicationsRoute
   '/_user/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
   '/_user/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/_user/event/$eventId/manage/graphs': typeof UserEventEventIdManageGraphsRoute
   '/_user/event/$eventId/manage/kp': typeof UserEventEventIdManageKpRoute
   '/_user/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/_user/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
@@ -481,6 +501,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/manage/applications'
     | '/event/$eventId/manage/bookings'
     | '/event/$eventId/manage/campers'
+    | '/event/$eventId/manage/graphs'
     | '/event/$eventId/manage/kp'
     | '/event/$eventId/manage/money'
     | '/event/$eventId/manage/roles'
@@ -503,6 +524,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/manage/applications'
     | '/event/$eventId/manage/bookings'
     | '/event/$eventId/manage/campers'
+    | '/event/$eventId/manage/graphs'
     | '/event/$eventId/manage/kp'
     | '/event/$eventId/manage/money'
     | '/event/$eventId/manage/roles'
@@ -526,6 +548,7 @@ export interface FileRouteTypes {
     | '/_user/event/$eventId/manage/applications'
     | '/_user/event/$eventId/manage/bookings'
     | '/_user/event/$eventId/manage/campers'
+    | '/_user/event/$eventId/manage/graphs'
     | '/_user/event/$eventId/manage/kp'
     | '/_user/event/$eventId/manage/money'
     | '/_user/event/$eventId/manage/roles'
@@ -610,6 +633,7 @@ export const routeTree = rootRoute
         "/_user/event/$eventId/manage/applications",
         "/_user/event/$eventId/manage/bookings",
         "/_user/event/$eventId/manage/campers",
+        "/_user/event/$eventId/manage/graphs",
         "/_user/event/$eventId/manage/kp",
         "/_user/event/$eventId/manage/money",
         "/_user/event/$eventId/manage/roles",
@@ -628,6 +652,10 @@ export const routeTree = rootRoute
     },
     "/_user/event/$eventId/manage/campers": {
       "filePath": "_user/event/$eventId/manage/campers.tsx",
+      "parent": "/_user/event/$eventId/manage"
+    },
+    "/_user/event/$eventId/manage/graphs": {
+      "filePath": "_user/event/$eventId/manage/graphs.tsx",
       "parent": "/_user/event/$eventId/manage"
     },
     "/_user/event/$eventId/manage/kp": {

@@ -56,6 +56,7 @@ export const ManageWrapper = () => {
                 <Tabs.Tab value="money">Money</Tabs.Tab>
               </Can>
               <Tabs.Tab value="settings">Settings</Tabs.Tab>
+              <Tabs.Tab value="graphs">Graphs</Tabs.Tab>
             </Tabs.List>
           </Tabs>
           <Outlet />

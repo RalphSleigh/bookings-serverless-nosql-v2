@@ -42,6 +42,7 @@ import { userMiddleware } from './middleware/user'
 import { am_in_lambda } from './utils'
 import { redirectToStripe } from './endpoints/booking/redirectToStripe'
 import { stripeWebhookHandler } from './endpoints/stripe'
+import { getGraphData } from './endpoints/event/manage/getGraphData'
 
 export const router = express.Router()
 export const app = express()
@@ -97,6 +98,7 @@ router.get('/event/:eventId/manage/applications', getEventApplications)
 router.post('/event/:eventId/manage/application/:userId/approve', approveApplicationEndpoint)
 router.post('/event/:eventId/manage/application/:userId/decline', declineApplicationEndpoint)
 router.get('/event/:eventId/manage/bookingHistory/:userId', getEventBookingHistory)
+router.get('/event/:eventId/manage/graphData', getGraphData)
 
 router.post('/stripe/webhook', stripeWebhookHandler)
 
