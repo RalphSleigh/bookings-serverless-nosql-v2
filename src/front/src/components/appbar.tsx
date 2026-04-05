@@ -1,9 +1,9 @@
-import { ActionIcon, AppShell, Avatar, Box, Button, Flex, Text, ThemeIcon, Title, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
+import { ActionIcon, Avatar, Box, Button, Flex, Text, Title, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { IconBug, IconLogout, IconMoon, IconSun } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouteContext, useSearch } from '@tanstack/react-router'
-import React, { useContext } from 'react'
+import React from 'react'
 
 import { envQueryOptions } from '../queries/env'
 import { CustomLink } from '../utils'
@@ -24,7 +24,7 @@ export const AppToolbar = () => {
   const matches = useMediaQuery('(min-width: 32em)')
 
   return (
-    <AppShell.Header>
+    <Box component="header" h={48}>
       <Flex gap="xs" justify="flex-start" align="center" direction="row" wrap="wrap" mr={8}>
         <Box>
           <CustomLink underline="hover" to="/">
@@ -76,7 +76,7 @@ export const AppToolbar = () => {
           </>
         ) : null}
       </Flex>
-    </AppShell.Header>
+    </Box>
   )
 }
 

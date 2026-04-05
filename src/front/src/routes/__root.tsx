@@ -1,10 +1,11 @@
-import { AppShell, Box, Text } from '@mantine/core'
-import { useQueryErrorResetBoundary, type QueryClient, type useSuspenseQuery } from '@tanstack/react-query'
+import { Box, Text } from '@mantine/core'
+import { useHeadroom } from '@mantine/hooks'
+import { type QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { createRootRoute, createRootRouteWithContext, Link, Outlet, useRouteContext, useRouter, useSearch } from '@tanstack/react-router'
+import { createRootRouteWithContext, Outlet, useRouteContext, useRouter } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import dayjs from 'dayjs'
 import * as React from 'react'
-import { useEffect } from 'react'
 
 import { getPermissionsFromUser } from '../../../shared/permissions'
 import { useAuth } from '../auth'
@@ -14,7 +15,6 @@ import classes from '../css/mainArea.module.css'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
 import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
-import dayjs from 'dayjs'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -51,21 +51,18 @@ function RootComponent(): React.JSX.Element {
 
   return (
     <>
-      <AppShell header={{ height: 48 }}>
+      <Box style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <AppToolbar />
-        <AppShell.Main className={classes.root}>
-          <Box style={{ minHeight: 'calc(100vh - 48px)', display: 'flex', flexDirection: 'column' }}>
-            <Box flex={1}>
-              <Outlet />
-            </Box>
-            <Box>
-              <Text size="xs" ta="center" c="dimmed" mt={16} mb={8}>
-                &copy; {new Date().getFullYear()} Woodcraft Folk. Source on <a href="https://github.com/RalphSleigh/bookings-serverless-nosql-v2">GitHub</a>. - Built {dayjs(BUILD_DATE).format('MMMM D, YYYY HH:mm')} - <a href="/api/auth/redirect?switch=true">Switch User</a>.
-              </Text>
-            </Box>
-          </Box>
-        </AppShell.Main>
-      </AppShell>
+        <Box className={classes.root} flex={1}>
+          <Outlet />
+        </Box>
+        <Box>
+          <Text size="xs" ta="center" c="dimmed" mt={16} mb={8}>
+            &copy; {new Date().getFullYear()} Woodcraft Folk. Source on <a href="https://github.com/RalphSleigh/bookings-serverless-nosql-v2">GitHub</a>. - Built{' '}
+            {dayjs(BUILD_DATE).format('MMMM D, YYYY HH:mm')} - <a href="/api/auth/redirect?switch=true">Switch User</a>.
+          </Text>
+        </Box>
+      </Box>
       <ReactQueryDevtools buttonPosition="bottom-right" />
       <TanStackRouterDevtools position="bottom-right" />
     </>
