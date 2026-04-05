@@ -8,6 +8,8 @@ import React from 'react'
 import { envQueryOptions } from '../queries/env'
 import { CustomLink } from '../utils'
 
+import classes from '../css/appBar.module.css'
+
 //import { useSuspenseIfUser } from '../queries/useSuspenseWrapper';
 
 export const AppToolbar = () => {
@@ -24,7 +26,7 @@ export const AppToolbar = () => {
   const matches = useMediaQuery('(min-width: 32em)')
 
   return (
-    <Box component="header" h={48}>
+    <Box component="header" h={48} className={classes.root}>
       <Flex gap="xs" justify="flex-start" align="center" direction="row" wrap="wrap" mr={8}>
         <Box>
           <CustomLink underline="hover" to="/">

@@ -1,0 +1,4 @@
+.root {
+  background-color: var(--mantine-color-body);
+  border-bottom: 1px solid var(--app-shell-border-color);
+}
