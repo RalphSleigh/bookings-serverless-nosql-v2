@@ -24,7 +24,7 @@ export const AppToolbar = () => {
   const matches = useMediaQuery('(min-width: 32em)')
 
   return (
-    <Box component="header">
+    <Box component="header" h="48px">
       <Flex gap="xs" justify="flex-start" align="center" direction="row" wrap="wrap" mr={8}>
         <Box>
           <CustomLink underline="hover" to="/">
