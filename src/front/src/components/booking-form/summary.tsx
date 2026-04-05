@@ -12,8 +12,10 @@ const reverseAgeGroups = [...ageGroups].reverse()
 export const BookingSummary: React.FC = ({}) => {
   const [people, setPeople] = useState<PartialBookingType['people']>([])
 
-  const peopleWithIndex = (people || []).map((p, i) => ({ ...p, index: i }))
-
+  const peopleWithIndex = (people || [])
+    .map((p, i) => (p ? { ...p, index: i } : null))
+    .filter((p): p is NonNullable<typeof p> => p !== null)
+    
   const event = useEvent()
 
   const filter = campersInAgeGroup(event)
