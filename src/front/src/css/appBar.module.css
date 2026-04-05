@@ -1,4 +1,12 @@
 .root {
+  @mixin light {
+    --app-shell-border-color: var(--mantine-color-gray-3);
+  }
+
+  @mixin dark {
+    --app-shell-border-color: var(--mantine-color-dark-4);
+  }
+
   background-color: var(--mantine-color-body);
   border-bottom: 1px solid var(--app-shell-border-color);
 }
