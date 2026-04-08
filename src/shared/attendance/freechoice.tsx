@@ -63,6 +63,7 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
         <Input.Label required>Nights attending:</Input.Label>
         <Button.Group style={{ flexWrap: 'wrap' }}>{buttons}</Button.Group>
         {invalid && <Input.Error>{error?.message}</Input.Error>}
+        {currentBitMask !== 0 && (<Text size="sm" mt={2}>{bitCount32(currentBitMask)} nights selected</Text>)}
       </>
     )
   }
