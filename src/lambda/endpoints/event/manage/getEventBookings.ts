@@ -8,7 +8,7 @@ import { HandlerWrapper } from '../../../utils'
 
 export type TPersonWithoutSensitiveInfo<Event extends TEvent = TEvent> = Omit<TPerson<Event>, 'kp' | 'health'>
 
-type TBookingWithoutSensitiveInfo<Event extends TEvent = TEvent> = Omit<TBooking, 'people'> & {
+export type TBookingWithoutSensitiveInfo<Event extends TEvent = TEvent> = Omit<TBooking, 'people'> & {
   people: TPersonWithoutSensitiveInfo<Event>[]
 }
 
