@@ -1,15 +1,25 @@
-import { AspectRatio, Container, Grid, Title } from '@mantine/core'
+import { AspectRatio, Box, Container, Grid, Group, Text, Title } from '@mantine/core'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+
+import { TPersonWithoutSensitiveInfo } from '../../../../lambda/endpoints/event/manage/getEventBookings'
+import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { getEventGraphDataQueryOptions } from '../../queries/getEventGraphData'
-import { start } from 'react-email/src/commands/start';
+import { useEvent } from '../../utils'
 
 export const ManageGraphs: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
   const { eventId } = route.useParams()
   const graphQuery = useSuspenseQuery(getEventGraphDataQueryOptions(eventId))
+  const bookingQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
+  const event = useEvent()
+
+  const people: TPersonWithoutSensitiveInfo[] = bookingQuery.data.bookings.reduce((acc, b) => [...acc, ...(b.people || [])], [] as TPersonWithoutSensitiveInfo[])
+
+  const volunteers = people.filter((p) => p.basic.role === 'volunteer').length
+  const participants = people.filter((p) => p.basic.role === 'participant').length
 
   const graphData = graphQuery.data.data.map((d) => {
     return { total: d.count, time: Date.parse(d.date) }
@@ -17,13 +27,116 @@ export const ManageGraphs: React.FC = () => {
 
   const ticks = [] as number[]
 
-  for(let month =dayjs(graphData[0].time).endOf('month').add(1, 'day').startOf('month'); month.isBefore(dayjs(graphData[graphData.length - 1].time)); month = month.add(1, 'month')) {
+  for (let month = dayjs(graphData[0].time).endOf('month').add(1, 'day').startOf('month'); month.isBefore(dayjs(graphData[graphData.length - 1].time)); month = month.add(1, 'month')) {
     ticks.push(month.valueOf())
   }
 
   return (
     <Container strategy="grid" fluid>
       <Grid mt={16}>
+        {event.bigCampMode && (
+          <>
+            <Grid.Col span={12}>
+              <Group grow preventGrowOverflow={false} gap={0}>
+                <Box>
+                  <Text
+                    style={{
+                      fontSize: '1.5rem',
+                      textAlign: 'right',
+                    }}
+                  >
+                    Participants
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: '0.8rem',
+                      textAlign: 'right',
+                      color: 'var(--mantine-primary-color-light-color)',
+                    }}
+                  >
+                    {participants}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: '1.5rem',
+                      fontWeight: 'bold',
+                      textAlign: 'right',
+                      color: 'var(--mantine-primary-color-filled)',
+                    }}
+                  >
+                    {participants / Math.min(participants, volunteers)}
+                  </Text>
+                </Box>
+                <Box
+                  style={{
+                    flexGrow: 0,
+                  }}
+
+                  ml={4}
+                  mr={4}
+                >
+                  <Text
+                    style={{
+                      fontSize: '1.5rem',
+                      textAlign: 'center',
+                    }}
+                  >
+                     : 
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: '0.8rem',
+                      textAlign: 'center',
+                      color: 'var(--mantine-primary-color-light-color)',
+                    }}
+                  >
+                     : 
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: '1.5rem',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      color: 'var(--mantine-primary-color-filled)',
+                    }}
+                  >
+                    :
+                  </Text>
+                </Box>
+
+                <Box>
+                  <Text
+                    style={{
+                      fontSize: '1.5rem',
+                      textAlign: 'left',
+                    }}
+                  >
+                    Volunteers
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: '0.8rem',
+                      textAlign: 'left',
+                      color: 'var(--mantine-primary-color-light-color)',
+                    }}
+                  >
+                    {volunteers}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: '1.5rem',
+                      fontWeight: 'bold',
+                      textAlign: 'left',
+                      color: 'var(--mantine-primary-color-filled)',
+                    }}
+                  >
+                    {volunteers / Math.min(participants, volunteers)}
+                  </Text>
+                </Box>
+              </Group>
+            </Grid.Col>
+          </>
+        )}
         <Grid.Col span={12}>
           <Title order={3}>People Booked Over Time</Title>
           <AspectRatio ratio={3} mt={16}>

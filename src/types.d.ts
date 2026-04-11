@@ -5,3 +5,5 @@ declare module "*.module.css" {
 
 
 declare const BUILD_DATE: string;
+
+declare module '*.css';
