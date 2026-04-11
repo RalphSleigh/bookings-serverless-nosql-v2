@@ -58,7 +58,7 @@ export const createBooking = HandlerWrapperLoggedIn(
     await enqueueAsyncTask({
       type: 'discordMessage',
       data: {
-        message: `${createdBooking.data.basic!.name} (${createdBooking.data.basic!.district ? createdBooking.data.basic!.district : 'Individual'}) created a booking for event ${event.name}, they have booked ${booking.people.length} people`,
+        message: `${createdBooking.data.basic!.name} (${createdBooking.data.basic!.district ? createdBooking.data.basic!.district : 'Individual'}) created a booking for event ${event.name}, they have booked ${booking.people.length} ${booking.people.length > 1 ? 'people' : 'person'}.`,
       },
     })
 

@@ -160,14 +160,14 @@ export const updateBooking = HandlerWrapper(
         await enqueueAsyncTask({
           type: 'discordMessage',
           data: {
-            message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) edited their booking for event ${event.name}, they have booked ${people.length} people (previously ${existingBooking.people.length})`,
+          message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) edited their booking for event ${event.name}, they have booked ${people.length} ${people.length > 1 ? 'people' : 'person'} (previously ${existingBooking.people.length})`,
           },
         })
       } else {
         await enqueueAsyncTask({
           type: 'discordMessage',
           data: {
-            message: `${user.name} edited booking ${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) for event ${event.name}, they have booked ${people.length} people (previously ${existingBooking.people.length})`,
+            message: `${user.name} edited booking ${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) for event ${event.name}, they have booked ${people.length} ${people.length > 1 ? 'people' : 'person'} (previously ${existingBooking.people.length})`,
           },
         })
       }
