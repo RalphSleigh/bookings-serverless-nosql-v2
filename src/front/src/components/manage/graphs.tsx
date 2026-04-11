@@ -31,6 +31,12 @@ export const ManageGraphs: React.FC = () => {
     ticks.push(month.valueOf())
   }
 
+  const numberFormatter = new Intl.NumberFormat('en-GB', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+
   return (
     <Container strategy="grid" fluid>
       <Grid mt={16}>
@@ -64,7 +70,7 @@ export const ManageGraphs: React.FC = () => {
                       color: 'var(--mantine-primary-color-filled)',
                     }}
                   >
-                    {participants / Math.min(participants, volunteers)}
+                    {numberFormatter.format(participants / Math.min(participants, volunteers))}
                   </Text>
                 </Box>
                 <Box
@@ -130,7 +136,7 @@ export const ManageGraphs: React.FC = () => {
                       color: 'var(--mantine-primary-color-filled)',
                     }}
                   >
-                    {volunteers / Math.min(participants, volunteers)}
+                    {numberFormatter.format(volunteers / Math.min(participants, volunteers))}
                   </Text>
                 </Box>
               </Group>
