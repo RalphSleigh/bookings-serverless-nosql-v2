@@ -101,9 +101,11 @@ export const authCallback: RequestHandler = async (req, res) => {
       }
 
       logToSystem(`New user created: ${JSON.stringify(user)}`)
+      logToSystem(`Using user agent: ${req.headers['user-agent']} and accept language: ${req.headers['accept-language']}`)
     } else {
       user = UserSchema.parse(userResult.data)
       logToSystem(`User found: ${JSON.stringify(user)}`)
+      logToSystem(`Using user agent: ${req.headers['user-agent']} and accept language: ${req.headers['accept-language']}`)
     }
 
     res.locals.logger.logToPath(user)
