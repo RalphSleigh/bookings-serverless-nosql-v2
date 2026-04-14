@@ -52,11 +52,12 @@ export const ManageWrapper = () => {
               <Can I="viewRoles" this={subject('eventId', { eventId })}>
                 <Tabs.Tab value="roles">Roles</Tabs.Tab>
               </Can>
+              <Tabs.Tab value="comms">Comms</Tabs.Tab>
               <Can I="getFees" this={subject('eventId', { eventId })}>
                 <Tabs.Tab value="money">Money</Tabs.Tab>
               </Can>
-              <Tabs.Tab value="settings">Settings</Tabs.Tab>
               <Tabs.Tab value="graphs">Graphs</Tabs.Tab>
+              <Tabs.Tab value="settings">Settings</Tabs.Tab>
             </Tabs.List>
           </Tabs>
           <Outlet />
