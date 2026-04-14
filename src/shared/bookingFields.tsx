@@ -9,6 +9,7 @@ import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { ageGroupFromPerson } from './woodcraft'
+import { getFeeType } from './fees/fees'
 
 dayjs.extend(relativeTime)
 
@@ -155,6 +156,15 @@ class Updated extends BookingField {
   Cell: CellType = ({ cell }) => dayjs(cell.getValue<Date>()).fromNow()
 }
 
+class PaymentReference extends BookingField {
+  name = 'Payment Reference'
+  enabled: (event: TEvent) => boolean = (event) => event.fee.feeStructure === 'vcamp'
+  accessor = (b: TBookingResponse) => {
+    const fees = getFeeType(this.event)
+    return fees.getPaymentReference(b)
+  }
+}
+
 export const bookingFields: (event: TEvent) => BookingField[] = (event) => {
   return [
     new BookingType(event),
@@ -168,6 +178,7 @@ export const bookingFields: (event: TEvent) => BookingField[] = (event) => {
     new CampsWith(event),
     new Equipment(event),
     new AccessibilityRequirements(event),
+    new PaymentReference(event),
     new EditLink(event),
     new Created(event),
     new Updated(event),
