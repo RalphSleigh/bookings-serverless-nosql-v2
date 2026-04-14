@@ -12,7 +12,7 @@ import { TEvent, TEventEalingFees } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
-import { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
+import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export class EalingFees implements FeeStructure<TEventEalingFees> {
   typeName: 'ealing' = 'ealing'

@@ -13,7 +13,7 @@ import { TFee } from '../schemas/fees'
 import { TUser } from '../schemas/user'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
-import { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
+import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export class VCampFees implements FeeStructure<TEventVCampFees> {
   typeName: 'vcamp' = 'vcamp'

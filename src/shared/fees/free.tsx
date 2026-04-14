@@ -6,7 +6,7 @@ import { AttendanceStructureValues } from '../attendance/attendance'
 import { PartialBookingType, TBooking } from '../schemas/booking'
 import { TEvent, TEventFeesUnion, TEventFreeFees } from '../schemas/event'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
-import { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
+import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export class FreeFees implements FeeStructure<TEventFreeFees> {
   typeName: 'free' = 'free'
