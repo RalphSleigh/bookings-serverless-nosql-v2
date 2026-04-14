@@ -3,13 +3,12 @@ import { getRouteApi, useRouteContext } from '@tanstack/react-router'
 import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
-import { TPerson } from '../../../../shared/schemas/person'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
 import 'mantine-react-table/styles.css'
 
 import { subject } from '@casl/ability'
-import { ActionIcon, Anchor, Box, Container, Flex, Modal, Paper, ScrollArea, Stack, Text, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Box, Container, Flex, Modal, ScrollArea, Stack, Text, Title } from '@mantine/core'
 import { IconDownload } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
@@ -17,9 +16,8 @@ import useLocalStorageState from 'use-local-storage-state'
 
 import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { bookingFields } from '../../../../shared/bookingFields'
-import { TBooking } from '../../../../shared/schemas/booking'
+import { getFeeType } from '../../../../shared/fees/fees'
 import { TEvent } from '../../../../shared/schemas/event'
-import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { Can } from '../../permissionContext'
 import { CustomLink, useEvent } from '../../utils'
@@ -179,7 +177,7 @@ const campingDetailsLarge = (event: TEvent, booking: TBookingResponse) => (
     <Text>
       <b>Camps With:</b> {booking.camping && 'who' in booking.camping ? booking.camping.who : ''}
     </Text>
-      <Text>
+    <Text>
       <b>Equipment:</b> {booking.camping && 'equipment' in booking.camping ? booking.camping.equipment : ''}
     </Text>
     <Text>
@@ -217,11 +215,18 @@ const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingRe
 
   const peopleList = booking.people.map((p) => <li key={p.personId}>{p.basic.name}</li>)
 
+  const paymentReference = getFeeType(event).getPaymentReference(booking)
+
   return (
     <Flex>
       <Box>
         {basic}
         {camping}
+        {paymentReference !== '' && (
+          <Text>
+            <b>Payment Reference:</b> {paymentReference}
+          </Text>
+        )}
         <Text>
           <b>Booked:</b> {booking.people.length}
         </Text>
