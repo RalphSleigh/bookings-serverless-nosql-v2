@@ -33,6 +33,8 @@ export const ManageMoney = () => {
   const bookings = useMemo(() => bookingsQuery.data.bookings, [bookingsQuery.data])
   const fees = useMemo(() => feesQuery.data.fees, [feesQuery.data])
 
+  const usesReferences = feeStructure.typeName === 'vcamp'
+
   let totalFees = 0
   let totalsPaid = 0
 
@@ -47,6 +49,7 @@ export const ManageMoney = () => {
 
     return (
       <Table.Tr key={b.userId} style={{ cursor: 'pointer' }} onClick={() => setSelected(b.userId)}>
+        {usesReferences && <Table.Td>{feeStructure.getPaymentReference(b)}</Table.Td>}
         <Table.Td>{'district' in b.basic && b.basic.district? `${b.basic.district} (${b.basic.name})` : b.basic.name}</Table.Td>
         <Table.Td>{currency(totalWithAdjustments)}</Table.Td>
         <Table.Td>{currency(totalPaid)}</Table.Td>
@@ -69,6 +72,7 @@ export const ManageMoney = () => {
       <Table striped highlightOnHover withColumnBorders mt={8}>
         <Table.Thead>
           <Table.Tr>
+            {usesReferences && <Table.Th>Reference</Table.Th>}
             <Table.Th>Booking</Table.Th>
             <Table.Th>Fee</Table.Th>
             <Table.Th>Paid</Table.Th>
@@ -81,6 +85,7 @@ export const ManageMoney = () => {
             <Table.Td>
               <b>Total</b>
             </Table.Td>
+            {usesReferences && <Table.Td></Table.Td>}
             <Table.Td>
               <b>{currency(totalFees)}</b>
             </Table.Td>
@@ -173,6 +178,9 @@ const MoneyDetails = ({ feeStructure, event, booking, fees }: { feeStructure: Fe
 
   return (
     <>
+      <Title order={4} mb={16}>
+        {'district' in booking.basic && booking.basic.district ? `${booking.basic.district} (${booking.basic.name})` : booking.basic.name} - {feeStructure.getPaymentReference(booking)}
+      </Title>
       <Table striped highlightOnHover withColumnBorders mt={8}>
         <Table.Thead>
           <Table.Tr>

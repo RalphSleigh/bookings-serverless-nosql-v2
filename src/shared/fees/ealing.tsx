@@ -12,6 +12,7 @@ import { TEvent, TEventEalingFees } from '../schemas/event'
 import { TPerson } from '../schemas/person'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
+import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export class EalingFees implements FeeStructure<TEventEalingFees> {
   typeName: 'ealing' = 'ealing'
@@ -240,7 +241,7 @@ export class EalingFees implements FeeStructure<TEventEalingFees> {
     )
   }
 
-  getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventEalingFees>>): string {
+  getPaymentReference(booking: TBookingResponse<TEvent<any, any, any, TEventEalingFees>>): string {
     return `EALING${booking.userId.split('-')[0].toUpperCase()}`
   }
 }
