@@ -1,11 +1,9 @@
+import { Box, Container, Table, Text } from '@mantine/core'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi, useRouteContext } from '@tanstack/react-router'
 import { JSX } from 'react'
 
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
-
-import { Box, Container, Table, Text } from '@mantine/core'
-
 import { useEvent } from '../../utils'
 
 export const ManageComms = () => {
@@ -22,9 +20,7 @@ export const ManageComms = () => {
           <Table.Td></Table.Td>
           <Table.Td>{c.name}</Table.Td>
           <Table.Td>
-            <a href={`mailto:${c.email}`}>
-              {c.email}
-            </a>
+            <a href={`mailto:${c.email}`}>{c.email}</a>
           </Table.Td>
         </Table.Tr>
       )
@@ -35,19 +31,19 @@ export const ManageComms = () => {
         <Table.Td>{'type' in booking.basic && booking.basic.type === 'group' ? booking.basic.district : 'Individual'}</Table.Td>
         <Table.Td>{booking.basic.name}</Table.Td>
         <Table.Td>
-          <a href={`mailto:${booking.basic.email}`}>
-            {booking.basic.email}
-          </a>
+          <a href={`mailto:${booking.basic.email}`}>{booking.basic.email}</a>
         </Table.Td>
       </Table.Tr>
     )
     return [...acc, row, ...extraComms]
   }, [] as JSX.Element[])
 
-  const mailAllLink = `mailto:?bcc=${bookingsQuery.data.bookings
-    .map((b) => [b.basic.email, ...(b.extraContacts || []).map((c) => c.email)])
-    .flat()
-    .join(',')}`
+  const mailAllLink = `mailto:?bcc=${encodeURIComponent(
+    bookingsQuery.data.bookings
+      .map((b) => [b.basic.email, ...(b.extraContacts || []).map((c) => c.email)])
+      .flat()
+      .join(','),
+  )}`
 
   return (
     <>
@@ -55,10 +51,7 @@ export const ManageComms = () => {
         <Box data-breakout>
           <Text ml={8}>This table contains the primary booking contact and any extra contacts they have supplied</Text>
           <Text mb={8} ml={8}>
-            Email all addresses:{' '}
-            <a href={mailAllLink}>
-              Link
-            </a>
+            Email all addresses: <a href={mailAllLink}>Link</a>
           </Text>
           <Table>
             <Table.Thead>
