@@ -6,6 +6,7 @@ import { PartialBookingType, TBooking, TBookingForType } from '../schemas/bookin
 import { TEvent, TEventFeesUnion } from '../schemas/event'
 import { TFee } from '../schemas/fees'
 import { TUser } from '../schemas/user'
+import { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export type FeeStructureConfigData<T extends TEventFeesUnion> = Required<Pick<T, 'feeStructure'>> & PartialDeep<T>
 export type FeeStructureCondfigurationElement<T extends TEventFeesUnion> = React.FC<{
@@ -35,5 +36,6 @@ export interface FeeStructure<T extends TEventFeesUnion = TEventFeesUnion> {
   BookingFormDisplayElement: BookingFormDisplayElement<T>
   EventListDisplayElement: EventListDisplayElement<T>
   EmailElement: EmailElement<T>
-  getPaymentReference(booking: TBooking<TEvent<any, any, any, T>>): string
+  getPaymentReference(booking: TBookingResponse<TEvent<any, any, any, T>>): string
 }
+  

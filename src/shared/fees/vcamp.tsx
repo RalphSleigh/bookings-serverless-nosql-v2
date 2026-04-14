@@ -13,6 +13,7 @@ import { TFee } from '../schemas/fees'
 import { TUser } from '../schemas/user'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
+import { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 
 export class VCampFees implements FeeStructure<TEventVCampFees> {
   typeName: 'vcamp' = 'vcamp'
@@ -305,7 +306,7 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
     )
   }
 
-  getPaymentReference(booking: TBooking<TEvent<any, any, any, TEventVCampFees>>): string {
+  getPaymentReference(booking: TBookingResponse<TEvent<any, any, any, TEventVCampFees>>): string {
     return `VC26-${booking.userId.split('-')[4].slice(0, 6).toUpperCase()}`
   }
 
