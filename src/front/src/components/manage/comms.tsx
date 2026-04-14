@@ -1,27 +1,11 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi, useRouteContext } from '@tanstack/react-router'
-import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
-import { JSX, useMemo, useState } from 'react'
+import { JSX } from 'react'
 
-import { TPerson } from '../../../../shared/schemas/person'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
-import 'mantine-react-table/styles.css'
+import { Box, Container, Table, Text } from '@mantine/core'
 
-import { ActionIcon, Box, Button, Container, Flex, Modal, Paper, Table, Text, Title } from '@mantine/core'
-import { IconDownload } from '@tabler/icons-react'
-import dayjs from 'dayjs'
-import { download, generateCsv, mkConfig } from 'export-to-csv'
-import useLocalStorageState from 'use-local-storage-state'
-
-import { TBookingResponse, TPersonResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
-import { getAttendanceType } from '../../../../shared/attendance/attendance'
-import { getKPType } from '../../../../shared/kp/kp'
-import { personFields } from '../../../../shared/personFields'
-import { TBooking } from '../../../../shared/schemas/booking'
-import { TEvent } from '../../../../shared/schemas/event'
-import { ageGroupFromPerson, ageGroups, campersInAgeGroup } from '../../../../shared/woodcraft'
-import styles from '../../css/dataTable.module.css'
 import { useEvent } from '../../utils'
 
 export const ManageComms = () => {
@@ -38,7 +22,7 @@ export const ManageComms = () => {
           <Table.Td></Table.Td>
           <Table.Td>{c.name}</Table.Td>
           <Table.Td>
-            <a href={`mailto:${c.email}`} target="_blank">
+            <a href={`mailto:${c.email}`}>
               {c.email}
             </a>
           </Table.Td>
@@ -51,7 +35,7 @@ export const ManageComms = () => {
         <Table.Td>{'type' in booking.basic && booking.basic.type === 'group' ? booking.basic.district : 'Individual'}</Table.Td>
         <Table.Td>{booking.basic.name}</Table.Td>
         <Table.Td>
-          <a href={`mailto:${booking.basic.email}`} target="_blank">
+          <a href={`mailto:${booking.basic.email}`}>
             {booking.basic.email}
           </a>
         </Table.Td>
@@ -72,7 +56,7 @@ export const ManageComms = () => {
           <Text ml={8}>This table contains the primary booking contact and any extra contacts they have supplied</Text>
           <Text mb={8} ml={8}>
             Email all addresses:{' '}
-            <a href={mailAllLink} target="_blank">
+            <a href={mailAllLink}>
               Link
             </a>
           </Text>
