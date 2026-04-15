@@ -50,7 +50,7 @@ export const ManageMoney = () => {
     return (
       <Table.Tr key={b.userId} style={{ cursor: 'pointer' }} onClick={() => setSelected(b.userId)}>
         {usesReferences && <Table.Td>{feeStructure.getPaymentReference(b)}</Table.Td>}
-        <Table.Td>{'district' in b.basic && b.basic.district? `${b.basic.district} (${b.basic.name})` : b.basic.name}</Table.Td>
+        <Table.Td>{'district' in b.basic && b.basic.district ? `${b.basic.district} (${b.basic.name})` : b.basic.name}</Table.Td>
         <Table.Td>{currency(totalWithAdjustments)}</Table.Td>
         <Table.Td>{currency(totalPaid)}</Table.Td>
         <Table.Td>
@@ -135,8 +135,8 @@ const MoneyDetails = ({ feeStructure, event, booking, fees }: { feeStructure: Fe
     return (
       <Table.Tr>
         <Table.Td>{fee.note}</Table.Td>
-        <Table.Td>{currency(fee.amount || 0)}</Table.Td>
         <Table.Td></Table.Td>
+        <Table.Td>{currency(fee.amount || 0)}</Table.Td>
         <Table.Td align="center">
           <ActionIcon loading={deleteMutation.isPending} variant="subtle" aria-label="Delete" onClick={() => deleteMutation.mutate(fee)}>
             <IconX size={16} color="red" />
