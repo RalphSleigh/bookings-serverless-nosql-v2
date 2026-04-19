@@ -161,12 +161,22 @@ class BookedByDistrict extends PersonField {
 
 class Village extends PersonField {
   name = 'Village'
-  enabled = (event: TEvent) => !!this.villages && this.villages.villages.length > 0
-  accessor = ({ p, b }: { p: TPersonResponse; b: TBooking }) => {
-    if (!this.villages) return ''
-    const village = this.villages.villages.find((v) => v.bookings.includes(b.userId))
-    return village ? village.name : ''
+  private villageByUserId = new Map<string, string>()
+
+  constructor(event: TEvent, villages?: TVillages) {
+    super(event, villages)
+
+    if (villages) {
+      for (const village of villages.villages) {
+        for (const userId of village.bookings) {
+          this.villageByUserId.set(userId, village.name)
+        }
+      }
+    }
   }
+
+  enabled = (event: TEvent) => !!this.villages && this.villages.villages.length > 0
+  accessor = ({ p, b }: { p: TPersonResponse; b: TBooking }) => this.villageByUserId.get(b.userId) || ''
 }
 
 export class Current extends PersonField {
