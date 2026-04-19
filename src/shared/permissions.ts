@@ -99,6 +99,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getApplications', 'eventId', (e) => e.eventId === role.eventId)
     can('approveApplication', 'eventId', (e) => e.eventId === role.eventId)
     can('update', 'eventBooking', (b) => b.event.eventId === role.eventId && b.booking.eventId === role.eventId)
+    can('manageVillages', 'eventId', (e) => e.eventId === role.eventId)
 
     can('getSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
     can('createSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
@@ -116,6 +117,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getApplications', 'eventId', (e) => e.eventId === role.eventId)
     can('approveApplication', 'eventId', (e) => e.eventId === role.eventId)
     can('update', 'eventBooking', (b) => b.event.eventId === role.eventId && b.booking.eventId === role.eventId)
+    can('manageVillages', 'eventId', (e) => e.eventId === role.eventId)
 
     can('getSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
     can('createSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
