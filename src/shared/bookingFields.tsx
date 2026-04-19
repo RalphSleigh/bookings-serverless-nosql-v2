@@ -10,6 +10,7 @@ import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { ageGroupFromPerson } from './woodcraft'
 import { getFeeType } from './fees/fees'
+import { TVillages } from './schemas/villages'
 
 dayjs.extend(relativeTime)
 
@@ -17,6 +18,7 @@ type CellType = MRT_ColumnDef<TBookingResponse>['Cell']
 
 abstract class BookingField {
   event: TEvent
+  villages?: TVillages
   abstract name: string
   enabled: (event: TEvent) => boolean = () => true
   enabledForDrive: (event: TEvent) => boolean = () => true
@@ -38,8 +40,9 @@ abstract class BookingField {
     }
   }
 
-  constructor(event: TEvent) {
+  constructor(event: TEvent, villages?: TVillages) {
     this.event = event
+    this.villages = villages
   }
 
   bookingTableDef = () => {
@@ -91,6 +94,41 @@ class District extends BookingField {
   enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
   accessor = (b: TBookingResponse) => ('district' in b.basic ? b.basic.district || '' : '')
 }
+
+class Village extends BookingField {
+  name = 'Village'
+  private cachedVillages?: TVillages
+  private villageNameByUserId = new Map<TBookingResponse['userId'], string>()
+
+  enabled: (event: TEvent) => boolean = (event) => !!this.villages && this.villages.villages.length > 0
+
+  private getVillageNameByUserId() {
+    if (!this.villages) {
+      this.cachedVillages = undefined
+      this.villageNameByUserId.clear()
+      return this.villageNameByUserId
+    }
+
+    if (this.cachedVillages !== this.villages) {
+      this.cachedVillages = this.villages
+      this.villageNameByUserId = new Map<TBookingResponse['userId'], string>()
+
+      for (const village of this.villages.villages) {
+        for (const userId of village.bookings) {
+          this.villageNameByUserId.set(userId, village.name)
+        }
+      }
+    }
+
+    return this.villageNameByUserId
+  }
+
+  accessor = (b: TBookingResponse) => {
+    if (!this.villages) return ''
+    return this.getVillageNameByUserId().get(b.userId) || ''
+  }
+}
+
 
 class PeopleCount extends BookingField {
   name = 'People'
@@ -165,13 +203,14 @@ class PaymentReference extends BookingField {
   }
 }
 
-export const bookingFields: (event: TEvent) => BookingField[] = (event) => {
+export const bookingFields: (event: TEvent, villages?: TVillages) => BookingField[] = (event, villages) => {
   return [
     new BookingType(event),
     new Name(event),
     new District(event),
     new Email(event),
     new Phone(event),
+    new Village(event, villages),
     new PeopleCount(event),
     new Shuttle(event),
     new AnythingElse(event),

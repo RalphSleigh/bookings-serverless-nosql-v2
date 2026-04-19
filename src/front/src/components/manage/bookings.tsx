@@ -29,7 +29,7 @@ export const ManageBookings = () => {
   const bookingsQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
   const event = useEvent()
 
-  const fields = useMemo(() => bookingFields(event).filter((f) => f.enabled(event) && f.available(user.roles)), [])
+  const fields = useMemo(() => bookingFields(event, bookingsQuery.data.villages).filter((f) => f.enabled(event) && f.available(user.roles)), [])
   const visibilityDefault = fields.reduce(
     (acc, f) => {
       acc[f.name] = !f.hideByDefault
@@ -50,7 +50,7 @@ export const ManageBookings = () => {
 
   const handleExportRows = (rows: MRT_Row<TBookingResponse>[]) => {
     const rowData = rows.map((row) => row.original)
-    const fields = bookingFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
+    const fields = bookingFields(event, bookingsQuery.data.villages).filter((f) => f.enabled(event) && f.enabledForDrive(event))
     const columnNames = fields.map((f) => f.titleForDrive())
     let data = rowData.map((row) => {
       return fields.reduce(

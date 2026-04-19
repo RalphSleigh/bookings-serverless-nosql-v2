@@ -39,7 +39,7 @@ export const ManageCampers = () => {
     [bookingsQuery.data],
   )
 
-  const fields = useMemo(() => personFields(event).filter((f) => f.enabled(event) && f.available(user.roles)), [])
+  const fields = useMemo(() => personFields(event, bookingsQuery.data.villages).filter((f) => f.enabled(event) && f.available(user.roles)), [])
   const visibilityDefault = fields.reduce(
     (acc, f) => {
       acc[f.name] = !f.hideByDefault
@@ -58,7 +58,7 @@ export const ManageCampers = () => {
 
   const handleExportRows = (rows: MRT_Row<{ p: TPersonResponse<TEvent>; b: TBooking<TEvent> }>[]) => {
     const rowData = rows.map((row) => row.original)
-    const fields = personFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
+    const fields = personFields(event, bookingsQuery.data.villages).filter((f) => f.enabled(event) && f.enabledForDrive(event))
     const columnNames = fields.map((f) => f.titleForDrive())
     let data = rowData.map((row) => {
       return fields.reduce(
