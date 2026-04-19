@@ -56,6 +56,9 @@ export const ManageWrapper = () => {
               <Can I="getFees" this={subject('eventId', { eventId })}>
                 <Tabs.Tab value="money">Money</Tabs.Tab>
               </Can>
+              <Can I="manageVillages" this={subject('eventId', { eventId })}>
+                <Tabs.Tab value="villages">Villages</Tabs.Tab>
+              </Can>
               <Tabs.Tab value="graphs">Graphs</Tabs.Tab>
               <Tabs.Tab value="settings">Settings</Tabs.Tab>
             </Tabs.List>

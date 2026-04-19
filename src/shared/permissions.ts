@@ -6,6 +6,7 @@ import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
 import { TRole, TRoleForForm } from './schemas/role'
 import { ContextUser } from './schemas/user'
+import { ca } from 'zod/v4/locales'
 
 export type EventID = Pick<TEvent, 'eventId'>
 
@@ -16,7 +17,7 @@ export type Abilities =
   | ['book' | 'apply', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
-  | ['getBackend' | 'getSensitiveFields' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
+  | ['getBackend' | 'getSensitiveFields' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication' | 'manageVillages', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
   | ['delete', 'role' | (TRole & ForcedSubject<'role'>)]
@@ -80,6 +81,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getApplications', 'eventId', (e) => true)
     can('approveApplication', 'eventId', (e) => true)
     can('update', 'eventBooking', (b) => true)
+    can('manageVillages', 'eventId', (e) => true)
 
     can('getSheet', 'eventBookingIds', (ids) => true)
     can('createSheet', 'eventBookingIds', (ids) => true)

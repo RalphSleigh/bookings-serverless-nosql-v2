@@ -3,6 +3,7 @@ import { subject } from '@casl/ability'
 import { TBooking } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { TPerson } from '../../../../shared/schemas/person'
+import { TVillages } from '../../../../shared/schemas/villages'
 import { DB } from '../../../dynamo'
 import { HandlerWrapper } from '../../../utils'
 
@@ -16,7 +17,7 @@ export type TBookingResponse<Event extends TEvent = TEvent> = TBooking<Event> | 
 
 export type TPersonResponse<Event extends TEvent = TEvent> = TPerson<Event> | TPersonWithoutSensitiveInfo<Event>
 
-export type GetEventBookingsResponseType = { bookings: TBookingResponse[] }
+export type GetEventBookingsResponseType = { bookings: TBookingResponse[]; villages?: TVillages }
 
 export const getEventBookings = HandlerWrapper(
   (req, res) => ['getBackend', subject('eventId', { eventId: res.locals.event.eventId })],
@@ -33,9 +34,11 @@ export const getEventBookings = HandlerWrapper(
             const peopleForResponse = permissions.can('getSensitiveFields', subject('eventId', { eventId: event.eventId })) ? people : people.map(({ kp, health, ...rest }) => rest)
             return { ...b, people: peopleForResponse } as TBookingResponse
           })
-        res.json({ bookings: bookingsWithPeople })
+
+        const villages = bookings.data.villages.pop()
+        res.json({ bookings: bookingsWithPeople, villages: villages })
       } else {
-        res.json({ bookings: [] } as GetEventBookingsResponseType)
+        res.json({ bookings: [], villages: undefined } as GetEventBookingsResponseType)
       }
     } catch (error) {
       res.locals.logger.logToPath('Bookings query failed')

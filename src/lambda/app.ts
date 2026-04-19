@@ -43,6 +43,7 @@ import { am_in_lambda } from './utils'
 import { redirectToStripe } from './endpoints/booking/redirectToStripe'
 import { stripeWebhookHandler } from './endpoints/stripe'
 import { getGraphData } from './endpoints/event/manage/getGraphData'
+import { manageVillages } from './endpoints/event/manage/manageVillages'
 
 export const router = express.Router()
 export const app = express()
@@ -99,6 +100,7 @@ router.post('/event/:eventId/manage/application/:userId/approve', approveApplica
 router.post('/event/:eventId/manage/application/:userId/decline', declineApplicationEndpoint)
 router.get('/event/:eventId/manage/bookingHistory/:userId', getEventBookingHistory)
 router.get('/event/:eventId/manage/graphData', getGraphData)
+router.post('/event/:eventId/manage/villages', manageVillages)
 
 router.post('/stripe/webhook', stripeWebhookHandler)
 
