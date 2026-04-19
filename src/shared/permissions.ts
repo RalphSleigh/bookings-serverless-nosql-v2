@@ -1,12 +1,10 @@
-import { Ability, AbilityBuilder, ConditionsMatcher, createMongoAbility, ForcedSubject, MatchConditions, MongoAbility, PureAbility } from '@casl/ability'
-import { Optional } from '@tanstack/react-query'
+import { AbilityBuilder, ConditionsMatcher, createMongoAbility, ForcedSubject, MatchConditions, PureAbility } from '@casl/ability'
 import dayjs from 'dayjs'
 
 import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
 import { TRole, TRoleForForm } from './schemas/role'
 import { ContextUser } from './schemas/user'
-import { ca } from 'zod/v4/locales'
 
 export type EventID = Pick<TEvent, 'eventId'>
 
@@ -134,5 +132,5 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
     can('getFees', 'eventId', (e) => e.eventId === role.eventId)
     can('createFee', 'eventId', (e) => e.eventId === role.eventId)
-  }
+  },
 }

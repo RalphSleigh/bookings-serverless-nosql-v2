@@ -1,14 +1,14 @@
-import { z } from "zod/v4";
-import { TRole } from './role';
-import { id } from "zod/v4/locales";
+import { z } from 'zod/v4'
 
 export const VillagesSchema = z.object({
-    eventId: z.uuidv7(),
-    villages: z.array(z.object({
-        id: z.string(),
-        name: z.string(),
-        bookings: z.array(z.uuidv7()),
-    }))
+  eventId: z.uuidv7(),
+  villages: z.array(
+    z.object({
+      id: z.uuidv7(),
+      name: z.string(),
+      bookings: z.array(z.uuidv7()),
+    }),
+  ),
 })
 
-export type TVillages = z.infer<typeof VillagesSchema>;
+export type TVillages = z.infer<typeof VillagesSchema>
