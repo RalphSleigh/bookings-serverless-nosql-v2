@@ -46,7 +46,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
       }
 
       const roles = RoleSchema.array().parse(rolesQuery.data)
-      const filteredPersonFields = personFields(event).filter((f) => f.enabledForDrive(event) && f.available(roles))
+      const filteredPersonFields = personFields(event, bookingsQuery.data.villages[0]).filter((f) => f.enabledForDrive(event) && f.available(roles))
 
       if (filteredPersonFields.length === 0) {
         console.log(`No fields available for user ${user.name} for event ${event.name}, skipping`)
@@ -55,7 +55,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
 
       filteredPersonFields.push(new Current(event))
 
-      const filteredBookingFields = bookingFields(event).filter((f) => f.enabledForDrive(event) && f.available(roles))
+      const filteredBookingFields = bookingFields(event, bookingsQuery.data.villages[0]).filter((f) => f.enabledForDrive(event) && f.available(roles))
 
       const parsedPeople = bookingsQuery.data?.person.map((p) => PersonSchema(event).parse(p))
       const parsedBookings = bookingsQuery.data?.booking.map((b) => BookingSchema(event).parse({ ...b, people: parsedPeople?.filter((p) => p.userId === b.userId && p.eventId === b.eventId) }))
