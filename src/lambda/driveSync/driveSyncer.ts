@@ -3,7 +3,7 @@ import { sheets } from '@googleapis/sheets'
 
 import { bookingFields } from '../../shared/bookingFields'
 import { Current, personFields } from '../../shared/personFields'
-import { BookingSchema, TBooking } from '../../shared/schemas/booking'
+import { BookingSchema } from '../../shared/schemas/booking'
 import { EventSchema } from '../../shared/schemas/event'
 import { PersonSchema } from '../../shared/schemas/person'
 import { RoleSchema } from '../../shared/schemas/role'
@@ -36,6 +36,8 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
       return { ...b, people } as TBooking
     }) */
 
+    const villages = bookingsQuery.data.villages && bookingsQuery.data.villages[0] ? bookingsQuery.data.villages[0] : undefined
+
     for (const user of users.data) {
       console.log(`Syncing drive for user ${user.name}`)
       const rolesQuery = await DBRole.match({ userId: user.userId, eventId }).go()
@@ -46,7 +48,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
       }
 
       const roles = RoleSchema.array().parse(rolesQuery.data)
-      const filteredPersonFields = personFields(event, bookingsQuery.data.villages[0]).filter((f) => f.enabledForDrive(event) && f.available(roles))
+      const filteredPersonFields = personFields(event, villages).filter((f) => f.enabledForDrive(event) && f.available(roles))
 
       if (filteredPersonFields.length === 0) {
         console.log(`No fields available for user ${user.name} for event ${event.name}, skipping`)
@@ -55,7 +57,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
 
       filteredPersonFields.push(new Current(event))
 
-      const filteredBookingFields = bookingFields(event, bookingsQuery.data.villages[0]).filter((f) => f.enabledForDrive(event) && f.available(roles))
+      const filteredBookingFields = bookingFields(event, villages).filter((f) => f.enabledForDrive(event) && f.available(roles))
 
       const parsedPeople = bookingsQuery.data?.person.map((p) => PersonSchema(event).parse(p))
       const parsedBookings = bookingsQuery.data?.booking.map((b) => BookingSchema(event).parse({ ...b, people: parsedPeople?.filter((p) => p.userId === b.userId && p.eventId === b.eventId) }))
