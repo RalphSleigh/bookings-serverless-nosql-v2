@@ -1,5 +1,4 @@
-import { Ability, AbilityBuilder, ConditionsMatcher, createMongoAbility, ForcedSubject, MatchConditions, MongoAbility, PureAbility } from '@casl/ability'
-import { Optional } from '@tanstack/react-query'
+import { AbilityBuilder, ConditionsMatcher, createMongoAbility, ForcedSubject, MatchConditions, PureAbility } from '@casl/ability'
 import dayjs from 'dayjs'
 
 import { TBooking } from './schemas/booking'
@@ -16,7 +15,7 @@ export type Abilities =
   | ['book' | 'apply', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
-  | ['getBackend' | 'getSensitiveFields' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
+  | ['getBackend' | 'getSensitiveFields' | 'getFees' | 'createFee' | 'getApplications' | 'approveApplication' | 'manageVillages', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['viewRoles', 'eventId' | (EventID & ForcedSubject<'eventId'>)]
   | ['create', 'role' | (TRoleForForm & ForcedSubject<'role'>)]
   | ['delete', 'role' | (TRole & ForcedSubject<'role'>)]
@@ -80,6 +79,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getApplications', 'eventId', (e) => true)
     can('approveApplication', 'eventId', (e) => true)
     can('update', 'eventBooking', (b) => true)
+    can('manageVillages', 'eventId', (e) => true)
 
     can('getSheet', 'eventBookingIds', (ids) => true)
     can('createSheet', 'eventBookingIds', (ids) => true)
@@ -97,6 +97,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getApplications', 'eventId', (e) => e.eventId === role.eventId)
     can('approveApplication', 'eventId', (e) => e.eventId === role.eventId)
     can('update', 'eventBooking', (b) => b.event.eventId === role.eventId && b.booking.eventId === role.eventId)
+    can('manageVillages', 'eventId', (e) => e.eventId === role.eventId)
 
     can('getSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
     can('createSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
@@ -114,6 +115,7 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getApplications', 'eventId', (e) => e.eventId === role.eventId)
     can('approveApplication', 'eventId', (e) => e.eventId === role.eventId)
     can('update', 'eventBooking', (b) => b.event.eventId === role.eventId && b.booking.eventId === role.eventId)
+    can('manageVillages', 'eventId', (e) => e.eventId === role.eventId)
 
     can('getSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
     can('createSheet', 'eventBookingIds', (ids) => ids.eventId === role.eventId)
@@ -130,5 +132,5 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
     can('getFees', 'eventId', (e) => e.eventId === role.eventId)
     can('createFee', 'eventId', (e) => e.eventId === role.eventId)
-  }
+  },
 }
