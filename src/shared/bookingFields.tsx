@@ -97,11 +97,35 @@ class District extends BookingField {
 
 class Village extends BookingField {
   name = 'Village'
+  private cachedVillages?: TVillages
+  private villageNameByUserId = new Map<TBookingResponse['userId'], string>()
+
   enabled: (event: TEvent) => boolean = (event) => !!this.villages && this.villages.villages.length > 0
+
+  private getVillageNameByUserId() {
+    if (!this.villages) {
+      this.cachedVillages = undefined
+      this.villageNameByUserId.clear()
+      return this.villageNameByUserId
+    }
+
+    if (this.cachedVillages !== this.villages) {
+      this.cachedVillages = this.villages
+      this.villageNameByUserId = new Map<TBookingResponse['userId'], string>()
+
+      for (const village of this.villages.villages) {
+        for (const userId of village.bookings) {
+          this.villageNameByUserId.set(userId, village.name)
+        }
+      }
+    }
+
+    return this.villageNameByUserId
+  }
+
   accessor = (b: TBookingResponse) => {
     if (!this.villages) return ''
-    const village = this.villages.villages.find((v) => v.bookings.includes(b.userId))
-    return village ? village.name : ''
+    return this.getVillageNameByUserId().get(b.userId) || ''
   }
 }
 
