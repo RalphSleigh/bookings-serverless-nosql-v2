@@ -951,6 +951,55 @@ export const DBApplication = new Entity(
   { client, table },
 )
 
+export const DBVillage = new Entity(
+  {
+    model: {
+      entity: 'village',
+      version: '1',
+      service: 'bookings',
+    },
+    attributes: {
+      eventId: {
+        type: 'string',
+        required: true,
+      },
+      villages: {
+        type: 'list',
+        required: true,
+        items: {
+          type: 'map',
+          properties: {
+            id: { type: 'string', required: true },
+            name: { type: 'string', required: true },
+            bookings: {
+              type: 'list',
+              items: {
+                type: 'string',
+              },
+              required: true,
+            },
+          },
+        },
+      },
+    },
+    indexes: {
+      natural: {
+        collection: 'booking',
+        type: 'clustered',
+        pk: {
+          field: 'pk',
+          composite: ['eventId'],
+        },
+        sk: {
+          field: 'sk',
+          composite: ['eventId'],
+        },
+      },
+    },
+  },
+  { client, table },
+)
+
 export const DB = new Service({
   user: DBUser,
   role: DBRole,
@@ -960,4 +1009,5 @@ export const DB = new Service({
   personHistory: DBPersonHistory,
   fee: DBFee,
   application: DBApplication,
+  villages: DBVillage,
 })

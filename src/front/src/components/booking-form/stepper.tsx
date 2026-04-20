@@ -67,7 +67,7 @@ export const BookingStepper: React.FC<{ event: TEvent; schema: ReturnType<typeof
   return (
     <>
       <WatchDebounce value={booking} set={setBooking} duration={500} name={undefined} />
-      <Box style={{ position: 'sticky', top: 56 }} p={8}>
+      <Box style={{ position: 'sticky', top: 8 }} p={8}>
         <Stepper active={state} orientation="vertical" onStepClick={onStepClick} color="green">
           {event.bigCampMode && <Stepper.Step label="Booking Type" description="What sort of booking are you making?" />}
           <Stepper.Step label="Your details" description="Some basic information about you" />

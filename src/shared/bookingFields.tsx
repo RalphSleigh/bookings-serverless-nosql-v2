@@ -9,6 +9,8 @@ import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { ageGroupFromPerson } from './woodcraft'
+import { getFeeType } from './fees/fees'
+import { TVillages } from './schemas/villages'
 
 dayjs.extend(relativeTime)
 
@@ -16,6 +18,7 @@ type CellType = MRT_ColumnDef<TBookingResponse>['Cell']
 
 abstract class BookingField {
   event: TEvent
+  villages?: TVillages
   abstract name: string
   enabled: (event: TEvent) => boolean = () => true
   enabledForDrive: (event: TEvent) => boolean = () => true
@@ -30,15 +33,16 @@ abstract class BookingField {
   valueForDrive: (b: TBookingResponse) => string = (b) => {
     if (typeof this.accessor === 'function') {
       const v = this.accessor(b)
-      return typeof v === 'string' ? v : v.toLocaleString("en-GB")
+      return typeof v === 'string' ? v : v.toLocaleString('en-GB')
     } else {
       const v = getProperty<TBookingResponse, string, string>(b, this.accessor, '')
       return v
     }
   }
 
-  constructor(event: TEvent) {
+  constructor(event: TEvent, villages?: TVillages) {
     this.event = event
+    this.villages = villages
   }
 
   bookingTableDef = () => {
@@ -79,6 +83,53 @@ class Phone extends BookingField {
   accessor = 'basic.telephone'
 }
 
+class BookingType extends BookingField {
+  name = 'Booking Type'
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => ('type' in b.basic ? b.basic.type : '')
+}
+
+class District extends BookingField {
+  name = 'District'
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => ('district' in b.basic ? b.basic.district || '' : '')
+}
+
+class Village extends BookingField {
+  name = 'Village'
+  private cachedVillages?: TVillages
+  private villageNameByUserId = new Map<TBookingResponse['userId'], string>()
+
+  enabled: (event: TEvent) => boolean = (event) => !!this.villages && this.villages.villages.length > 0
+
+  private getVillageNameByUserId() {
+    if (!this.villages) {
+      this.cachedVillages = undefined
+      this.villageNameByUserId.clear()
+      return this.villageNameByUserId
+    }
+
+    if (this.cachedVillages !== this.villages) {
+      this.cachedVillages = this.villages
+      this.villageNameByUserId = new Map<TBookingResponse['userId'], string>()
+
+      for (const village of this.villages.villages) {
+        for (const userId of village.bookings) {
+          this.villageNameByUserId.set(userId, village.name)
+        }
+      }
+    }
+
+    return this.villageNameByUserId
+  }
+
+  accessor = (b: TBookingResponse) => {
+    if (!this.villages) return ''
+    return this.getVillageNameByUserId().get(b.userId) || ''
+  }
+}
+
+
 class PeopleCount extends BookingField {
   name = 'People'
   size = 20
@@ -88,7 +139,7 @@ class PeopleCount extends BookingField {
 class Shuttle extends BookingField {
   name = 'Shuttle'
   size = 20
-  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+
   accessor = (b: TBookingResponse) => ('shuttle' in b.other ? b.other.shuttle : 'N/A')
 }
 
@@ -97,6 +148,27 @@ class AnythingElse extends BookingField {
   size = 150
   enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
   accessor = (b: TBookingResponse) => b.other.anythingElse || ''
+}
+
+class CampsWith extends BookingField {
+  name = 'Camps With'
+  size = 150
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => (b.camping && 'who' in b.camping ? (b.camping.who ?? '') : '')
+}
+
+class Equipment extends BookingField {
+  name = 'Equipment'
+  size = 150
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => (b.camping && 'equipment' in b.camping ? (b.camping.equipment ?? '') : '')
+}
+
+class AccessibilityRequirements extends BookingField {
+  name = 'Accessibility Requirements'
+  size = 150
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  accessor = (b: TBookingResponse) => (b.camping && 'accessibility' in b.camping ? (b.camping.accessibility ?? '') : '')
 }
 
 class EditLink extends BookingField {
@@ -122,6 +194,39 @@ class Updated extends BookingField {
   Cell: CellType = ({ cell }) => dayjs(cell.getValue<Date>()).fromNow()
 }
 
-export const bookingFields: (event: TEvent) => BookingField[] = (event) => {
-  return [new Name(event), new Email(event), new Phone(event), new PeopleCount(event), new Shuttle(event), new AnythingElse(event), new EditLink(event), new Created(event), new Updated(event)]
+class PaymentReference extends BookingField {
+  name = 'Payment Reference'
+  enabled: (event: TEvent) => boolean = (event) => event.fee.feeStructure === 'vcamp'
+  accessor = (b: TBookingResponse) => {
+    const fees = getFeeType(this.event)
+    return fees.getPaymentReference(b)
+  }
+}
+
+class WhatsApp extends BookingField {
+  name = 'WhatsApp'
+  enabled: (event: TEvent) => boolean = (event) => !event.bigCampMode
+  accessor = (b: TBookingResponse) => ('whatsApp' in b.other ? b.other.whatsApp : 'N/A')
+}
+
+export const bookingFields: (event: TEvent, villages?: TVillages) => BookingField[] = (event, villages) => {
+  return [
+    new BookingType(event),
+    new Name(event),
+    new District(event),
+    new Email(event),
+    new Phone(event),
+    new Village(event, villages),
+    new PeopleCount(event),
+    new Shuttle(event),
+    new AnythingElse(event),
+    new CampsWith(event),
+    new Equipment(event),
+    new AccessibilityRequirements(event),
+    new PaymentReference(event),
+    new WhatsApp(event),
+    new EditLink(event),
+    new Created(event),
+    new Updated(event),
+  ]
 }

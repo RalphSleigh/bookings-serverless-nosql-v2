@@ -8,6 +8,8 @@ import { TPerson } from '../../../../shared/schemas/person'
 import { AgeGroup, ageGroupFromPerson, ageGroups } from '../../../../shared/woodcraft'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { useEvent } from '../../utils'
+import { TBooking } from '../../../../shared/schemas/booking'
+import { TEvent } from '../../../../shared/schemas/event'
 
 export const ManageKP: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -15,15 +17,12 @@ export const ManageKP: React.FC = () => {
   const bookingsQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
   const event = useEvent()
 
-  const bookings = bookingsQuery.data.bookings.map((b) => (
-    <div key={b.userId}>
-      <p>{b.basic.name}</p>
-    </div>
-  ))
+  //cast this here as the KP page should always have sensitive fields
+  const bookings = bookingsQuery.data.bookings as TBooking<TEvent>[]
 
   const campers = useMemo(
     () =>
-      bookingsQuery.data.bookings.reduce<TPerson[]>((acc, booking) => {
+      bookings.reduce<TPerson[]>((acc, booking) => {
         return [...acc, ...booking.people]
       }, []),
     [bookingsQuery.data],
@@ -72,7 +71,6 @@ const ageGroupList = ageGroups.map(ag => ag.construct(0))
   const KP = useMemo(() => getKPType(event), [event])
   return (
     <>
-      <p>Manage KP</p>
       <Table>
         <Table.Thead>
           <Table.Tr>

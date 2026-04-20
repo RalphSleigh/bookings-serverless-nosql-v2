@@ -3,13 +3,12 @@ import { getRouteApi, useRouteContext } from '@tanstack/react-router'
 import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
-import { TPerson } from '../../../../shared/schemas/person'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
 import 'mantine-react-table/styles.css'
 
 import { subject } from '@casl/ability'
-import { ActionIcon, Anchor, Box, Container, Flex, Modal, Paper, ScrollArea, Stack, Text, Title } from '@mantine/core'
+import { ActionIcon, Anchor, Box, Container, Flex, Modal, ScrollArea, Stack, Text, Title } from '@mantine/core'
 import { IconDownload } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
@@ -17,9 +16,8 @@ import useLocalStorageState from 'use-local-storage-state'
 
 import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { bookingFields } from '../../../../shared/bookingFields'
-import { TBooking } from '../../../../shared/schemas/booking'
+import { getFeeType } from '../../../../shared/fees/fees'
 import { TEvent } from '../../../../shared/schemas/event'
-import { ageGroupFromPerson } from '../../../../shared/woodcraft'
 import styles from '../../css/dataTable.module.css'
 import { Can } from '../../permissionContext'
 import { CustomLink, useEvent } from '../../utils'
@@ -31,7 +29,7 @@ export const ManageBookings = () => {
   const bookingsQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
   const event = useEvent()
 
-  const fields = useMemo(() => bookingFields(event).filter((f) => f.enabled(event) && f.available(user.roles)), [])
+  const fields = useMemo(() => bookingFields(event, bookingsQuery.data.villages).filter((f) => f.enabled(event) && f.available(user.roles)), [])
   const visibilityDefault = fields.reduce(
     (acc, f) => {
       acc[f.name] = !f.hideByDefault
@@ -43,6 +41,7 @@ export const ManageBookings = () => {
   const bookings = useMemo(() => bookingsQuery.data.bookings, [bookingsQuery.data])
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageState(`event-${eventId}-booking-column-visibility-default`, { defaultValue: visibilityDefault })
+  const [columnSize, setColumnSize] = useLocalStorageState<{ [key: string]: number }>(`event-${eventId}-booking-column-size`, { defaultValue: {} })
   const [sorting, setSorting] = useLocalStorageState<Array<{ id: string; desc: boolean }>>(`event-${eventId}-bookings-sorting`, { defaultValue: [] })
 
   const columns = useMemo<MRT_ColumnDef<TBookingResponse>[]>(() => fields.map((f) => f.bookingTableDef()), [])
@@ -51,7 +50,7 @@ export const ManageBookings = () => {
 
   const handleExportRows = (rows: MRT_Row<TBookingResponse>[]) => {
     const rowData = rows.map((row) => row.original)
-    const fields = bookingFields(event).filter((f) => f.enabled(event) && f.enabledForDrive(event))
+    const fields = bookingFields(event, bookingsQuery.data.villages).filter((f) => f.enabled(event) && f.enabledForDrive(event))
     const columnNames = fields.map((f) => f.titleForDrive())
     let data = rowData.map((row) => {
       return fields.reduce(
@@ -80,9 +79,11 @@ export const ManageBookings = () => {
     mantineTableProps: {
       className: styles.table,
     },
-    state: { columnVisibility: columnVisibility, sorting: sorting },
+    state: { columnVisibility: columnVisibility, sorting: sorting, columnSizing: columnSize },
+    enableColumnResizing: true,
     onColumnVisibilityChange: setColumnVisibility,
     onSortingChange: setSorting,
+    onColumnSizingChange: setColumnSize,
     mantineTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
         setSelected(row.original.userId)
@@ -100,6 +101,7 @@ export const ManageBookings = () => {
         <MRT_ToggleFullScreenButton table={table} />
       </Flex>
     ),
+    layoutMode: 'grid',
     initialState: { density: 'xs', pagination: { pageSize: 100, pageIndex: 0 } },
   })
 
@@ -173,6 +175,15 @@ const campingDetailsLarge = (event: TEvent, booking: TBookingResponse) => (
   <>
     <Title order={4}>Camping Details</Title>
     <Text>
+      <b>Camps With:</b> {booking.camping && 'who' in booking.camping ? booking.camping.who : ''}
+    </Text>
+    <Text>
+      <b>Equipment:</b> {booking.camping && 'equipment' in booking.camping ? booking.camping.equipment : ''}
+    </Text>
+    <Text>
+      <b>Accessibility Requirements:</b> {booking.camping && 'accessibility' in booking.camping ? booking.camping.accessibility : ''}
+    </Text>
+    <Text>
       <b>Shuttle:</b> {'shuttle' in booking.other ? booking.other.shuttle : 'N/A'}
     </Text>
     <Text>
@@ -204,11 +215,18 @@ const BookingDetails = ({ event, booking }: { event: TEvent; booking: TBookingRe
 
   const peopleList = booking.people.map((p) => <li key={p.personId}>{p.basic.name}</li>)
 
+  const paymentReference = getFeeType(event).getPaymentReference(booking)
+
   return (
     <Flex>
       <Box>
         {basic}
         {camping}
+        {paymentReference !== '' && (
+          <Text>
+            <b>Payment Reference:</b> {paymentReference}
+          </Text>
+        )}
         <Text>
           <b>Booked:</b> {booking.people.length}
         </Text>

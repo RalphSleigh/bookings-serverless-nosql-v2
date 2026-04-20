@@ -10,12 +10,14 @@ import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
 import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
+import { TVillages } from './schemas/villages'
 import { ageGroupFromPerson } from './woodcraft'
 
 dayjs.extend(relativeTime)
 
 export abstract class PersonField<T extends TEvent = TEvent> {
   event: TEvent
+  villages?: TVillages
   abstract name: string
   enabledForDrive: (event: TEvent) => boolean = () => true
   enabled: (event: TEvent) => boolean = () => true
@@ -47,8 +49,9 @@ export abstract class PersonField<T extends TEvent = TEvent> {
   }
   sortingFn?: MRT_ColumnDef<{ p: TPersonResponse<T>; b: TBooking<T> }>['sortingFn']
 
-  constructor(event: TEvent) {
+  constructor(event: TEvent, villages?: TVillages) {
     this.event = event
+    this.villages = villages
   }
 
   personTableDef: () => MRT_ColumnDef<{ p: TPersonResponse<T>; b: TBooking<T> }> = () => {
@@ -156,12 +159,32 @@ class BookedByDistrict extends PersonField {
   accessor = ({ p, b }: { p: TPersonResponse; b: TBooking }) => ('district' in b.basic ? b.basic.district || '' : '')
 }
 
+class Village extends PersonField {
+  name = 'Village'
+  private villageByUserId = new Map<string, string>()
+
+  constructor(event: TEvent, villages?: TVillages) {
+    super(event, villages)
+
+    if (villages) {
+      for (const village of villages.villages) {
+        for (const userId of village.bookings) {
+          this.villageByUserId.set(userId, village.name)
+        }
+      }
+    }
+  }
+
+  enabled = (event: TEvent) => !!this.villages && this.villages.villages.length > 0
+  accessor = ({ p, b }: { p: TPersonResponse; b: TBooking }) => this.villageByUserId.get(b.userId) || ''
+}
+
 export class Current extends PersonField {
   name = 'Current'
   accessor = ({ p }: { p: TPersonResponse }) => !p.cancelled
 }
 
-export const personFields = <E extends TEvent>(event: E): PersonField<E>[] => {
+export const personFields = <E extends TEvent>(event: E, villages?: TVillages): PersonField<E>[] => {
   const attendance = getAttendanceType(event)
   const kp = getKPType(event)
   return [
@@ -169,6 +192,7 @@ export const personFields = <E extends TEvent>(event: E): PersonField<E>[] => {
     new Name(event),
     new BookedBy(event),
     new BookedByDistrict(event),
+    new Village(event, villages),
     new Email(event),
     new Dob(event),
     new Age(event),

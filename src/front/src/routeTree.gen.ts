@@ -23,10 +23,13 @@ import { Route as UserEventEventIdManageIndexImport } from './routes/_user/event
 import { Route as UserEventEventIdOwnUpdateImport } from './routes/_user/event/$eventId/own/update'
 import { Route as UserEventEventIdOwnBookImport } from './routes/_user/event/$eventId/own/book'
 import { Route as UserEventEventIdOwnApplyImport } from './routes/_user/event/$eventId/own/apply'
+import { Route as UserEventEventIdManageVillagesImport } from './routes/_user/event/$eventId/manage/villages'
 import { Route as UserEventEventIdManageSettingsImport } from './routes/_user/event/$eventId/manage/settings'
 import { Route as UserEventEventIdManageRolesImport } from './routes/_user/event/$eventId/manage/roles'
 import { Route as UserEventEventIdManageMoneyImport } from './routes/_user/event/$eventId/manage/money'
 import { Route as UserEventEventIdManageKpImport } from './routes/_user/event/$eventId/manage/kp'
+import { Route as UserEventEventIdManageGraphsImport } from './routes/_user/event/$eventId/manage/graphs'
+import { Route as UserEventEventIdManageCommsImport } from './routes/_user/event/$eventId/manage/comms'
 import { Route as UserEventEventIdManageCampersImport } from './routes/_user/event/$eventId/manage/campers'
 import { Route as UserEventEventIdManageBookingsImport } from './routes/_user/event/$eventId/manage/bookings'
 import { Route as UserEventEventIdManageApplicationsImport } from './routes/_user/event/$eventId/manage/applications'
@@ -107,6 +110,13 @@ const UserEventEventIdOwnApplyRoute = UserEventEventIdOwnApplyImport.update({
   getParentRoute: () => UserEventEventIdRoute,
 } as any)
 
+const UserEventEventIdManageVillagesRoute =
+  UserEventEventIdManageVillagesImport.update({
+    id: '/villages',
+    path: '/villages',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
+
 const UserEventEventIdManageSettingsRoute =
   UserEventEventIdManageSettingsImport.update({
     id: '/settings',
@@ -133,6 +143,20 @@ const UserEventEventIdManageKpRoute = UserEventEventIdManageKpImport.update({
   path: '/kp',
   getParentRoute: () => UserEventEventIdManageRoute,
 } as any)
+
+const UserEventEventIdManageGraphsRoute =
+  UserEventEventIdManageGraphsImport.update({
+    id: '/graphs',
+    path: '/graphs',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
+
+const UserEventEventIdManageCommsRoute =
+  UserEventEventIdManageCommsImport.update({
+    id: '/comms',
+    path: '/comms',
+    getParentRoute: () => UserEventEventIdManageRoute,
+  } as any)
 
 const UserEventEventIdManageCampersRoute =
   UserEventEventIdManageCampersImport.update({
@@ -250,6 +274,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserEventEventIdManageCampersImport
       parentRoute: typeof UserEventEventIdManageImport
     }
+    '/_user/event/$eventId/manage/comms': {
+      id: '/_user/event/$eventId/manage/comms'
+      path: '/comms'
+      fullPath: '/event/$eventId/manage/comms'
+      preLoaderRoute: typeof UserEventEventIdManageCommsImport
+      parentRoute: typeof UserEventEventIdManageImport
+    }
+    '/_user/event/$eventId/manage/graphs': {
+      id: '/_user/event/$eventId/manage/graphs'
+      path: '/graphs'
+      fullPath: '/event/$eventId/manage/graphs'
+      preLoaderRoute: typeof UserEventEventIdManageGraphsImport
+      parentRoute: typeof UserEventEventIdManageImport
+    }
     '/_user/event/$eventId/manage/kp': {
       id: '/_user/event/$eventId/manage/kp'
       path: '/kp'
@@ -276,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/event/$eventId/manage/settings'
       preLoaderRoute: typeof UserEventEventIdManageSettingsImport
+      parentRoute: typeof UserEventEventIdManageImport
+    }
+    '/_user/event/$eventId/manage/villages': {
+      id: '/_user/event/$eventId/manage/villages'
+      path: '/villages'
+      fullPath: '/event/$eventId/manage/villages'
+      preLoaderRoute: typeof UserEventEventIdManageVillagesImport
       parentRoute: typeof UserEventEventIdManageImport
     }
     '/_user/event/$eventId/own/apply': {
@@ -329,10 +374,13 @@ interface UserEventEventIdManageRouteChildren {
   UserEventEventIdManageApplicationsRoute: typeof UserEventEventIdManageApplicationsRoute
   UserEventEventIdManageBookingsRoute: typeof UserEventEventIdManageBookingsRoute
   UserEventEventIdManageCampersRoute: typeof UserEventEventIdManageCampersRoute
+  UserEventEventIdManageCommsRoute: typeof UserEventEventIdManageCommsRoute
+  UserEventEventIdManageGraphsRoute: typeof UserEventEventIdManageGraphsRoute
   UserEventEventIdManageKpRoute: typeof UserEventEventIdManageKpRoute
   UserEventEventIdManageMoneyRoute: typeof UserEventEventIdManageMoneyRoute
   UserEventEventIdManageRolesRoute: typeof UserEventEventIdManageRolesRoute
   UserEventEventIdManageSettingsRoute: typeof UserEventEventIdManageSettingsRoute
+  UserEventEventIdManageVillagesRoute: typeof UserEventEventIdManageVillagesRoute
   UserEventEventIdManageIndexRoute: typeof UserEventEventIdManageIndexRoute
   UserEventEventIdManageBookingUserIdHistoryRoute: typeof UserEventEventIdManageBookingUserIdHistoryRoute
 }
@@ -343,10 +391,13 @@ const UserEventEventIdManageRouteChildren: UserEventEventIdManageRouteChildren =
       UserEventEventIdManageApplicationsRoute,
     UserEventEventIdManageBookingsRoute: UserEventEventIdManageBookingsRoute,
     UserEventEventIdManageCampersRoute: UserEventEventIdManageCampersRoute,
+    UserEventEventIdManageCommsRoute: UserEventEventIdManageCommsRoute,
+    UserEventEventIdManageGraphsRoute: UserEventEventIdManageGraphsRoute,
     UserEventEventIdManageKpRoute: UserEventEventIdManageKpRoute,
     UserEventEventIdManageMoneyRoute: UserEventEventIdManageMoneyRoute,
     UserEventEventIdManageRolesRoute: UserEventEventIdManageRolesRoute,
     UserEventEventIdManageSettingsRoute: UserEventEventIdManageSettingsRoute,
+    UserEventEventIdManageVillagesRoute: UserEventEventIdManageVillagesRoute,
     UserEventEventIdManageIndexRoute: UserEventEventIdManageIndexRoute,
     UserEventEventIdManageBookingUserIdHistoryRoute:
       UserEventEventIdManageBookingUserIdHistoryRoute,
@@ -407,10 +458,13 @@ export interface FileRoutesByFullPath {
   '/event/$eventId/manage/applications': typeof UserEventEventIdManageApplicationsRoute
   '/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
   '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/event/$eventId/manage/comms': typeof UserEventEventIdManageCommsRoute
+  '/event/$eventId/manage/graphs': typeof UserEventEventIdManageGraphsRoute
   '/event/$eventId/manage/kp': typeof UserEventEventIdManageKpRoute
   '/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
   '/event/$eventId/manage/settings': typeof UserEventEventIdManageSettingsRoute
+  '/event/$eventId/manage/villages': typeof UserEventEventIdManageVillagesRoute
   '/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
@@ -430,10 +484,13 @@ export interface FileRoutesByTo {
   '/event/$eventId/manage/applications': typeof UserEventEventIdManageApplicationsRoute
   '/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
   '/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/event/$eventId/manage/comms': typeof UserEventEventIdManageCommsRoute
+  '/event/$eventId/manage/graphs': typeof UserEventEventIdManageGraphsRoute
   '/event/$eventId/manage/kp': typeof UserEventEventIdManageKpRoute
   '/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
   '/event/$eventId/manage/settings': typeof UserEventEventIdManageSettingsRoute
+  '/event/$eventId/manage/villages': typeof UserEventEventIdManageVillagesRoute
   '/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
@@ -455,10 +512,13 @@ export interface FileRoutesById {
   '/_user/event/$eventId/manage/applications': typeof UserEventEventIdManageApplicationsRoute
   '/_user/event/$eventId/manage/bookings': typeof UserEventEventIdManageBookingsRoute
   '/_user/event/$eventId/manage/campers': typeof UserEventEventIdManageCampersRoute
+  '/_user/event/$eventId/manage/comms': typeof UserEventEventIdManageCommsRoute
+  '/_user/event/$eventId/manage/graphs': typeof UserEventEventIdManageGraphsRoute
   '/_user/event/$eventId/manage/kp': typeof UserEventEventIdManageKpRoute
   '/_user/event/$eventId/manage/money': typeof UserEventEventIdManageMoneyRoute
   '/_user/event/$eventId/manage/roles': typeof UserEventEventIdManageRolesRoute
   '/_user/event/$eventId/manage/settings': typeof UserEventEventIdManageSettingsRoute
+  '/_user/event/$eventId/manage/villages': typeof UserEventEventIdManageVillagesRoute
   '/_user/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/_user/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/_user/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
@@ -481,10 +541,13 @@ export interface FileRouteTypes {
     | '/event/$eventId/manage/applications'
     | '/event/$eventId/manage/bookings'
     | '/event/$eventId/manage/campers'
+    | '/event/$eventId/manage/comms'
+    | '/event/$eventId/manage/graphs'
     | '/event/$eventId/manage/kp'
     | '/event/$eventId/manage/money'
     | '/event/$eventId/manage/roles'
     | '/event/$eventId/manage/settings'
+    | '/event/$eventId/manage/villages'
     | '/event/$eventId/own/apply'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
@@ -503,10 +566,13 @@ export interface FileRouteTypes {
     | '/event/$eventId/manage/applications'
     | '/event/$eventId/manage/bookings'
     | '/event/$eventId/manage/campers'
+    | '/event/$eventId/manage/comms'
+    | '/event/$eventId/manage/graphs'
     | '/event/$eventId/manage/kp'
     | '/event/$eventId/manage/money'
     | '/event/$eventId/manage/roles'
     | '/event/$eventId/manage/settings'
+    | '/event/$eventId/manage/villages'
     | '/event/$eventId/own/apply'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
@@ -526,10 +592,13 @@ export interface FileRouteTypes {
     | '/_user/event/$eventId/manage/applications'
     | '/_user/event/$eventId/manage/bookings'
     | '/_user/event/$eventId/manage/campers'
+    | '/_user/event/$eventId/manage/comms'
+    | '/_user/event/$eventId/manage/graphs'
     | '/_user/event/$eventId/manage/kp'
     | '/_user/event/$eventId/manage/money'
     | '/_user/event/$eventId/manage/roles'
     | '/_user/event/$eventId/manage/settings'
+    | '/_user/event/$eventId/manage/villages'
     | '/_user/event/$eventId/own/apply'
     | '/_user/event/$eventId/own/book'
     | '/_user/event/$eventId/own/update'
@@ -610,10 +679,13 @@ export const routeTree = rootRoute
         "/_user/event/$eventId/manage/applications",
         "/_user/event/$eventId/manage/bookings",
         "/_user/event/$eventId/manage/campers",
+        "/_user/event/$eventId/manage/comms",
+        "/_user/event/$eventId/manage/graphs",
         "/_user/event/$eventId/manage/kp",
         "/_user/event/$eventId/manage/money",
         "/_user/event/$eventId/manage/roles",
         "/_user/event/$eventId/manage/settings",
+        "/_user/event/$eventId/manage/villages",
         "/_user/event/$eventId/manage/",
         "/_user/event/$eventId/manage/booking/$userId/history"
       ]
@@ -630,6 +702,14 @@ export const routeTree = rootRoute
       "filePath": "_user/event/$eventId/manage/campers.tsx",
       "parent": "/_user/event/$eventId/manage"
     },
+    "/_user/event/$eventId/manage/comms": {
+      "filePath": "_user/event/$eventId/manage/comms.tsx",
+      "parent": "/_user/event/$eventId/manage"
+    },
+    "/_user/event/$eventId/manage/graphs": {
+      "filePath": "_user/event/$eventId/manage/graphs.tsx",
+      "parent": "/_user/event/$eventId/manage"
+    },
     "/_user/event/$eventId/manage/kp": {
       "filePath": "_user/event/$eventId/manage/kp.tsx",
       "parent": "/_user/event/$eventId/manage"
@@ -644,6 +724,10 @@ export const routeTree = rootRoute
     },
     "/_user/event/$eventId/manage/settings": {
       "filePath": "_user/event/$eventId/manage/settings.tsx",
+      "parent": "/_user/event/$eventId/manage"
+    },
+    "/_user/event/$eventId/manage/villages": {
+      "filePath": "_user/event/$eventId/manage/villages.tsx",
       "parent": "/_user/event/$eventId/manage"
     },
     "/_user/event/$eventId/own/apply": {
