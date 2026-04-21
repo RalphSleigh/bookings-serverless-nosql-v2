@@ -1,10 +1,10 @@
-import { ActionIcon, Avatar, Box, Button, Container, Flex, Grid, Modal, NumberInput, Overlay, Paper, Table, Text, TextInput, Title, Transition } from '@mantine/core'
+import { ActionIcon, Avatar, Container, Flex, Loader, Table, Text, Title } from '@mantine/core'
 import pdf from '@stdlib/stats-base-dists-normal-pdf'
-import { IconCheck, IconCurrencyPound, IconX } from '@tabler/icons-react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { defaultParseSearch, getRouteApi } from '@tanstack/react-router'
+import { IconCheck, IconX } from '@tabler/icons-react'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { TApplication } from '../../../../shared/schemas/application'
@@ -14,6 +14,7 @@ import { declineApplicationMutation } from '../../mutations/declineApplication'
 import { getEventApplicationsQueryOptions } from '../../queries/getEventApplications'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { useEvent } from '../../utils'
+import { getEventApplicationSheetNumbersQueryOptions } from '../../queries/getEventApplicationSheetNumbers'
 
 export const ManageApplications = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -21,6 +22,7 @@ export const ManageApplications = () => {
   const { eventId } = event
   const applicationsQuery = useSuspenseQuery(getEventApplicationsQueryOptions(eventId))
   const bookingsQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
+  const sheetNumbersQuery = useQuery(getEventApplicationSheetNumbersQueryOptions(eventId))
 
   const bookings = useMemo(() => bookingsQuery.data.bookings, [bookingsQuery.data])
 
@@ -59,6 +61,7 @@ export const ManageApplications = () => {
         <Table.Td>{app.district}</Table.Td>
         <Table.Td>{app.minPredicted === app.maxPredicted ? app.minPredicted : `${app.minPredicted} - ${app.maxPredicted}`}</Table.Td>
         <Table.Td>{booking ? booking.people.filter(p => !p.cancelled).length : ''}</Table.Td>
+        <Table.Td>{sheetNumbersQuery.isSuccess ? sheetNumbersQuery.data.numbers[app.userId] ?? '' : <Loader size={16}/>}</Table.Td>
         <Table.Td>
           <Flex gap={8}>
             <DeclineButton event={event} application={app} />
@@ -169,6 +172,7 @@ export const ManageApplications = () => {
             <Table.Th>Group/District</Table.Th>
             <Table.Th>Predicted</Table.Th>
             <Table.Th>Booked</Table.Th>
+            <Table.Th>In Sheet</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>

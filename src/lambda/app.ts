@@ -44,6 +44,7 @@ import { redirectToStripe } from './endpoints/booking/redirectToStripe'
 import { stripeWebhookHandler } from './endpoints/stripe'
 import { getGraphData } from './endpoints/event/manage/getGraphData'
 import { manageVillages } from './endpoints/event/manage/manageVillages'
+import { getApplicationSheetNumbers } from './endpoints/event/manage/getApplicationSheetNumbers'
 
 export const router = express.Router()
 export const app = express()
@@ -101,6 +102,7 @@ router.post('/event/:eventId/manage/application/:userId/decline', declineApplica
 router.get('/event/:eventId/manage/bookingHistory/:userId', getEventBookingHistory)
 router.get('/event/:eventId/manage/graphData', getGraphData)
 router.post('/event/:eventId/manage/villages', manageVillages)
+router.get('/event/:eventId/manage/applicationSheetNumbers', getApplicationSheetNumbers)
 
 router.post('/stripe/webhook', stripeWebhookHandler)
 
