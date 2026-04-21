@@ -113,15 +113,15 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
         <Title order={3} style={{ flexGrow: 1 }} ml={8}>
           {name}
         </Title>
-        <ActionIcon onClick={renameFn}>
+        <ActionIcon onClick={renameFn} gradient={{ from: 'blue', to: 'cyan', deg: 110 }} variant="gradient">
           <IconEdit size={16} />
         </ActionIcon>
-        <ActionIcon onClick={deleteFn} color="red">
+        <ActionIcon onClick={deleteFn} gradient={{ from: 'red', to: 'orange', deg: 110 }} variant="gradient">
           <IconX size={16} />
         </ActionIcon>
       </Group>
 
-      <Table mt="md">
+      <Table mt="md" striped>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>

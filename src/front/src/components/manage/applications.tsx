@@ -202,7 +202,7 @@ export const ManageApplications = () => {
 const ApproveButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
   const mutation = approveApplicationMutation(event.eventId)
   return (
-    <ActionIcon loading={mutation.isPending} color="green" variant="filled" onClick={() => mutation.mutate(application.userId)}>
+    <ActionIcon loading={mutation.isPending} gradient={{ from: 'teal', to: 'lime', deg: 110 }} variant="gradient" onClick={() => mutation.mutate(application.userId)}>
       <IconCheck />
     </ActionIcon>
   )
@@ -211,7 +211,7 @@ const ApproveButton = ({ event, application }: { event: TEvent; application: TAp
 const DeclineButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
   const mutation = declineApplicationMutation(event.eventId)
   return (
-    <ActionIcon loading={mutation.isPending} color="red" variant="filled" onClick={() => mutation.mutate(application.userId)}>
+    <ActionIcon loading={mutation.isPending} gradient={{ from: 'red', to: 'orange', deg: 110 }} variant="gradient" onClick={() => mutation.mutate(application.userId)}>
       <IconX />
     </ActionIcon>
   )
