@@ -72,11 +72,13 @@ export const ManageApplications = () => {
   })
 
   const totalApprovedMin = approved.reduce((a, c) => {
-    return a + c.minPredicted
+    const booking = bookings.find((b) => b.userId === c.userId)
+    return a + Math.max(c.minPredicted, booking ? booking.people.filter(p => !p.cancelled).length : 0)
   }, 0)
 
   const totalApprovedMax = approved.reduce((a, c) => {
-    return a + c.maxPredicted
+    const booking = bookings.find((b) => b.userId === c.userId)
+    return a + Math.max(c.maxPredicted, booking ? booking.people.filter(p => !p.cancelled).length : 0)
   }, 0)
 
   const totalMean = approved.reduce((a, c) => {
@@ -84,7 +86,8 @@ export const ManageApplications = () => {
   }, 0)
   const totalStdDev = Math.sqrt(
     approved.reduce((a, c) => {
-      const range = (c.maxPredicted - c.minPredicted) / 2 
+      const booking = bookings.find((b) => b.userId === c.userId)
+      const range = booking && booking.people.length > c.minPredicted ? 1 : (c.maxPredicted - c.minPredicted) / 2 
       return a + range * range
     }, 0),
   )
