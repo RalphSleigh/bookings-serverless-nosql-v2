@@ -219,7 +219,7 @@ export const ManageGraphs: React.FC = () => {
               <Table.Tr>
                 <Table.Th>Method</Table.Th>
                 <Table.Th>Bookings</Table.Th>
-                <Table.Th>Total</Table.Th>
+                <Table.Th>People</Table.Th>
                 <Table.Th>Average</Table.Th>
               </Table.Tr>
             </Table.Thead>
