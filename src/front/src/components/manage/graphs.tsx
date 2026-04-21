@@ -1,13 +1,36 @@
-import { AspectRatio, Box, Container, Grid, Group, Text, Title } from '@mantine/core'
+import { AspectRatio, Box, Container, Grid, Group, Table, Text, Title } from '@mantine/core'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { CartesianGrid, LabelList, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { TPersonWithoutSensitiveInfo } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { getEventGraphDataQueryOptions } from '../../queries/getEventGraphData'
 import { useEvent } from '../../utils'
+
+const numberFormatter = new Intl.NumberFormat('en-GB', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+})
+
+const methodMap: Record<string, string> = {
+  googleWCF: 'Google (Woodcraft Folk)',
+  google: 'Google',
+  apple: 'Apple',
+  yahoo: 'Yahoo',
+  microsoft: 'Microsoft',
+  discord: 'Discord',
+}
+
+const fillMap: Record<string, string> = {
+  googleWCF: 'green',
+  google: 'red',
+  apple: 'grey',
+  yahoo: 'purple',
+  microsoft: 'blue',
+  discord: 'violet',
+}
 
 export const ManageGraphs: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -31,12 +54,10 @@ export const ManageGraphs: React.FC = () => {
     ticks.push(month.valueOf())
   }
 
-  const numberFormatter = new Intl.NumberFormat('en-GB', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
+  const loginData = graphQuery.data.loginData
 
-
+  const pieBookingData = Object.entries(loginData).map(([method, data]) => ({ name: methodMap[method] || method, value: data.bookings, fill: fillMap[method] || '#000000' }))
+  const piePeopleData = Object.entries(loginData).map(([method, data]) => ({ name: methodMap[method] || method, value: data.total, fill: fillMap[method] || '#000000' }))
   return (
     <Container strategy="grid" fluid>
       <Grid mt={16}>
@@ -77,7 +98,6 @@ export const ManageGraphs: React.FC = () => {
                   style={{
                     flexGrow: 0,
                   }}
-
                   ml={4}
                   mr={4}
                 >
@@ -87,7 +107,7 @@ export const ManageGraphs: React.FC = () => {
                       textAlign: 'center',
                     }}
                   >
-                     : 
+                    :
                   </Text>
                   <Text
                     style={{
@@ -96,7 +116,7 @@ export const ManageGraphs: React.FC = () => {
                       color: 'var(--mantine-primary-color-light-color)',
                     }}
                   >
-                     : 
+                    :
                   </Text>
                   <Text
                     style={{
@@ -165,6 +185,55 @@ export const ManageGraphs: React.FC = () => {
               </LineChart>
             </ResponsiveContainer>
           </AspectRatio>
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <Title order={3}>Login Methods</Title>
+          {Object.entries(loginData).map(([method, data]) => (
+            <Text key={method} c={fillMap[method] || '#000000'} component="span">
+<b>&bull;&nbsp;{methodMap[method] || method}</b>&nbsp;</Text>
+          ))}
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Title order={4}>By Bookings</Title>
+          <AspectRatio ratio={2} mt={16}>
+          <ResponsiveContainer aspect={2}>
+          <PieChart>
+            <Pie data={pieBookingData} dataKey="value" nameKey="name"outerRadius="70%"/>
+          </PieChart>
+          </ResponsiveContainer>
+          </AspectRatio>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Title order={4}>By People</Title>
+          <AspectRatio ratio={2} mt={16}>
+          <ResponsiveContainer aspect={2}>
+          <PieChart>
+            <Pie data={piePeopleData} dataKey="value" nameKey="name" outerRadius="70%"/>
+          </PieChart>
+          </ResponsiveContainer>
+          </AspectRatio>
+        </Grid.Col>
+          <Grid.Col span={12}>
+          <Table striped>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Method</Table.Th>
+                <Table.Th>Bookings</Table.Th>
+                <Table.Th>Total</Table.Th>
+                <Table.Th>Average</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {Object.entries(loginData).map(([method, data]) => (
+                <Table.Tr key={method}>
+                  <Table.Td>{methodMap[method] || method}</Table.Td>
+                  <Table.Td>{data.bookings}</Table.Td>
+                  <Table.Td>{data.total}</Table.Td>
+                  <Table.Td>{data.total > 0 ? (data.bookings / data.total).toFixed(2) : ''}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
         </Grid.Col>
       </Grid>
     </Container>
