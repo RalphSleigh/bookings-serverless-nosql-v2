@@ -4,7 +4,6 @@ import { IconCheck, IconX } from '@tabler/icons-react'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import { mean } from 'lodash'
 import { useMemo } from 'react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
