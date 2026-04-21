@@ -5,7 +5,7 @@ import { HandlerWrapper } from '../../../utils'
 import { getCampersFromSheet } from '../../../sheetsInput'
 import { TUser } from '../../../../shared/schemas/user'
 
-export type GetApplicationSheetNumbersResponseType = { numbers: Record<string, number | undefined> }
+export type GetApplicationSheetNumbersResponseType = { numbers: Record<string, number | null> }
 
 export const getApplicationSheetNumbers = HandlerWrapper(
   (req, res) => ['getApplications', subject('eventId', { eventId: res.locals.event.eventId })],
@@ -18,14 +18,14 @@ export const getApplicationSheetNumbers = HandlerWrapper(
 
         const approvedApplications = applications.data.filter(a => a.status === 'approved')
 
-        const result: Record<string, number | undefined> = {}
+        const result: Record<string, number | null> = {}
 
         for (const application of approvedApplications) {
             try {
             const campersFromSheet = await getCampersFromSheet(res.locals.config, res.locals.event, {userId: application.userId} as TUser)
             result[application.userId] = campersFromSheet.length
             } catch (error) {
-                result[application.userId] = undefined
+                result[application.userId] = null
             }
                 }
 
