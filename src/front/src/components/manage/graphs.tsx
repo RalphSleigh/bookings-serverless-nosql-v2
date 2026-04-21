@@ -229,7 +229,7 @@ export const ManageGraphs: React.FC = () => {
                   <Table.Td>{methodMap[method] || method}</Table.Td>
                   <Table.Td>{data.bookings}</Table.Td>
                   <Table.Td>{data.total}</Table.Td>
-                  <Table.Td>{data.total > 0 ? (data.bookings / data.total).toFixed(2) : ''}</Table.Td>
+                  <Table.Td>{data.bookings > 0 ? (data.total / data.bookings).toFixed(2) : ''}</Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
