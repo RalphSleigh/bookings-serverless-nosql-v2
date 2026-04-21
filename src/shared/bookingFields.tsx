@@ -203,6 +203,12 @@ class PaymentReference extends BookingField {
   }
 }
 
+class WhatsApp extends BookingField {
+  name = 'WhatsApp'
+  enabled: (event: TEvent) => boolean = (event) => !event.bigCampMode
+  accessor = (b: TBookingResponse) => ('whatsApp' in b.other ? b.other.whatsApp : 'N/A')
+}
+
 export const bookingFields: (event: TEvent, villages?: TVillages) => BookingField[] = (event, villages) => {
   return [
     new BookingType(event),
@@ -218,6 +224,7 @@ export const bookingFields: (event: TEvent, villages?: TVillages) => BookingFiel
     new Equipment(event),
     new AccessibilityRequirements(event),
     new PaymentReference(event),
+    new WhatsApp(event),
     new EditLink(event),
     new Created(event),
     new Updated(event),
