@@ -157,7 +157,7 @@ export const ManageApplications = () => {
         Approved
       </Title>
       <Text mb={16}>
-        Total predicted: {totalApprovedMin} - ({totalMean.toFixed(2)} - {totalApprovedMax}), booked: {totalBooked}
+        Total predicted: {totalApprovedMin} - ({totalMean.toFixed(0)}) - {totalApprovedMax}, booked: {totalBooked}
       </Text>
       <ResponsiveContainer width="100%" height={100}>
       <AreaChart width={730} height={250} data={probs} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
