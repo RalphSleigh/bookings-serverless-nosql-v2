@@ -15,6 +15,7 @@ import { getEventApplicationsQueryOptions } from '../../queries/getEventApplicat
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { useEvent } from '../../utils'
 import { getEventApplicationSheetNumbersQueryOptions } from '../../queries/getEventApplicationSheetNumbers'
+import { mean } from 'lodash'
 
 export const ManageApplications = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -82,12 +83,14 @@ export const ManageApplications = () => {
   }, 0)
 
   const totalMean = approved.reduce((a, c) => {
-    return a + (c.minPredicted + c.maxPredicted) / 2
+    const booking = bookings.find((b) => b.userId === c.userId)
+    return booking && booking.people.length > c.minPredicted ? a + booking.people.filter(p => !p.cancelled).length : a + (c.minPredicted + c.maxPredicted) / 2
   }, 0)
+
   const totalStdDev = Math.sqrt(
     approved.reduce((a, c) => {
       const booking = bookings.find((b) => b.userId === c.userId)
-      const range = booking && booking.people.length > c.minPredicted ? 1 : (c.maxPredicted - c.minPredicted) / 2 
+      const range = booking && booking.people.length > c.minPredicted ? 0.5 : (c.maxPredicted - c.minPredicted) / 2 
       return a + range * range
     }, 0),
   )
@@ -154,7 +157,7 @@ export const ManageApplications = () => {
         Approved
       </Title>
       <Text mb={16}>
-        Total predicted: {totalApprovedMin} - {totalApprovedMax}, booked: {totalBooked}
+        Total predicted: {totalApprovedMin} - ({totalMean.toFixed(2)} - {totalApprovedMax}), booked: {totalBooked}
       </Text>
       <ResponsiveContainer width="100%" height={100}>
       <AreaChart width={730} height={250} data={probs} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
