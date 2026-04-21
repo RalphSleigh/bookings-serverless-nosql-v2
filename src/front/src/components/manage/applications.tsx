@@ -95,7 +95,7 @@ export const ManageApplications = () => {
       const booking = bookings.find((b) => b.userId === c.userId)
       const rangeMin = Math.max(c.minPredicted, booking ? booking.people.filter((p) => !p.cancelled).length : 0)
       const rangeMax = Math.max(c.maxPredicted, booking ? booking.people.filter((p) => !p.cancelled).length : 0)
-      const range = (rangeMax - rangeMin) / 2
+      const range = rangeMin === rangeMax ? 0.5 : (rangeMax - rangeMin) / 2
       return a + range * range
     }, 0),
   )
