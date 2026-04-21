@@ -1,10 +1,19 @@
 import { subject } from '@casl/ability'
-import { DBPersonHistory } from '../../../dynamo'
+import { DB, DBPersonHistory, DBUser } from '../../../dynamo'
 import { HandlerWrapperLoggedIn } from '../../../utils'
 import dayjs from 'dayjs'
 
 
-export type GetGraphDataResponseType = { data:  Array<{"date": string, "count": number}> }
+type LoginData = {
+  googleWCF: {bookings: number, total: number}
+  google: {bookings: number, total: number}
+  apple: {bookings: number, total: number}
+  yahoo: {bookings: number, total: number}
+  microsoft: {bookings: number, total: number}
+  discord: {bookings: number, total: number}
+}
+
+export type GetGraphDataResponseType = { data:  Array<{"date": string, "count": number}>, loginData: LoginData }
 
 export const getGraphData = HandlerWrapperLoggedIn<{ eventId: string }>(
   (req, res) => ['getBackend', subject('eventId', { eventId: res.locals.event.eventId })],
@@ -27,7 +36,33 @@ export const getGraphData = HandlerWrapperLoggedIn<{ eventId: string }>(
             results.push({ date: day.format('YYYY-MM-DD'), count: peopleOnDay })
         }
 
-        res.json({ data: results })
+        const users = await DBUser.scan.go({pages: "all"})
+        const bookings = await DB.collections.booking({ eventId: event.eventId }).go()
+
+        const googleWCFBookings = bookings.data?.booking.filter(b => users.data?.find(u => u.userId === b.userId && u.sub.includes('google') && u.isWoodcraft))
+        const googleBookings = bookings.data?.booking.filter(b => users.data?.find(u => u.userId === b.userId && u.sub.includes('google') && !u.isWoodcraft))
+        const appleBookings = bookings.data?.booking.filter(b => users.data?.find(u => u.userId === b.userId && u.sub.includes('apple')))
+        const yahooBookings = bookings.data?.booking.filter(b => users.data?.find(u => u.userId === b.userId && u.sub.includes('yahoo')))
+        const microsoftBookings = bookings.data?.booking.filter(b => users.data?.find(u => u.userId === b.userId && u.sub.includes('windowslive')))
+        const discordBookings = bookings.data?.booking.filter(b => users.data?.find(u => u.userId === b.userId && u.sub.includes('discord')))
+
+        const googleWCFTotal = bookings.data?.person.filter(p => googleWCFBookings?.map(b => b.userId).includes(p.userId)).length
+        const googleTotal = bookings.data?.person.filter(p => googleBookings?.map(b => b.userId).includes(p.userId)).length
+        const appleTotal = bookings.data?.person.filter(p => appleBookings?.map(b => b.userId).includes(p.userId)).length
+        const yahooTotal = bookings.data?.person.filter(p => yahooBookings?.map(b => b.userId).includes(p.userId)).length
+        const microsoftTotal = bookings.data?.person.filter(p => microsoftBookings?.map(b => b.userId).includes(p.userId)).length
+        const discordTotal = bookings.data?.person.filter(p => discordBookings?.map(b => b.userId).includes(p.userId)).length
+
+        const loginData: LoginData = {
+          googleWCF: { bookings: googleWCFBookings.length, total: googleWCFTotal },
+          google: { bookings: googleBookings.length, total: googleTotal },
+          apple: { bookings: appleBookings.length, total: appleTotal },
+          yahoo: { bookings: yahooBookings.length, total: yahooTotal },
+          microsoft: { bookings: microsoftBookings.length, total: microsoftTotal },
+          discord: { bookings: discordBookings.length, total: discordTotal },
+        }
+
+        res.json({ data: results, loginData })
       } else {
         res.status(404).json({ message: 'No Data Found' } as any)
       }
