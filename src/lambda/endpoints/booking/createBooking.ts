@@ -4,11 +4,13 @@ import { v7 as uuidv7 } from 'uuid'
 
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
-import { DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
-import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../utils'
+import { DBApplication, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
+import { HandlerWrapperLoggedIn } from '../../utils'
 
 export type TCreateBookingData = {
   booking: TBooking
+  min: number
+  max: number
 }
 
 export const createBooking = HandlerWrapperLoggedIn(
@@ -76,6 +78,20 @@ export const createBooking = HandlerWrapperLoggedIn(
         eventId: event.eventId,
       },
     })
+
+    const application = await DBApplication.get({ userId: res.locals.user.userId, eventId: res.locals.event.eventId }).go()
+
+    if (application.data) {
+      await DBApplication.patch(application.data).set({ minPredicted: req.body.min, maxPredicted: req.body.max }).go()
+      if (application.data.minPredicted !== req.body.min || application.data.maxPredicted !== req.body.max) {
+        await enqueueAsyncTask({
+          type: 'discordMessage',
+          data: {
+            message: `${res.locals.user.name} updated their application predictions for event ${event.name} when creating a booking, they updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${req.body.min} - ${req.body.max}`,
+          },
+        })
+      }
+    }
 
     res.json({ ok: 'ok' })
   },

@@ -5,13 +5,14 @@ import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
 import { TRole, TRoleForForm } from './schemas/role'
 import { ContextUser } from './schemas/user'
+import { TBookingResponse } from '../lambda/endpoints/event/manage/getEventBookings'
 
 export type EventID = Pick<TEvent, 'eventId'>
 
 export type Abilities =
   | ['manage', 'all']
   | ['get', 'events' | 'event' | 'currentUser' | 'env' | 'ownBookings' | 'users' | 'errors']
-  | ['update', 'userPreferences' | 'eventBooking' | ({ event: TEvent; booking: TBooking } & ForcedSubject<'eventBooking'>)]
+  | ['update', 'userPreferences' | 'eventBooking' | ({ event: TEvent; booking: TBookingResponse } & ForcedSubject<'eventBooking'>)]
   | ['book' | 'apply', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
