@@ -64,6 +64,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
     maxPredicted: application?.maxPredicted || 0,
   })
 
+  const numbersValid = predictedNumbers.minPredicted <= predictedNumbers.maxPredicted && predictedNumbers.minPredicted >= 0 && predictedNumbers.maxPredicted >= 0
+
   const onSubmit = useCallback(
     (data: z.infer<typeof schema>) => {
       console.log('Submitting booking data:', data)
@@ -144,7 +146,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               {itemToDisplay}
               {application && <ApplicationPredictedNumbers predictedNumbers={predictedNumbers} setPredictedNumbers={setPredictedNumbers} application={application} />}
               <Flex gap={8} mt={16}>
-                <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid}>
+                <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid || !numbersValid}>
                   {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
                 </Button>
                 {mode === 'edit' && (
