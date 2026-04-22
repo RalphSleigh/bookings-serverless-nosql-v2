@@ -1,15 +1,14 @@
 //import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox, Alert, AlertTitle } from "@mui/material"
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, Container, Flex, Grid, NumberInput, Paper, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { Box, Button, Flex, Grid, NumberInput, Paper, Text, Title } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { IconAlertTriangle, IconInfoCircle, IconInfoCircleFilled } from '@tabler/icons-react'
+import { useDebounce } from '@react-hook/debounce'
+import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react'
 import { UseMutationResult } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
-import { debounce } from 'lodash'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { DefaultValues, FormProvider, useForm } from 'react-hook-form'
-import z4, { z } from 'zod/v4'
+import { z } from 'zod/v4'
 
 import { getFeeType } from '../../../../shared/fees/fees.js'
 import { TApplication } from '../../../../shared/schemas/application.js'
@@ -18,10 +17,9 @@ import { TApplication } from '../../../../shared/schemas/application.js'
 //import { MemoBookingExtraContactFields } from "./extraContacts.js";
 //import { MemoCampingFields } from "./camping.js";
 //import { consent } from "../../../shared/consents/consent.js";
-import { BookingSchema, BookingSchemaForClient, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
+import { BookingSchemaForClient, PartialBookingType, TBooking } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { TFee } from '../../../../shared/schemas/fees.js'
-import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
 import { cancelBooking } from '../../mutations/cancelBooking.js'
 import { WatchDebounce } from '../../utils.js'
 import { BasicFieldsBig, BasicFieldsSmall } from './basicFields.js'
@@ -192,18 +190,23 @@ const ApplicationPredictedNumbers = ({
 }) => {
   const [people, setPeople] = useState<PartialBookingType['people']>([])
   const [localState, setLocalState] = useState({ minPredicted: application.minPredicted, maxPredicted: application.maxPredicted })
+
+  const [deboundedData, setDebouncedData] = useDebounce(localState, 500)
+
   const handleChange = (name: string) => (value: string | number) => {
     setLocalState((prev) => ({
       ...prev,
       [name]: Number(value),
     }))
-    debounce(() => {
-      setPredictedNumbers((prev) => ({
-        ...prev,
-        [name]: Number(value),
-      }))
-    }, 500)()
+    setDebouncedData((prev) => ({
+      ...prev,
+      [name]: Number(value),
+    }))
   }
+
+  const updatedPredictedNumbers = useEffect(() => {
+    setPredictedNumbers(deboundedData)
+  }, [deboundedData, setPredictedNumbers])
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} p="lg">
@@ -227,6 +230,7 @@ const ApplicationPredictedNumbers = ({
           style={{ width: '50%' }}
           label="Minimum Predicted"
           name="minPredicted"
+          allowNegative={false}
           value={localState.minPredicted}
           onChange={handleChange('minPredicted')}
           error={localState.minPredicted > localState.maxPredicted ? 'Minimum predicted cannot be greater than maximum predicted' : undefined}
@@ -235,6 +239,7 @@ const ApplicationPredictedNumbers = ({
           style={{ width: '50%' }}
           label="Maximum Predicted"
           name="maxPredicted"
+          allowNegative={false}
           value={localState.maxPredicted}
           onChange={handleChange('maxPredicted')}
           error={localState.maxPredicted < localState.minPredicted ? 'Maximum predicted cannot be less than minimum predicted' : undefined}

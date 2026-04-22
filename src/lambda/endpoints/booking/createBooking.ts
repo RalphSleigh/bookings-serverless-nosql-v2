@@ -2,6 +2,7 @@ import { subject } from '@casl/ability'
 import { CreateEntityItem } from 'electrodb'
 import { v7 as uuidv7 } from 'uuid'
 
+import { ApplicationSchema } from '../../../shared/schemas/application'
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
 import { DBApplication, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
@@ -82,7 +83,8 @@ export const createBooking = HandlerWrapperLoggedIn(
     const application = await DBApplication.get({ userId: res.locals.user.userId, eventId: res.locals.event.eventId }).go()
 
     if (application.data) {
-      await DBApplication.patch(application.data).set({ minPredicted: req.body.min, maxPredicted: req.body.max }).go()
+      const newApplication = ApplicationSchema.parse({ ...application.data, minPredicted: req.body.min, maxPredicted: req.body.max })
+      await DBApplication.patch(application.data).set(newApplication).go()
       if (application.data.minPredicted !== req.body.min || application.data.maxPredicted !== req.body.max) {
         await enqueueAsyncTask({
           type: 'discordMessage',

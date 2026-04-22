@@ -4,6 +4,7 @@ import { isEqual } from 'lodash-es'
 import { v7 as uuidv7 } from 'uuid'
 
 import { generateDiscordDiff } from '../../../shared/bookingDiff'
+import { ApplicationSchema } from '../../../shared/schemas/application'
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
 import { DBApplication, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
@@ -223,7 +224,8 @@ export const updateBooking = HandlerWrapper(
     const application = await DBApplication.get({ userId: booking.userId, eventId: booking.eventId }).go()
 
     if (application.data) {
-      await DBApplication.patch(application.data).set({ minPredicted: req.body.min, maxPredicted: req.body.max }).go()
+      const newApplication = ApplicationSchema.parse({ ...application.data, minPredicted: req.body.min, maxPredicted: req.body.max })
+      await DBApplication.patch(application.data).set(newApplication).go()
       if (application.data.minPredicted !== req.body.min || application.data.maxPredicted !== req.body.max) {
         if (own) {
           await enqueueAsyncTask({

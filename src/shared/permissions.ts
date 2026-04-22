@@ -5,7 +5,7 @@ import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
 import { TRole, TRoleForForm } from './schemas/role'
 import { ContextUser } from './schemas/user'
-import { TBookingResponse } from '../lambda/endpoints/event/manage/getEventBookings'
+import type { TBookingResponse } from '../lambda/endpoints/event/manage/getEventBookings'
 
 export type EventID = Pick<TEvent, 'eventId'>
 
