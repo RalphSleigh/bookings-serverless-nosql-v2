@@ -28,6 +28,7 @@ function EditBookingComponent() {
 
   const event = useEvent()
   const booking = bookingsQuery.data.bookings.find((booking) => booking.eventId === event.eventId && booking.userId === user.userId)
+  const application = bookingsQuery.data?.applications.find((a) => a.eventId === event.eventId && a.userId === user.userId)
 
   const fees = bookingsQuery.data?.fees.filter((f) => f.eventId === event.eventId && f.userId === user.userId) || []
 
@@ -39,5 +40,5 @@ function EditBookingComponent() {
     })
     return <Navigate to="/" />
   }
-  return <BookingForm mode={booking.cancelled ? 'rebook' : 'edit'} event={event} inputData={booking} mutation={updateBookingMuation()} payments={fees} />
+  return <BookingForm mode={booking.cancelled ? 'rebook' : 'edit'} event={event} inputData={booking} mutation={updateBookingMuation()} payments={fees} application={application} />
 }

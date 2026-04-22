@@ -2,20 +2,18 @@ import { notifications } from '@mantine/notifications'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { useContext } from 'react'
 
-import { TCreateEventData } from '../../../lambda/endpoints/event/createEvent'
-import { TEvent, TEventWhenCreating } from '../../../shared/schemas/event'
-import { TBookingForType } from '../../../shared/schemas/booking'
 import { TCreateBookingData } from '../../../lambda/endpoints/booking/createBooking'
+import { TBookingForType } from '../../../shared/schemas/booking'
+import { TEvent } from '../../../shared/schemas/event'
 
 export const createBookingMuation = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({event, booking}: {event: TEvent, booking:TBookingForType}) => {
-      return await axios.post<TCreateBookingData>(`/api/event/${event.eventId}/booking/create`, { booking })
+    mutationFn: async ({ event, booking, min, max }: { event: TEvent; booking: TBookingForType; min: number; max: number }) => {
+      return await axios.post<TCreateBookingData>(`/api/event/${event.eventId}/booking/create`, { booking, min, max })
     },
     onSuccess: (data: AxiosResponse, context) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
