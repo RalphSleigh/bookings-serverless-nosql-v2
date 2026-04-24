@@ -84,7 +84,7 @@ export const createBooking = HandlerWrapperLoggedIn(
 
     if (application.data) {
       const newApplication = ApplicationSchema.parse({ ...application.data, minPredicted: req.body.min, maxPredicted: req.body.max })
-      await DBApplication.patch(application.data).set(newApplication).go()
+      await DBApplication.patch(application.data).set({minPredicted:newApplication.minPredicted, maxPredicted:newApplication.maxPredicted}).go()
       if (application.data.minPredicted !== req.body.min || application.data.maxPredicted !== req.body.max) {
         await enqueueAsyncTask({
           type: 'discordMessage',
