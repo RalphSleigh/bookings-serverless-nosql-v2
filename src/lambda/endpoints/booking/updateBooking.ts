@@ -225,20 +225,21 @@ export const updateBooking = HandlerWrapper(
 
     if (application.data) {
       const newApplication = ApplicationSchema.parse({ ...application.data, minPredicted: req.body.min, maxPredicted: req.body.max })
-      await DBApplication.patch(application.data).set(newApplication).go()
-      if (application.data.minPredicted !== req.body.min || application.data.maxPredicted !== req.body.max) {
+
+      if (application.data.minPredicted !== newApplication.minPredicted || application.data.maxPredicted !== newApplication.maxPredicted) {
+          await DBApplication.patch(application.data).set({minPredicted:newApplication.minPredicted, maxPredicted:newApplication.maxPredicted}).go()
         if (own) {
           await enqueueAsyncTask({
             type: 'discordMessage',
             data: {
-              message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) updated their application predictions for event ${event.name} when updating their booking, they updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${req.body.min} - ${req.body.max}`,
+              message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) updated their application predictions for event ${event.name} when updating their booking, they updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${newApplication.minPredicted} - ${newApplication.maxPredicted}`,
             },
           })
         } else {
           await enqueueAsyncTask({
             type: 'discordMessage',
             data: {
-              message: `${user.name} updated application predictions for ${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) for event ${event.name} when updating a booking, they updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${req.body.min} - ${req.body.max}`,
+              message: `${user.name} updated application predictions for ${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) for event ${event.name} when updating a booking, they updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${newApplication.minPredicted} - ${newApplication.maxPredicted}`,
             },
           })
         }
