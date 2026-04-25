@@ -89,7 +89,7 @@ export const createBooking = HandlerWrapperLoggedIn(
         await enqueueAsyncTask({
           type: 'discordMessage',
           data: {
-            message: `${res.locals.user.name} updated their application predictions for event ${event.name} when creating a booking, they updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${newApplication.minPredicted} - ${newApplication.maxPredicted}`,
+            message: `Prediction updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${newApplication.minPredicted} - ${newApplication.maxPredicted}`,
           },
         })
       }
