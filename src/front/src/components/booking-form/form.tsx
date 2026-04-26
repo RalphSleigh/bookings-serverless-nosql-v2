@@ -1,26 +1,27 @@
 //import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox, Alert, AlertTitle } from "@mui/material"
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Container, Flex, Grid, Paper, Text, Textarea, Title } from '@mantine/core'
+import { Box, Button, Flex, Grid, NumberInput, Paper, Text, Title } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { IconAlertTriangle } from '@tabler/icons-react'
+import { useDebounce } from '@react-hook/debounce'
+import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react'
 import { UseMutationResult } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { DefaultValues, FormProvider, useForm } from 'react-hook-form'
-import z4, { z } from 'zod/v4'
+import { z } from 'zod/v4'
 
 import { getFeeType } from '../../../../shared/fees/fees.js'
+import { TApplication } from '../../../../shared/schemas/application.js'
 //import { getAttendance } from "../../../shared/attendance/attendance.js";
 //import { organisations } from "../../../shared/ifm.js";
 //import { MemoBookingExtraContactFields } from "./extraContacts.js";
 //import { MemoCampingFields } from "./camping.js";
 //import { consent } from "../../../shared/consents/consent.js";
-import { BookingSchema, BookingSchemaForClient, BookingSchemaForType, PartialBookingType, TBooking, TBookingForType } from '../../../../shared/schemas/booking.js'
+import { BookingSchemaForClient, PartialBookingType, TBooking } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
 import { TFee } from '../../../../shared/schemas/fees.js'
-import { PersonSchemaForType } from '../../../../shared/schemas/person.js'
 import { cancelBooking } from '../../mutations/cancelBooking.js'
+import { WatchDebounce } from '../../utils.js'
 import { BasicFieldsBig, BasicFieldsSmall } from './basicFields.js'
 import { CampingFormSection } from './camping.js'
 import { ChangesDisplay } from './changes.js'
@@ -38,12 +39,15 @@ import { MemoValidationErrors } from './validation.js'
 type BookingFormProps = {
   mode: 'create' | 'edit' | 'rebook' | 'view'
   event: TEvent
+  application?: TApplication
   inputData: DefaultValues<TBooking> & { userId: string; eventId: string }
   mutation: UseMutationResult<any, any, any, any>
   payments: TFee[]
 }
 
-export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData, mutation, payments }) => {
+type PredictedNumbers = Pick<TApplication, 'minPredicted' | 'maxPredicted'>
+
+export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData, mutation, payments, application }) => {
   // export function BookingForm({ data, originalData, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, originalData: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: (notify) => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
   const { user } = useRouteContext({ from: '/_user' })
   const readOnly = mode === 'view'
@@ -55,12 +59,19 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
   const { formState, handleSubmit } = formMethods
   const { isValid } = formState
 
+  const [predictedNumbers, setPredictedNumbers] = useState<PredictedNumbers>({
+    minPredicted: application?.minPredicted || 0,
+    maxPredicted: application?.maxPredicted || 0,
+  })
+
+  const numbersValid = predictedNumbers.minPredicted <= predictedNumbers.maxPredicted && predictedNumbers.minPredicted >= 0 && predictedNumbers.maxPredicted >= 0
+
   const onSubmit = useCallback(
     (data: z.infer<typeof schema>) => {
       console.log('Submitting booking data:', data)
-      mutation.mutate({ event, booking: data })
+      mutation.mutate({ event, booking: data, min: predictedNumbers.minPredicted, max: predictedNumbers.maxPredicted })
     },
-    [event, mutation],
+    [event, mutation, predictedNumbers],
   )
 
   const cancelBookingMutation = cancelBooking(event.eventId, inputData.userId)
@@ -133,8 +144,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
               <fees.BookingFormDisplayElement event={event} user={user} fees={payments} />
               <PermissionForm event={event} checked={checked} setChecked={setChecked} />
               {itemToDisplay}
+              {application && <ApplicationPredictedNumbers predictedNumbers={predictedNumbers} setPredictedNumbers={setPredictedNumbers} application={application} />}
               <Flex gap={8} mt={16}>
-                <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid}>
+                <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid || !numbersValid}>
                   {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
                 </Button>
                 {mode === 'edit' && (
@@ -164,6 +176,76 @@ const CheckTheBox = () => {
         <Title order={2} size="h4">
           Please check the permission box
         </Title>
+      </Flex>
+    </Paper>
+  )
+}
+
+const ApplicationPredictedNumbers = ({
+  predictedNumbers,
+  setPredictedNumbers,
+  application,
+}: {
+  predictedNumbers: PredictedNumbers
+  setPredictedNumbers: React.Dispatch<React.SetStateAction<PredictedNumbers>>
+  application: TApplication
+}) => {
+  const [people, setPeople] = useState<PartialBookingType['people']>([])
+  const [localState, setLocalState] = useState({ minPredicted: application.minPredicted, maxPredicted: application.maxPredicted })
+
+  const [deboundedData, setDebouncedData] = useDebounce(localState, 500)
+
+  const handleChange = (name: string) => (value: string | number) => {
+    setLocalState((prev) => ({
+      ...prev,
+      [name]: Number(value),
+    }))
+    setDebouncedData((prev) => ({
+      ...prev,
+      [name]: Number(value),
+    }))
+  }
+
+  const updatedPredictedNumbers = useEffect(() => {
+    setPredictedNumbers(deboundedData)
+  }, [deboundedData, setPredictedNumbers])
+
+  return (
+    <Paper shadow="md" radius="md" withBorder mt={16} p="lg">
+      <WatchDebounce value={people} set={setPeople} name="people" duration={500} />
+      <Flex gap="xs" align="flex-start">
+        <Box>
+          <IconInfoCircle size={40} stroke={1.5} color="green" />
+        </Box>
+        <Box>
+          <Text>
+            You previously predicted {application.minPredicted} - {application.maxPredicted} people. You can update these numbers if you are now more certain about how many people you will be booking
+            for, this is helpful to the camp team.
+          </Text>
+          <Text>
+            You are currently booking <b>{people?.length}</b> {people?.length === 1 ? 'person' : 'people'}.
+          </Text>
+        </Box>
+      </Flex>
+      <Flex gap="xs" align="center" mb={8}>
+        <NumberInput
+          style={{ width: '50%' }}
+          label="Minimum Predicted"
+          name="minPredicted"
+          allowNegative={false}
+          value={localState.minPredicted}
+          onChange={handleChange('minPredicted')}
+          error={localState.minPredicted > localState.maxPredicted ? 'Minimum predicted cannot be greater than maximum predicted' : undefined}
+        />
+        <NumberInput
+          style={{ width: '50%' }}
+          label="Maximum Predicted"
+          name="maxPredicted"
+          allowNegative={false}
+          value={localState.maxPredicted}
+          onChange={handleChange('maxPredicted')}
+          error={localState.maxPredicted < localState.minPredicted ? 'Maximum predicted cannot be less than minimum predicted' : undefined}
+        />
       </Flex>
     </Paper>
   )

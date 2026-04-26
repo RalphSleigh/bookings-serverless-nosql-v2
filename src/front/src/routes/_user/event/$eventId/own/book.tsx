@@ -50,5 +50,5 @@ function BookEventComponent() {
     inputData.basic = { name: user.name, email: user.email }
   }
 
-  return <BookingForm mode="create" event={event} inputData={inputData} mutation={createBookingMuation()} payments={fees} />
+  return <BookingForm mode="create" event={event} inputData={inputData} mutation={createBookingMuation()} payments={fees} application={application} />
 }

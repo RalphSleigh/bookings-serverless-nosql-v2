@@ -1,16 +1,19 @@
 import { subject } from '@casl/ability'
-import { CreateEntityItem, EntityIdentifiers, UpdateEntityItem } from 'electrodb'
+import { CreateEntityItem, EntityIdentifiers } from 'electrodb'
 import { isEqual } from 'lodash-es'
 import { v7 as uuidv7 } from 'uuid'
 
 import { generateDiscordDiff } from '../../../shared/bookingDiff'
+import { ApplicationSchema } from '../../../shared/schemas/application'
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
-import { DB, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
+import { DBApplication, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
 import { HandlerWrapper } from '../../utils'
 
-export type TCreateBookingData = {
+export type TUpdateBookingData = {
   booking: TBooking
+  min: number
+  max: number
 }
 
 export const updateBooking = HandlerWrapper(
@@ -160,7 +163,7 @@ export const updateBooking = HandlerWrapper(
         await enqueueAsyncTask({
           type: 'discordMessage',
           data: {
-          message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) edited their booking for event ${event.name}, they have booked ${people.length} ${people.length > 1 ? 'people' : 'person'} (previously ${existingBooking.people.length})`,
+            message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) edited their booking for event ${event.name}, they have booked ${people.length} ${people.length > 1 ? 'people' : 'person'} (previously ${existingBooking.people.length})`,
           },
         })
       } else {
@@ -217,6 +220,31 @@ export const updateBooking = HandlerWrapper(
         eventId: event.eventId,
       },
     })
+
+    const application = await DBApplication.get({ userId: booking.userId, eventId: booking.eventId }).go()
+
+    if (application.data) {
+      const newApplication = ApplicationSchema.parse({ ...application.data, minPredicted: req.body.min, maxPredicted: req.body.max })
+
+      if (application.data.minPredicted !== newApplication.minPredicted || application.data.maxPredicted !== newApplication.maxPredicted) {
+          await DBApplication.patch(application.data).set({minPredicted:newApplication.minPredicted, maxPredicted:newApplication.maxPredicted}).go()
+        if (own) {
+          await enqueueAsyncTask({
+            type: 'discordMessage',
+            data: {
+              message: `${updatedBooking.data.basic!.name} (${updatedBooking.data.basic!.district}) updated their application predictions for event ${event.name} when updating their booking, they updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${newApplication.minPredicted} - ${newApplication.maxPredicted}`,
+            },
+          })
+        } else {
+          await enqueueAsyncTask({
+            type: 'discordMessage',
+            data: {
+              message: `Prediction updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${newApplication.minPredicted} - ${newApplication.maxPredicted}`,
+            },
+          })
+        }
+      }
+    }
 
     res.locals.logger.logToPath(`Update booking took ${Date.now() - startTime}ms`)
 

@@ -11,6 +11,9 @@ import { manageVillageMutation } from '../../mutations/manageVillages'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { useEvent } from '../../utils'
 
+const VILLAGE_OK = 50
+const VILLAGE_FULL = 80
+
 export const ManageVillages: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
   const { eventId } = route.useParams()
@@ -87,40 +90,44 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
 
   const bookingsElements = bookings.map((booking) => (
     <Table.Tr key={booking.userId}>
+      <Table.Td>{'district' in booking.basic && booking.basic.district ? `${booking.basic.district} (${booking.basic.name})` : booking.basic.name}</Table.Td>
       <Table.Td>
-        {'district' in booking.basic && booking.basic.district ? `${booking.basic.district} (${booking.basic.name})` : booking.basic.name}
+        {booking.camping?.who}
+        <br />
+        {booking.camping?.equipment}
       </Table.Td>
+      <Table.Td>{booking.people.length}</Table.Td>
       <Table.Td>
-        {booking.people.length}
-      </Table.Td>
-      <Table.Td>
-        <ActionIcon onClick={() => unassignFn(id, booking.userId)} color="red">
+        <ActionIcon onClick={() => unassignFn(id, booking.userId)} color="red" variant="outline">
           <IconX size={16} />
         </ActionIcon>
       </Table.Td>
     </Table.Tr>
   ))
-        
+
+  const total = bookings.reduce((acc, booking) => acc + booking.people.length, 0)
+
   return (
-    <Paper data-breakout shadow="sm" radius="md" withBorder mt="md" p="sm">
+    <Paper data-breakout shadow="sm" radius="md" withBorder mt="md" p="sm" style={{ borderColor: totalColour(total) }}>
       <Group gap={4}>
         <Title order={3} style={{ flexGrow: 1 }} ml={8}>
           {name}
         </Title>
-        <ActionIcon onClick={renameFn}>
+        <ActionIcon onClick={renameFn} gradient={{ from: 'blue', to: 'cyan', deg: 110 }} variant="gradient">
           <IconEdit size={16} />
         </ActionIcon>
-        <ActionIcon onClick={deleteFn} color="red">
+        <ActionIcon onClick={deleteFn} gradient={{ from: 'red', to: 'orange', deg: 110 }} variant="gradient">
           <IconX size={16} />
         </ActionIcon>
       </Group>
-      
-      <Table mt="md">
+
+      <Table mt="md" striped>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
+            <Table.Th>Details</Table.Th>
             <Table.Th>Campers</Table.Th>
-            <Table.Th></Table.Th>  
+            <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -129,8 +136,9 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
             <Table.Td>
               <b>Total</b>
             </Table.Td>
+            <Table.Td></Table.Td>
             <Table.Td>
-              <b>{bookings.reduce((acc, booking) => acc + booking.people.length, 0)}</b>
+              <Text c={totalColour(total)}><b>{total}</b></Text>
             </Table.Td>
             <Table.Td></Table.Td>
           </Table.Tr>
@@ -165,4 +173,8 @@ const NoVillageBookingElement: React.FC<{ booking: TBookingResponse<TEvent>; vil
       <Select mt="md" placeholder="Assign to village" data={assignVillageOptions} onChange={assignVillageFn} />
     </Paper>
   )
+}
+
+const totalColour = (number: number) => {
+  return number < VILLAGE_OK ? 'green' : number < VILLAGE_FULL ? 'yellow' : 'red'
 }

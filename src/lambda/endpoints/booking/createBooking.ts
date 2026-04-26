@@ -2,13 +2,16 @@ import { subject } from '@casl/ability'
 import { CreateEntityItem } from 'electrodb'
 import { v7 as uuidv7 } from 'uuid'
 
+import { ApplicationSchema } from '../../../shared/schemas/application'
 import { BookingSchema, TBooking } from '../../../shared/schemas/booking'
 import { enqueueAsyncTask } from '../../asyncTasks/asyncTaskQueuer'
-import { DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
-import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../utils'
+import { DBApplication, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../../dynamo'
+import { HandlerWrapperLoggedIn } from '../../utils'
 
 export type TCreateBookingData = {
   booking: TBooking
+  min: number
+  max: number
 }
 
 export const createBooking = HandlerWrapperLoggedIn(
@@ -76,6 +79,21 @@ export const createBooking = HandlerWrapperLoggedIn(
         eventId: event.eventId,
       },
     })
+
+    const application = await DBApplication.get({ userId: res.locals.user.userId, eventId: res.locals.event.eventId }).go()
+
+    if (application.data) {
+      const newApplication = ApplicationSchema.parse({ ...application.data, minPredicted: req.body.min, maxPredicted: req.body.max })
+      if (application.data.minPredicted !== newApplication.minPredicted || application.data.maxPredicted !== newApplication.maxPredicted) {
+        await DBApplication.patch(application.data).set({ minPredicted: newApplication.minPredicted, maxPredicted: newApplication.maxPredicted }).go()
+        await enqueueAsyncTask({
+          type: 'discordMessage',
+          data: {
+            message: `Prediction updated from ${application.data.minPredicted} - ${application.data.maxPredicted} to ${newApplication.minPredicted} - ${newApplication.maxPredicted}`,
+          },
+        })
+      }
+    }
 
     res.json({ ok: 'ok' })
   },

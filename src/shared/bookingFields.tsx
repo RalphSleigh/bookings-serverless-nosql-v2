@@ -146,7 +146,6 @@ class Shuttle extends BookingField {
 class AnythingElse extends BookingField {
   name = 'Anything Else'
   size = 150
-  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
   accessor = (b: TBookingResponse) => b.other.anythingElse || ''
 }
 

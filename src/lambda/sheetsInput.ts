@@ -469,7 +469,7 @@ const cachedPromise = (key: string, fn: () => Promise<any>) => {
   return promiseCache[key]
 }
 
-export const getCampersFromSheet = async (config: ConfigType, event: TEvent, user: TUser): Promise<TPerson[]> => {
+export const getCampersFromSheet = async (config: ConfigType, event: TEvent, user: TUser | {userId: string}): Promise<TPerson[]> => {
   const auth = await getAuthClientForScope(config, ['https://www.googleapis.com/auth/drive.readonly'])
   const drive_instance = drive({ version: 'v3', auth })
 
