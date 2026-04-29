@@ -11,6 +11,7 @@ import { TApplication } from '../../../../shared/schemas/application'
 import { TEvent } from '../../../../shared/schemas/event'
 import { approveApplicationMutation } from '../../mutations/approveApplication'
 import { declineApplicationMutation } from '../../mutations/declineApplication'
+import { deleteApplicationMutation } from '../../mutations/deleteApplication'
 import { getEventApplicationsQueryOptions } from '../../queries/getEventApplications'
 import { getEventApplicationSheetNumbersQueryOptions } from '../../queries/getEventApplicationSheetNumbers'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
@@ -126,6 +127,7 @@ export const ManageApplications = () => {
       <Table.Td>
         <Flex gap={8}>
           <ApproveButton event={event} application={app} />
+          <DeleteButton event={event} application={app} />
         </Flex>
       </Table.Td>
     </Table.Tr>
@@ -221,6 +223,15 @@ const ApproveButton = ({ event, application }: { event: TEvent; application: TAp
 
 const DeclineButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
   const mutation = declineApplicationMutation(event.eventId)
+  return (
+    <ActionIcon loading={mutation.isPending} gradient={{ from: 'yellow', to: 'orange', deg: 110 }} variant="gradient" onClick={() => mutation.mutate(application.userId)}>
+      <IconX />
+    </ActionIcon>
+  )
+}
+
+const DeleteButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
+  const mutation = deleteApplicationMutation(event.eventId)
   return (
     <ActionIcon loading={mutation.isPending} gradient={{ from: 'red', to: 'orange', deg: 110 }} variant="gradient" onClick={() => mutation.mutate(application.userId)}>
       <IconX />
