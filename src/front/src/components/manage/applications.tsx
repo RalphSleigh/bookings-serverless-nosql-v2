@@ -233,7 +233,14 @@ const DeclineButton = ({ event, application }: { event: TEvent; application: TAp
 const DeleteButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
   const mutation = deleteApplicationMutation(event.eventId)
   return (
-    <ActionIcon loading={mutation.isPending} gradient={{ from: 'red', to: 'orange', deg: 110 }} variant="gradient" onClick={() => mutation.mutate(application.userId)}>
+    <ActionIcon
+      loading={mutation.isPending}
+      gradient={{ from: 'red', to: 'orange', deg: 110 }}
+      variant="gradient"
+      onClick={() => {
+        if (confirm('Are you sure you want to delete this application? This action cannot be undone.')) mutation.mutate(application.userId)
+      }}
+    >
       <IconX />
     </ActionIcon>
   )
