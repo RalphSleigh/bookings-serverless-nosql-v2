@@ -13,6 +13,7 @@ import { createSheetForBookingEndpoint } from './endpoints/booking/createSheetFo
 import { getBookingHasSheet } from './endpoints/booking/getBookingHasSheet'
 import { getDataFromSheetEndpoint } from './endpoints/booking/getDataFromSheet'
 import { getUserBookings } from './endpoints/booking/getUserBookings'
+import { redirectToStripe } from './endpoints/booking/redirectToStripe'
 import { updateBooking } from './endpoints/booking/updateBooking'
 import { getEnv } from './endpoints/env'
 import { logClientErrors } from './endpoints/errors'
@@ -24,14 +25,19 @@ import { approveApplicationEndpoint } from './endpoints/event/manage/approveAppl
 import { createFeeItem } from './endpoints/event/manage/createFeeItem'
 import { createRole } from './endpoints/event/manage/createRole'
 import { declineApplicationEndpoint } from './endpoints/event/manage/declineApplication'
+import { deleteApplicationEndpoint } from './endpoints/event/manage/deleteApplication'
 import { deleteFeeItem } from './endpoints/event/manage/deleteFeeItem'
 import { deleteRole } from './endpoints/event/manage/deleteRole'
+import { getApplicationSheetNumbers } from './endpoints/event/manage/getApplicationSheetNumbers'
 import { getEventApplications } from './endpoints/event/manage/getEventApplications'
 import { getEventBookingHistory } from './endpoints/event/manage/getEventBookingHistory'
 import { getEventBookings } from './endpoints/event/manage/getEventBookings'
 import { getEventFees } from './endpoints/event/manage/getEventFees'
 import { getEventRoles } from './endpoints/event/manage/getEventRoles'
+import { getGraphData } from './endpoints/event/manage/getGraphData'
 import { getUsers } from './endpoints/event/manage/getUsers'
+import { manageVillages } from './endpoints/event/manage/manageVillages'
+import { stripeWebhookHandler } from './endpoints/stripe'
 import { getUser } from './endpoints/user/getUser'
 import { updateUserPreference } from './endpoints/user/updateUserPreference'
 import { configMiddleware } from './middleware/config'
@@ -40,20 +46,19 @@ import { loggerMiddleware, requestLoggerMiddleware } from './middleware/logger'
 import { ownBookingMiddleware } from './middleware/ownBooking'
 import { userMiddleware } from './middleware/user'
 import { am_in_lambda } from './utils'
-import { redirectToStripe } from './endpoints/booking/redirectToStripe'
-import { stripeWebhookHandler } from './endpoints/stripe'
-import { getGraphData } from './endpoints/event/manage/getGraphData'
-import { manageVillages } from './endpoints/event/manage/manageVillages'
-import { getApplicationSheetNumbers } from './endpoints/event/manage/getApplicationSheetNumbers'
 
 export const router = express.Router()
 export const app = express()
 
 router.use(loggerMiddleware)
-router.use(express.json({verify(req, res, buf, encoding) {
-  //@ts-expect-error
-  req.rawBody = buf
-},}))
+router.use(
+  express.json({
+    verify(req, res, buf, encoding) {
+      //@ts-expect-error
+      req.rawBody = buf
+    },
+  }),
+)
 router.use(cookieParser())
 router.use(configMiddleware)
 router.use(userMiddleware)
@@ -99,6 +104,7 @@ router.delete('/event/:eventId/manage/fee/:feeId', deleteFeeItem)
 router.get('/event/:eventId/manage/applications', getEventApplications)
 router.post('/event/:eventId/manage/application/:userId/approve', approveApplicationEndpoint)
 router.post('/event/:eventId/manage/application/:userId/decline', declineApplicationEndpoint)
+router.delete('/event/:eventId/manage/application/:userId', deleteApplicationEndpoint)
 router.get('/event/:eventId/manage/bookingHistory/:userId', getEventBookingHistory)
 router.get('/event/:eventId/manage/graphData', getGraphData)
 router.post('/event/:eventId/manage/villages', manageVillages)
