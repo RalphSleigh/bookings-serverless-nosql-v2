@@ -14,7 +14,7 @@ export type TCreateRoleData = {
   role: TRoleForForm
 }
 
-const exemptRoles: TRole['role'][] = []
+const exemptRoles: TRole['role'][] = ['amend']
 
 export const createRole = HandlerWrapperLoggedIn<{}, TCreateRoleData>(
   (req, res) => ['create', subject('role', req.body.role)],

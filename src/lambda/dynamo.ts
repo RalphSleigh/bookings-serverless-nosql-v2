@@ -112,7 +112,7 @@ export const DBRole = new Entity(
         required: true,
       },
       role: {
-        type: ['admin', 'owner', 'manager', 'viewer', 'comms', 'finance'] as const,
+        type: ['admin', 'owner', 'manager', 'viewer', 'comms', 'finance', 'amend'] as const,
         required: true,
       },
       eventId: {
