@@ -137,23 +137,47 @@ function BookingButton({ event, booking, application }: { event: TEvent; booking
     if (application) {
       if (application.status === 'approved') {
         if (booking && !booking.cancelled) {
-          return (
-            <LoginButton to={`/event/$eventId/own/update`} gradFrom="blue" gradTo="violet">
-              Update Booking
-            </LoginButton>
-          )
+          if (permission.can('update', subject('eventBooking', { event, booking }))) {
+            return (
+              <LoginButton to={`/event/$eventId/own/update`} gradFrom="blue" gradTo="violet">
+                Update Booking
+              </LoginButton>
+            )
+          } else {
+            return (
+              <Button style={{ float: 'right' }} disabled>
+                Deadline Passed
+              </Button>
+            )
+          }
         } else if (booking && booking.cancelled) {
-          return (
-            <LoginButton to={`/event/$eventId/own/update`} gradFrom="blue" gradTo="violet">
-              Book
-            </LoginButton>
-          )
+          if (permission.can('update', subject('eventBooking', { event, booking }))) {
+            return (
+              <LoginButton to={`/event/$eventId/own/update`} gradFrom="blue" gradTo="violet">
+                Book
+              </LoginButton>
+            )
+          } else {
+            return (
+              <Button style={{ float: 'right' }} disabled>
+                Deadline Passed
+              </Button>
+            )
+          }
         } else {
-          return (
-            <LoginButton to={`/event/$eventId/own/book`} gradFrom="blue" gradTo="violet">
-              Book
-            </LoginButton>
-          )
+          if (permission.can('book', subject('event', event))) {
+            return (
+              <LoginButton to={`/event/$eventId/own/book`} gradFrom="blue" gradTo="violet">
+                Book
+              </LoginButton>
+            )
+          } else {
+            return (
+              <Button style={{ float: 'right' }} disabled>
+                Deadline Passed
+              </Button>
+            )
+          }
         }
       } else if (application.status === 'pending') {
         return (
