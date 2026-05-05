@@ -6,7 +6,6 @@ import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { de } from 'zod/v4/locales'
 
 import { TApplication } from '../../../../shared/schemas/application'
 import { TEvent } from '../../../../shared/schemas/event'

@@ -11,7 +11,7 @@ import { DB, DBBooking, DBBookingHistory, DBPerson, DBPersonHistory } from '../.
 import { HandlerWrapper, HandlerWrapperLoggedIn } from '../../utils'
 
 export const redirectToStripe = HandlerWrapperLoggedIn(
-  (req, res) => ['update', subject('eventBooking', { event: res.locals.event, booking: res.locals.booking })],
+  (req, res) => ['pay', subject('eventBooking', { event: res.locals.event, booking: res.locals.booking })],
   async (req, res) => {
     const user = res.locals.user
     const event = res.locals.event
