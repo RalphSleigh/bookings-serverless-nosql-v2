@@ -11,6 +11,7 @@ import { TEvent } from '../../../../shared/schemas/event'
 import { createSheetForBooking } from '../../mutations/createSheetForBooking'
 import { getCampersFromSheetMutation } from '../../mutations/getCampersFromSheet'
 import { getDoesBookingHaveSpreadsheet } from '../../queries/getDoesBookingHaveSpreadsheet'
+import { ReadOnlyContext } from './readOnlyContext'
 
 export const SheetsInput: React.FC<{ event: TEvent; userId: string, replace: (value: any) => void }> = ({ event, userId, replace  }) => {
   const basic = useWatch<TBookingSchemaForTypeBasicBig, 'basic'>({ name: 'basic' })
@@ -30,6 +31,7 @@ const SheetsDecider: React.FC<{ event: TEvent; userId: string, replace: (value: 
 }
 
 const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
+  const readOnly = useContext(ReadOnlyContext)
   const userId = useWatch<TBookingSchemaForTypeBasicBigGroup, 'userId'>({ name: 'userId' })
   const createSheet = createSheetForBooking(event.eventId)
 
@@ -55,6 +57,7 @@ const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
       ) : (
         <Flex mt={8} justify="flex-end">
           <Button
+            disabled={readOnly}
             loading={createSheet.isPending}
             gradient={{ from: 'cyan', to: 'green', deg: 110 }}
             variant="gradient"
@@ -70,6 +73,7 @@ const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
 
 const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; userId: string, replace: (value: any) => void }> = ({ sheet, event, userId, replace }) => {
   const getPeopleMutation = getCampersFromSheetMutation()
+  const readOnly = useContext(ReadOnlyContext)
 
   // const { setValue } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
 
@@ -108,7 +112,7 @@ const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; 
         </Text>
       )}
       <Flex mt={8} justify="flex-end">
-        <Button gradient={{ from: 'cyan', to: 'green', deg: 110 }} loading={getPeopleMutation.isPending} variant="gradient" onClick={updatePeopleFromSheet}>
+        <Button gradient={{ from: 'cyan', to: 'green', deg: 110 }} loading={getPeopleMutation.isPending} variant="gradient" onClick={updatePeopleFromSheet} disabled={readOnly}>
           Import Campers to Form
         </Button>
       </Flex>

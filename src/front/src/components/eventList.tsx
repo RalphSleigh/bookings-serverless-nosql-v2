@@ -1,6 +1,6 @@
 import { subject } from '@casl/ability'
 import { Button, Container, Paper, Table, Text, Title } from '@mantine/core'
-import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQueries } from '@tanstack/react-query'
 import { LinkProps, useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
@@ -145,9 +145,9 @@ function BookingButton({ event, booking, application }: { event: TEvent; booking
             )
           } else {
             return (
-              <Button style={{ float: 'right' }} disabled>
-                Deadline Passed
-              </Button>
+              <LoginButton to={`/event/$eventId/own/view`} gradFrom="yellow" gradTo="orange">
+                View Booking
+              </LoginButton>
             )
           }
         } else if (booking && booking.cancelled) {

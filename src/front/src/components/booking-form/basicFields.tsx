@@ -1,15 +1,16 @@
-import { Alert, Box, Grid, Paper, Radio, RadioGroup, Text, TextInput, Title } from '@mantine/core'
+import { Alert, Grid, Paper, Radio, RadioGroup, Text, TextInput, Title } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
-import React from 'react'
+import React, { useContext } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod/v4'
 
 import { organisations } from '../../../../shared/ifm'
-import { BookingSchemaForType, BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall, PartialBookingType, TBooking } from '../../../../shared/schemas/booking'
+import { BookingSchemaForTypeBasicBig, BookingSchemaForTypeBasicSmall, PartialBookingType } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import classes from '../../css/typeChooser.module.css'
 import { errorProps } from '../../utils'
 import { CustomSelect } from '../custom-inputs/customSelect'
+import { ReadOnlyContext } from './readOnlyContext'
 
 const PrivateRelayWarning = () => {
   const email = useWatch<PartialBookingType, 'basic.email'>({ name: 'basic.email' })
@@ -56,6 +57,7 @@ export const BasicFieldsSmall: React.FC<BasicBookingFieldsProps> = ({ event }) =
 
 export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => {
   const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForTypeBasicBig>>()
+  const readOnly = useContext(ReadOnlyContext)
 
   const bookingType = useWatch<PartialBookingType, 'basic.type'>({ name: 'basic.type' })
 
@@ -91,10 +93,12 @@ export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => 
             <Paper
               {...paperProps('group')(bookingType)}
               onClick={() => {
-                radioController.field.onChange('group')
+                if (!readOnly) {
+                  radioController.field.onChange('group')
+                }
               }}
             >
-              <Radio value="group" style={{ float: 'right' }} />
+              <Radio value="group" style={{ float: 'right' }} disabled={readOnly} />
               <Text size="lg">Group Booking</Text>
               <Text> If you are booking for a Woodcraft Folk District, Group, or other large booking, please select this option.</Text>
             </Paper>
@@ -103,10 +107,12 @@ export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => 
             <Paper
               {...paperProps('individual')(bookingType)}
               onClick={() => {
-                radioController.field.onChange('individual')
+                if (!readOnly) {
+                  radioController.field.onChange('individual')
+                }
               }}
             >
-              <Radio value="individual" style={{ float: 'right' }} />
+              <Radio value="individual" style={{ float: 'right' }} disabled={readOnly} />
               <Text size="lg">Individual Booking</Text>
               <Text> If you are booking just yourself or your family members, please select this option.</Text>
             </Paper>
@@ -114,12 +120,21 @@ export const BasicFieldsBig: React.FC<BasicBookingFieldsProps> = ({ event }) => 
         </Grid>
       </RadioGroup>
       {event.organisations && <CustomSelect name="basic.organisation" label="Organisation" control={control} data={organisations.map((o) => o[0])} required mt={16} {...e('basic.organisation')} />}
-      <TextInput autoComplete="district" id="district" data-form-type="other" required={bookingType === 'group'} label="District" {...register('basic.district')} {...e('basic.district')} />
+      <TextInput
+        autoComplete="district"
+        id="district"
+        data-form-type="other"
+        required={bookingType === 'group'}
+        label="District"
+        {...register('basic.district')}
+        {...e('basic.district')}
+        disabled={readOnly}
+      />
       <Title id="step-basic" size="h4" order={2} mt={16}>{`Your details`}</Title>
-      <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')} />
-      <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')} />
+      <TextInput autoComplete="name" id="name" data-form-type="name" required label="Your Name" {...register('basic.name')} {...e('basic.name')} disabled={readOnly} />
+      <TextInput autoComplete="email" id="email" data-form-type="email" required type="email" label="Your email" {...register('basic.email')} {...e('basic.email')} disabled={readOnly} />
       <PrivateRelayWarning />
-      <TextInput autoComplete="tel" id="telephone" data-form-type="phone" required type="tel" label="Phone Number" {...register('basic.telephone')} {...e('basic.telephone')} />
+      <TextInput autoComplete="tel" id="telephone" data-form-type="phone" required type="tel" label="Phone Number" {...register('basic.telephone')} {...e('basic.telephone')} disabled={readOnly} />
     </>
   )
 }

@@ -5,18 +5,20 @@ import { getMemoUpdateFunctions } from "../../../shared/util.js"
 import { PartialDeep } from "type-fest"
  */
 
-import { ActionIcon, Box, Button, Flex, Grid, LoadingOverlay, Overlay, Paper, Text, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Box, Flex, Grid, LoadingOverlay, Paper, Text, TextInput, Title } from '@mantine/core'
 import { IconPlus, IconTrash } from '@tabler/icons-react'
+import { useContext } from 'react'
 import { useFieldArray, UseFieldArrayAppend, UseFieldArrayRemove, useFormContext } from 'react-hook-form'
-import { z } from "zod/v4";
+import { z } from 'zod/v4'
 
 import { BookingSchemaForType } from '../../../../shared/schemas/booking'
 import { errorProps } from '../../utils'
+import { ReadOnlyContext } from './readOnlyContext'
 
 export function ExtraContactsForm() {
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray<z.infer<typeof BookingSchemaForType>>({
     name: 'extraContacts', // unique name for your Field Array
-  }) 
+  })
 
   const contacts = fields.map((f, i) => {
     return <ContactItem index={i} key={f.id} remove={remove} />
@@ -38,6 +40,7 @@ export function ExtraContactsForm() {
 
 const ContactItem = ({ index, remove }: { index: number; remove: UseFieldArrayRemove }) => {
   const { register, control, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const readOnly = useContext(ReadOnlyContext)
 
   const { errors } = formState
   const e = errorProps(errors)
@@ -47,6 +50,7 @@ const ContactItem = ({ index, remove }: { index: number; remove: UseFieldArrayRe
       <Grid p={0} gutter={16}>
         <Grid.Col span={6}>
           <TextInput
+            disabled={readOnly}
             autoComplete={`section-extra-contact-${index} name`}
             id={`extra-contact-name-${index}`}
             data-form-type="other"
@@ -58,15 +62,16 @@ const ContactItem = ({ index, remove }: { index: number; remove: UseFieldArrayRe
         <Grid.Col span={6}>
           <Flex gap={16}>
             <TextInput
+              disabled={readOnly}
               style={{ flexGrow: 1 }}
               autoComplete={`section-extra-contact-${index} email`}
               id={`extra-contact-email-${index}`}
               data-form-type="other"
               label="Email"
               {...register(`extraContacts.${index}.email` as const)}
-               {...e(`extraContacts.${index}.email`)}
+              {...e(`extraContacts.${index}.email`)}
             />
-            <ActionIcon variant="default" size="input-sm" onClick={() => remove(index)} mt={24}>
+            <ActionIcon variant="default" size="input-sm" onClick={() => remove(index)} mt={24} disabled={readOnly}>
               <IconTrash size={16} stroke={1.5} color="red" />
             </ActionIcon>
           </Flex>
@@ -78,8 +83,14 @@ const ContactItem = ({ index, remove }: { index: number; remove: UseFieldArrayRe
 }
 
 const ContactItemOverlay = ({ append }: { append: UseFieldArrayAppend<z.infer<typeof BookingSchemaForType>, 'extraContacts'> }) => {
+  const readOnly = useContext(ReadOnlyContext)
   return (
-    <Box style={{ position: 'relative', cursor: 'pointer' }} onClick={() => append({ name: '', email: '' })}>
+    <Box
+      style={{ position: 'relative', cursor: readOnly ? 'not-allowed' : 'pointer' }}
+      onClick={() => {
+        if (!readOnly) append({ name: '', email: '' })
+      }}
+    >
       <Paper shadow="md" radius="md" withBorder mt={16} pl={16} pr={16}>
         <Grid p={0} gutter={16}>
           <Grid.Col span={6}>
@@ -87,7 +98,7 @@ const ContactItemOverlay = ({ append }: { append: UseFieldArrayAppend<z.infer<ty
           </Grid.Col>
           <Grid.Col span={6}>
             <Flex gap={16}>
-              <TextInput label="Email" disabled style={{ flexGrow: 1 }}/>
+              <TextInput label="Email" disabled style={{ flexGrow: 1 }} />
               <ActionIcon variant="default" size="input-sm" mt={24} disabled>
                 <IconTrash size={16} stroke={1.5} color="red" />
               </ActionIcon>

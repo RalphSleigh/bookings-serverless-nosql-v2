@@ -6,7 +6,7 @@ import { useDebounce } from '@react-hook/debounce'
 import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react'
 import { UseMutationResult } from '@tanstack/react-query'
 import { useRouteContext } from '@tanstack/react-router'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { DefaultValues, FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod/v4'
 
@@ -30,6 +30,7 @@ import { ExtraContactsForm } from './extraContacts.js'
 import { OtherQuestionsForm } from './otherQuestions.js'
 import { PeopleForm } from './people.js'
 import { PermissionForm } from './permission.js'
+import { ReadOnlyContext } from './readOnlyContext.js'
 import { BookingStepper } from './stepper.js'
 import { BookingSummary } from './summary.js'
 import { MemoValidationErrors } from './validation.js'
@@ -122,49 +123,57 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
   }
 
   return (
-    <FormProvider {...formMethods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid gutter={0}>
-          {shouldDisplayStepper && (
-            <Grid.Col span={{ base: 12, lg: 3 }}>
-              <BookingStepper event={event} schema={schema} checked={checked} />
-            </Grid.Col>
-          )}
-          <Grid.Col span={{ base: 12, md: 9, lg: 6 }}>
-            <Paper shadow="md" radius="md" withBorder m={8} p="md">
-              <BasicFields event={event} />
-              <EmergencyContactSection />
-              {event.bigCampMode && <ExtraContactsForm />}
-              <PeopleForm event={event} userId={inputData.userId} />
-              {event.bigCampMode && <CampingFormSection />}
-              <OtherQuestionsForm />
-              <Title size="h4" order={2} mt={16} id="step-fees">
-                Fees
-              </Title>
-              <fees.BookingFormDisplayElement event={event} user={user} fees={payments} />
-              <PermissionForm event={event} checked={checked} setChecked={setChecked} />
-              {itemToDisplay}
-              {application && <ApplicationPredictedNumbers predictedNumbers={predictedNumbers} setPredictedNumbers={setPredictedNumbers} application={application} />}
-              <Flex gap={8} mt={16}>
-                <Button variant="gradient" gradient={{ from: 'cyan', to: 'green', deg: 110 }} type="submit" loading={mutation.isPending} disabled={mutation.isPending || !checked || !isValid || !numbersValid}>
-                  {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
-                </Button>
-                {mode === 'edit' && (
-                  <Button variant="gradient" gradient={{ from: 'red', to: 'pink', deg: 110 }} loading={cancelBookingMutation.isPending} onClick={cancelOnClick}>
-                    Cancel Booking
+    <ReadOnlyContext.Provider value={readOnly}>
+      <FormProvider {...formMethods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid gutter={0}>
+            {shouldDisplayStepper && (
+              <Grid.Col span={{ base: 12, lg: 3 }}>
+                <BookingStepper event={event} schema={schema} checked={checked} />
+              </Grid.Col>
+            )}
+            <Grid.Col span={{ base: 12, md: 9, lg: 6 }}>
+              <Paper shadow="md" radius="md" withBorder m={8} p="md">
+                <BasicFields event={event} />
+                <EmergencyContactSection />
+                {event.bigCampMode && <ExtraContactsForm />}
+                <PeopleForm event={event} userId={inputData.userId} />
+                {event.bigCampMode && <CampingFormSection />}
+                <OtherQuestionsForm />
+                <Title size="h4" order={2} mt={16} id="step-fees">
+                  Fees
+                </Title>
+                <fees.BookingFormDisplayElement event={event} user={user} fees={payments} />
+                <PermissionForm event={event} checked={checked} setChecked={setChecked} />
+                {!readOnly ? itemToDisplay : null}
+                {application && <ApplicationPredictedNumbers predictedNumbers={predictedNumbers} setPredictedNumbers={setPredictedNumbers} application={application} />}
+                <Flex gap={8} mt={16}>
+                  <Button
+                    variant="gradient"
+                    gradient={{ from: 'cyan', to: 'green', deg: 110 }}
+                    type="submit"
+                    loading={mutation.isPending}
+                    disabled={mutation.isPending || !checked || !isValid || !numbersValid}
+                  >
+                    {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
                   </Button>
-                )}
-              </Flex>
-            </Paper>
-          </Grid.Col>
-          {shouldDisplaySummary && (
-            <Grid.Col span={{ base: 12, md: 3 }}>
-              <BookingSummary />
+                  {mode === 'edit' && (
+                    <Button variant="gradient" gradient={{ from: 'red', to: 'pink', deg: 110 }} loading={cancelBookingMutation.isPending} onClick={cancelOnClick}>
+                      Cancel Booking
+                    </Button>
+                  )}
+                </Flex>
+              </Paper>
             </Grid.Col>
-          )}
-        </Grid>
-      </form>
-    </FormProvider>
+            {shouldDisplaySummary && (
+              <Grid.Col span={{ base: 12, md: 3 }}>
+                <BookingSummary />
+              </Grid.Col>
+            )}
+          </Grid>
+        </form>
+      </FormProvider>
+    </ReadOnlyContext.Provider>
   )
 }
 
@@ -194,6 +203,7 @@ const ApplicationPredictedNumbers = ({
   const [localState, setLocalState] = useState({ minPredicted: application.minPredicted, maxPredicted: application.maxPredicted })
 
   const [deboundedData, setDebouncedData] = useDebounce(localState, 500)
+  const readOnly = useContext(ReadOnlyContext)
 
   const handleChange = (name: string) => (value: string | number) => {
     setLocalState((prev) => ({
@@ -229,6 +239,7 @@ const ApplicationPredictedNumbers = ({
       </Flex>
       <Flex gap="xs" align="center" mb={8}>
         <NumberInput
+          disabled={readOnly}
           style={{ width: '50%' }}
           label="Minimum Predicted"
           name="minPredicted"
@@ -238,6 +249,7 @@ const ApplicationPredictedNumbers = ({
           error={localState.minPredicted > localState.maxPredicted ? 'Minimum predicted cannot be greater than maximum predicted' : undefined}
         />
         <NumberInput
+          disabled={readOnly}
           style={{ width: '50%' }}
           label="Maximum Predicted"
           name="maxPredicted"
