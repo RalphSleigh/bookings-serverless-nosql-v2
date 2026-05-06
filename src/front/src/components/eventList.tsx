@@ -1,6 +1,6 @@
 import { subject } from '@casl/ability'
 import { Button, Container, Paper, Table, Text, Title } from '@mantine/core'
-import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQueries } from '@tanstack/react-query'
 import { LinkProps, useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
@@ -15,7 +15,7 @@ import { TUser } from '../../../shared/schemas/user.js'
 import { ageGroupFromPerson } from '../../../shared/woodcraft.js'
 import { Can } from '../permissionContext'
 import { getEventsQueryOptions } from '../queries/getEvents.js'
-import { getUserBookingsQueryOptions } from '../queries/geUserBookings.js'
+import { getUserBookingsQueryOptions } from '../queries/getUserBookings.js'
 import { CustomLink, toLocalDate } from '../utils.js'
 import { CustomButtonLink } from './custom-inputs/customLinkButton.js'
 
@@ -145,9 +145,9 @@ function BookingButton({ event, booking, application }: { event: TEvent; booking
             )
           } else {
             return (
-              <Button style={{ float: 'right' }} disabled>
-                Deadline Passed
-              </Button>
+              <LoginButton to={`/event/$eventId/own/view`} gradFrom="yellow" gradTo="orange">
+                View Booking
+              </LoginButton>
             )
           }
         } else if (booking && booking.cancelled) {

@@ -1,16 +1,13 @@
-import { subject } from '@casl/ability'
 import { notifications } from '@mantine/notifications'
-import { IconArrowGuide } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, Navigate, redirect, useRouteContext } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 
 import { BookingForm } from '../../../../../components/booking-form/form'
-import { updateBookingMuation } from '../../../../../mutations/updateBooking'
-import { getEventsQueryOptions } from '../../../../../queries/getEvents'
+import { dummyMutation } from '../../../../../mutations/dummyMutation'
 import { getUserBookingsQueryOptions } from '../../../../../queries/getUserBookings'
 import { useEvent } from '../../../../../utils'
 
-export const Route = createFileRoute('/_user/event/$eventId/own/update')({
+export const Route = createFileRoute('/_user/event/$eventId/own/view')({
   // Can't check this as we need the event object to check permissions
   /*   beforeLoad: async ({ location, context }) => {
     if (context.permission.can('edit', 'event') === false)
@@ -18,10 +15,10 @@ export const Route = createFileRoute('/_user/event/$eventId/own/update')({
         to: '/',
       })
   }, */
-  component: EditBookingComponent,
+  component: ViewBookingComponent,
 })
 
-function EditBookingComponent() {
+function ViewBookingComponent() {
   const { permission, user } = Route.useRouteContext()
 
   const bookingsQuery = useSuspenseQuery(getUserBookingsQueryOptions)
@@ -32,13 +29,13 @@ function EditBookingComponent() {
 
   const fees = bookingsQuery.data?.fees.filter((f) => f.eventId === event.eventId && f.userId === user.userId) || []
 
-  if (!event || !booking || !permission.can('update', subject('eventBooking', { event, booking }))) {
+  if (!event || !booking || !permission.can('get', 'ownBookings')) {
     notifications.show({
       title: 'Error',
-      message: `Event  not found, or you don't have permission to book it`,
+      message: `Booking not found, or you don't have permission to view it`,
       color: 'red',
     })
     return <Navigate to="/" />
   }
-  return <BookingForm mode={booking.cancelled ? 'rebook' : 'edit'} event={event} inputData={booking} mutation={updateBookingMuation()} payments={fees} application={application} />
+  return <BookingForm mode={'view'} event={event} inputData={booking} mutation={dummyMutation()} payments={fees} application={application} />
 }

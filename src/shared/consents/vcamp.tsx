@@ -8,11 +8,14 @@ import { useWatch } from 'react-hook-form'
 import { useEvent } from '../../front/src/utils'
 import { TPerson, TPersonAttendance, TPersonKPData } from '../schemas/person'
 import dayjs from 'dayjs'
+import { ReadOnlyContext } from '../../front/src/components/booking-form/readOnlyContext'
+import { useContext } from 'react'
 
 
 export class VCampConsents implements ConsentStructure<TEventVCampConsents> {
   typeName: 'vcamp' = 'vcamp'
   FormSection: ConsentPersonFormSection = ({ index }) => {
+    const readOnly = useContext(ReadOnlyContext)
 
     const dob = useWatch<{ people: TBooking<TEvent<any, TEventVCampConsents>>['people'] }>({
       name: `people.${index}.basic.dob`
@@ -35,8 +38,8 @@ export class VCampConsents implements ConsentStructure<TEventVCampConsents> {
         >
           <Group mt={8}>
             <Input.Label required><b>Image Consent:</b> I have permission for photos and recordings of this individual to be taken at the event and used by Woodcraft Folk. IFM and other external bodies for publications, social media and during the event on site.</Input.Label>
-            <Radio value={'Yes'} label="Yes" />
-            <Radio value={'No'} label="No" />
+            <Radio disabled={readOnly} value={'Yes'} label="Yes" />
+            <Radio disabled={readOnly} value={'No'} label="No" />
           </Group>
         </CustomRadioGroup>
         <CustomRadioGroup<TBooking<TEvent<any, TEventVCampConsents>>>
@@ -46,8 +49,8 @@ export class VCampConsents implements ConsentStructure<TEventVCampConsents> {
         >
           <Group mt={8}>
             <Input.Label required w="100%"><b>Adventurous Activities Consent:</b> I can confirm that this individual can swim 25m unaided.</Input.Label>
-            <Radio value={'Yes'} label="Yes" />
-            <Radio value={'No'} label="No" />
+            <Radio disabled={readOnly} value={'Yes'} label="Yes" />
+            <Radio disabled={readOnly} value={'No'} label="No" />
           </Group>
         </CustomRadioGroup>
         {needsRSEconsent ? <CustomRadioGroup<TBooking<TEvent<any, TEventVCampConsents>>>
@@ -57,8 +60,8 @@ export class VCampConsents implements ConsentStructure<TEventVCampConsents> {
         >
           <Group mt={8}>
             <Input.Label required><b>Relations & Sex Education Consent:</b> I have permission for this individual to take part in Relationship & Sex Education workshops as part of the Venturer Camp MEST-UP programme. Everyone on camp will take part in a basic consent workshop, this consent is for content above and beyond that. (<a href="https://woodcraft.org.uk/resources/relationship-sex-education-policy/" target="_blank">policy</a>)</Input.Label>
-            <Radio value={'Yes'} label="Yes" />
-            <Radio value={'No'} label="No" />
+            <Radio disabled={readOnly} value={'Yes'} label="Yes" />
+            <Radio disabled={readOnly} value={'No'} label="No" />
           </Group>
         </CustomRadioGroup> : <Text mt={16} size="sm" c="dimmed">(RSE consent is only required for those aged 12 - 17)</Text>}
       </>

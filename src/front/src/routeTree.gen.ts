@@ -20,6 +20,7 @@ import { Route as UserEventEventIdImport } from './routes/_user/event/$eventId'
 import { Route as UserEventEventIdManageImport } from './routes/_user/event/$eventId/manage'
 import { Route as UserEventEventIdEditImport } from './routes/_user/event/$eventId/edit'
 import { Route as UserEventEventIdManageIndexImport } from './routes/_user/event/$eventId/manage/index'
+import { Route as UserEventEventIdOwnViewImport } from './routes/_user/event/$eventId/own/view'
 import { Route as UserEventEventIdOwnUpdateImport } from './routes/_user/event/$eventId/own/update'
 import { Route as UserEventEventIdOwnBookImport } from './routes/_user/event/$eventId/own/book'
 import { Route as UserEventEventIdOwnApplyImport } from './routes/_user/event/$eventId/own/apply'
@@ -91,6 +92,12 @@ const UserEventEventIdManageIndexRoute =
     path: '/',
     getParentRoute: () => UserEventEventIdManageRoute,
   } as any)
+
+const UserEventEventIdOwnViewRoute = UserEventEventIdOwnViewImport.update({
+  id: '/own/view',
+  path: '/own/view',
+  getParentRoute: () => UserEventEventIdRoute,
+} as any)
 
 const UserEventEventIdOwnUpdateRoute = UserEventEventIdOwnUpdateImport.update({
   id: '/own/update',
@@ -344,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserEventEventIdOwnUpdateImport
       parentRoute: typeof UserEventEventIdImport
     }
+    '/_user/event/$eventId/own/view': {
+      id: '/_user/event/$eventId/own/view'
+      path: '/own/view'
+      fullPath: '/event/$eventId/own/view'
+      preLoaderRoute: typeof UserEventEventIdOwnViewImport
+      parentRoute: typeof UserEventEventIdImport
+    }
     '/_user/event/$eventId/manage/': {
       id: '/_user/event/$eventId/manage/'
       path: '/'
@@ -414,6 +428,7 @@ interface UserEventEventIdRouteChildren {
   UserEventEventIdOwnApplyRoute: typeof UserEventEventIdOwnApplyRoute
   UserEventEventIdOwnBookRoute: typeof UserEventEventIdOwnBookRoute
   UserEventEventIdOwnUpdateRoute: typeof UserEventEventIdOwnUpdateRoute
+  UserEventEventIdOwnViewRoute: typeof UserEventEventIdOwnViewRoute
   UserEventEventIdBookingUserIdUpdateRoute: typeof UserEventEventIdBookingUserIdUpdateRoute
 }
 
@@ -423,6 +438,7 @@ const UserEventEventIdRouteChildren: UserEventEventIdRouteChildren = {
   UserEventEventIdOwnApplyRoute: UserEventEventIdOwnApplyRoute,
   UserEventEventIdOwnBookRoute: UserEventEventIdOwnBookRoute,
   UserEventEventIdOwnUpdateRoute: UserEventEventIdOwnUpdateRoute,
+  UserEventEventIdOwnViewRoute: UserEventEventIdOwnViewRoute,
   UserEventEventIdBookingUserIdUpdateRoute:
     UserEventEventIdBookingUserIdUpdateRoute,
 }
@@ -468,6 +484,7 @@ export interface FileRoutesByFullPath {
   '/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
+  '/event/$eventId/own/view': typeof UserEventEventIdOwnViewRoute
   '/event/$eventId/manage/': typeof UserEventEventIdManageIndexRoute
   '/event/$eventId/booking/$userId/update': typeof UserEventEventIdBookingUserIdUpdateRoute
   '/event/$eventId/manage/booking/$userId/history': typeof UserEventEventIdManageBookingUserIdHistoryRoute
@@ -494,6 +511,7 @@ export interface FileRoutesByTo {
   '/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
+  '/event/$eventId/own/view': typeof UserEventEventIdOwnViewRoute
   '/event/$eventId/manage': typeof UserEventEventIdManageIndexRoute
   '/event/$eventId/booking/$userId/update': typeof UserEventEventIdBookingUserIdUpdateRoute
   '/event/$eventId/manage/booking/$userId/history': typeof UserEventEventIdManageBookingUserIdHistoryRoute
@@ -522,6 +540,7 @@ export interface FileRoutesById {
   '/_user/event/$eventId/own/apply': typeof UserEventEventIdOwnApplyRoute
   '/_user/event/$eventId/own/book': typeof UserEventEventIdOwnBookRoute
   '/_user/event/$eventId/own/update': typeof UserEventEventIdOwnUpdateRoute
+  '/_user/event/$eventId/own/view': typeof UserEventEventIdOwnViewRoute
   '/_user/event/$eventId/manage/': typeof UserEventEventIdManageIndexRoute
   '/_user/event/$eventId/booking/$userId/update': typeof UserEventEventIdBookingUserIdUpdateRoute
   '/_user/event/$eventId/manage/booking/$userId/history': typeof UserEventEventIdManageBookingUserIdHistoryRoute
@@ -551,6 +570,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/own/apply'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
+    | '/event/$eventId/own/view'
     | '/event/$eventId/manage/'
     | '/event/$eventId/booking/$userId/update'
     | '/event/$eventId/manage/booking/$userId/history'
@@ -576,6 +596,7 @@ export interface FileRouteTypes {
     | '/event/$eventId/own/apply'
     | '/event/$eventId/own/book'
     | '/event/$eventId/own/update'
+    | '/event/$eventId/own/view'
     | '/event/$eventId/manage'
     | '/event/$eventId/booking/$userId/update'
     | '/event/$eventId/manage/booking/$userId/history'
@@ -602,6 +623,7 @@ export interface FileRouteTypes {
     | '/_user/event/$eventId/own/apply'
     | '/_user/event/$eventId/own/book'
     | '/_user/event/$eventId/own/update'
+    | '/_user/event/$eventId/own/view'
     | '/_user/event/$eventId/manage/'
     | '/_user/event/$eventId/booking/$userId/update'
     | '/_user/event/$eventId/manage/booking/$userId/history'
@@ -661,6 +683,7 @@ export const routeTree = rootRoute
         "/_user/event/$eventId/own/apply",
         "/_user/event/$eventId/own/book",
         "/_user/event/$eventId/own/update",
+        "/_user/event/$eventId/own/view",
         "/_user/event/$eventId/booking/$userId/update"
       ]
     },
@@ -740,6 +763,10 @@ export const routeTree = rootRoute
     },
     "/_user/event/$eventId/own/update": {
       "filePath": "_user/event/$eventId/own/update.tsx",
+      "parent": "/_user/event/$eventId"
+    },
+    "/_user/event/$eventId/own/view": {
+      "filePath": "_user/event/$eventId/own/view.tsx",
       "parent": "/_user/event/$eventId"
     },
     "/_user/event/$eventId/manage/": {

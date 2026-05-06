@@ -93,6 +93,16 @@ export const PersonSchemaForClient = (event: TEvent) => {
         error: `RSE Consent is required for those aged 12 - 17`,
       },
     )
+    .refine(
+      (data) => {
+        const dob = dayjs(data.basic.dob)
+        return dob.isAfter(startDate.subtract(120, 'years')) && dob.isBefore(startDate)
+      },
+      {
+        path: ['basic', 'dob'],
+        error: 'Please enter a valid date of birth',
+      },
+    )
 }
 
 export const PersonSchemaForType = z.object({

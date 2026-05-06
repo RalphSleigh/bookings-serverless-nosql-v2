@@ -8,7 +8,7 @@ import { TBooking } from '../../../../../../../shared/schemas/booking'
 import { defaultBookingData } from '../../../../../components/booking-form/defaults'
 import { BookingForm } from '../../../../../components/booking-form/form'
 import { createBookingMuation } from '../../../../../mutations/createBooking'
-import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
+import { getUserBookingsQueryOptions } from '../../../../../queries/getUserBookings'
 import { useEvent } from '../../../../../utils'
 
 export const Route = createFileRoute('/_user/event/$eventId/own/book')({

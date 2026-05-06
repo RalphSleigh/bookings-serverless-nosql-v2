@@ -7,7 +7,7 @@ import * as React from 'react'
 import { EventList } from '../components/eventList'
 import { Can } from '../permissionContext'
 import { getEventsQueryOptions } from '../queries/getEvents'
-import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
+import { getUserBookingsQueryOptions } from '../queries/getUserBookings'
 
 //import { useSuspenseIfUser } from '../queries/useSuspenseWrapper'
 

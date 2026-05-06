@@ -1,7 +1,5 @@
 import { drive, drive_v3 } from '@googleapis/drive'
-import { auth, sheets, sheets_v4 } from '@googleapis/sheets'
-import { request } from 'express'
-import { string } from 'zod/v4'
+import { sheets, sheets_v4 } from '@googleapis/sheets'
 
 import { getAttendanceType } from '../shared/attendance/attendance'
 import { FreeChoiceAttendance } from '../shared/attendance/freechoice'
@@ -469,7 +467,7 @@ const cachedPromise = (key: string, fn: () => Promise<any>) => {
   return promiseCache[key]
 }
 
-export const getCampersFromSheet = async (config: ConfigType, event: TEvent, user: TUser | {userId: string}): Promise<TPerson[]> => {
+export const getCampersFromSheet = async (config: ConfigType, event: TEvent, user: TUser | { userId: string }): Promise<TPerson[]> => {
   const auth = await getAuthClientForScope(config, ['https://www.googleapis.com/auth/drive.readonly'])
   const drive_instance = drive({ version: 'v3', auth })
 
