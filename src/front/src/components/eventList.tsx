@@ -15,7 +15,7 @@ import { TUser } from '../../../shared/schemas/user.js'
 import { ageGroupFromPerson } from '../../../shared/woodcraft.js'
 import { Can } from '../permissionContext'
 import { getEventsQueryOptions } from '../queries/getEvents.js'
-import { getUserBookingsQueryOptions } from '../queries/geUserBookings.js'
+import { getUserBookingsQueryOptions } from '../queries/getUserBookings.js'
 import { CustomLink, toLocalDate } from '../utils.js'
 import { CustomButtonLink } from './custom-inputs/customLinkButton.js'
 

@@ -7,7 +7,7 @@ import { createFileRoute, Navigate, redirect, useRouteContext } from '@tanstack/
 import { BookingForm } from '../../../../../components/booking-form/form'
 import { updateBookingMuation } from '../../../../../mutations/updateBooking'
 import { getEventsQueryOptions } from '../../../../../queries/getEvents'
-import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
+import { getUserBookingsQueryOptions } from '../../../../../queries/getUserBookings'
 import { useEvent } from '../../../../../utils'
 
 export const Route = createFileRoute('/_user/event/$eventId/own/update')({

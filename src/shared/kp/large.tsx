@@ -89,7 +89,7 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
           <Textarea
             disabled={readOnly}
             autoComplete={`section-person-${index} diet-preferences`}
-            id={`person-details-${index}`}
+            id={`person-preferences-${index}`}
             data-form-type="other"
             label="Food dislikes or preferences (not allergies)"
             {...register(`people.${index}.kp.preferences` as const)}

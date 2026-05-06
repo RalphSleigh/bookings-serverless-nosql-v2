@@ -1,26 +1,24 @@
 import { drive_v3 } from '@googleapis/drive'
 import { Button, Flex, Paper, Text, Title } from '@mantine/core'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { useRouteContext } from '@tanstack/react-router'
 import { MouseEventHandler, useContext, useEffect } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
-import z from 'zod/v4'
+import { useWatch } from 'react-hook-form'
 
-import { BookingSchemaForTypeBasicBig, TBookingSchemaForTypeBasicBig, TBookingSchemaForTypeBasicBigGroup } from '../../../../shared/schemas/booking'
+import { TBookingSchemaForTypeBasicBig, TBookingSchemaForTypeBasicBigGroup } from '../../../../shared/schemas/booking'
 import { TEvent } from '../../../../shared/schemas/event'
 import { createSheetForBooking } from '../../mutations/createSheetForBooking'
 import { getCampersFromSheetMutation } from '../../mutations/getCampersFromSheet'
 import { getDoesBookingHaveSpreadsheet } from '../../queries/getDoesBookingHaveSpreadsheet'
 import { ReadOnlyContext } from './readOnlyContext'
 
-export const SheetsInput: React.FC<{ event: TEvent; userId: string, replace: (value: any) => void }> = ({ event, userId, replace  }) => {
+export const SheetsInput: React.FC<{ event: TEvent; userId: string; replace: (value: any) => void }> = ({ event, userId, replace }) => {
   const basic = useWatch<TBookingSchemaForTypeBasicBig, 'basic'>({ name: 'basic' })
   if (basic?.type !== 'group') return null
   if (!event.bigCampMode) return null
   return <SheetsDecider event={event} userId={userId} replace={replace} />
 }
 
-const SheetsDecider: React.FC<{ event: TEvent; userId: string, replace: (value: any) => void }> = ({ event, userId, replace }) => {
+const SheetsDecider: React.FC<{ event: TEvent; userId: string; replace: (value: any) => void }> = ({ event, userId, replace }) => {
   const hasSheetsQuery = useSuspenseQuery(getDoesBookingHaveSpreadsheet(event.eventId, userId))
 
   if (hasSheetsQuery.data.sheet) {
@@ -71,7 +69,7 @@ const SheetBoxNoSheets: React.FC<{ event: TEvent }> = ({ event }) => {
   )
 }
 
-const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; userId: string, replace: (value: any) => void }> = ({ sheet, event, userId, replace }) => {
+const SheetBoxHasSheets: React.FC<{ sheet: drive_v3.Schema$File; event: TEvent; userId: string; replace: (value: any) => void }> = ({ sheet, event, userId, replace }) => {
   const getPeopleMutation = getCampersFromSheetMutation()
   const readOnly = useContext(ReadOnlyContext)
 

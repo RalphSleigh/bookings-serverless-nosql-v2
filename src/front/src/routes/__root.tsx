@@ -13,7 +13,7 @@ import { RouterErrorComponent } from '../components/routerErrorComponent'
 import classes from '../css/mainArea.module.css'
 import { envQueryOptions } from '../queries/env'
 import { getEventsQueryOptions } from '../queries/getEvents'
-import { getUserBookingsQueryOptions } from '../queries/geUserBookings'
+import { getUserBookingsQueryOptions } from '../queries/getUserBookings'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient

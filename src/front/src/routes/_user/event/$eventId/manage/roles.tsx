@@ -4,7 +4,7 @@ import { IconPlus } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, redirect, useRouteContext } from '@tanstack/react-router'
 
-import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
+import { getUserBookingsQueryOptions } from '../../../../../queries/getUserBookings'
 import { useEvent } from '../../../../../utils'
 import { getEventRolesQueryOptions } from '../../../../../queries/getEventRoles'
 import { getUsersQueryOptions } from '../../../../../queries/getUsers'

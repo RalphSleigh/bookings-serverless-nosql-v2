@@ -3,8 +3,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Navigate } from '@tanstack/react-router'
 
 import { BookingForm } from '../../../../../components/booking-form/form'
-import { updateBookingMuation } from '../../../../../mutations/updateBooking'
-import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
+import { dummyMutation } from '../../../../../mutations/dummyMutation'
+import { getUserBookingsQueryOptions } from '../../../../../queries/getUserBookings'
 import { useEvent } from '../../../../../utils'
 
 export const Route = createFileRoute('/_user/event/$eventId/own/view')({
@@ -37,5 +37,5 @@ function ViewBookingComponent() {
     })
     return <Navigate to="/" />
   }
-  return <BookingForm mode={'view'} event={event} inputData={booking} mutation={updateBookingMuation()} payments={fees} application={application} />
+  return <BookingForm mode={'view'} event={event} inputData={booking} mutation={dummyMutation()} payments={fees} application={application} />
 }
