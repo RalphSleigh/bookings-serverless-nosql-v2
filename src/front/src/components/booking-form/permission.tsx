@@ -13,7 +13,7 @@ export const PermissionForm = ({ event, checked, setChecked }: { event: TEvent; 
       <Title size="h4" order={2} mt={16} id="step-permission">
         Permission
       </Title>
-      <Grid onClick={() => setChecked(!checked)} style={{ cursor: 'pointer' }}>
+      <Grid onClick={() => { if (!readOnly) setChecked(!checked) }} style={{ cursor: 'pointer' }}>
         <Grid.Col span={12}>
           <Checkbox disabled={readOnly} size="xl" p={8} checked={checked} onChange={(event) => setChecked(event.currentTarget.checked)} m={8} className={classes.root} />
           <Text m={8} ml={16}>

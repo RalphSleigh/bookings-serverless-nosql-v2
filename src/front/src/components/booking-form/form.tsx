@@ -153,12 +153,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
                     gradient={{ from: 'cyan', to: 'green', deg: 110 }}
                     type="submit"
                     loading={mutation.isPending}
-                    disabled={mutation.isPending || !checked || !isValid || !numbersValid}
+                    disabled={readOnly || mutation.isPending || !checked || !isValid || !numbersValid}
                   >
                     {mode === 'edit' ? 'Update Booking' : 'Submit Booking'}
                   </Button>
                   {mode === 'edit' && (
-                    <Button variant="gradient" gradient={{ from: 'red', to: 'pink', deg: 110 }} loading={cancelBookingMutation.isPending} onClick={cancelOnClick}>
+                    <Button disabled={readOnly} variant="gradient" gradient={{ from: 'red', to: 'pink', deg: 110 }} loading={cancelBookingMutation.isPending} onClick={cancelOnClick}>
                       Cancel Booking
                     </Button>
                   )}
