@@ -1,6 +1,6 @@
 //import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox, Alert, AlertTitle } from "@mui/material"
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, Flex, Grid, NumberInput, Paper, Text, Title } from '@mantine/core'
+import { Box, Button, Flex, Grid, NumberInput, Paper, Switch, Text, Title } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useDebounce } from '@react-hook/debounce'
 import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react'
@@ -53,6 +53,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
   const { user } = useRouteContext({ from: '/_user' })
   const readOnly = mode === 'view'
   const own = inputData.userId === user.userId
+  const [notify, setNotify] = useState(true)
 
   const schema = BookingSchemaForClient(event)
   type BookingFormValues = z.infer<typeof schema>
@@ -70,9 +71,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
   const onSubmit = useCallback(
     (data: z.infer<typeof schema>) => {
       console.log('Submitting booking data:', data)
-      mutation.mutate({ event, booking: data, min: predictedNumbers.minPredicted, max: predictedNumbers.maxPredicted })
+      mutation.mutate({ event, booking: data, min: predictedNumbers.minPredicted, max: predictedNumbers.maxPredicted, notify })
     },
-    [event, mutation, predictedNumbers],
+    [event, mutation, predictedNumbers, notify],
   )
 
   const cancelBookingMutation = cancelBooking(event.eventId, inputData.userId)
@@ -147,7 +148,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
                 <PermissionForm event={event} checked={checked} setChecked={setChecked} />
                 {!readOnly ? itemToDisplay : null}
                 {application && <ApplicationPredictedNumbers predictedNumbers={predictedNumbers} setPredictedNumbers={setPredictedNumbers} application={application} />}
-                <Flex gap={8} mt={16}>
+                <Flex gap={8} mt={16} align="center">
                   <Button
                     variant="gradient"
                     gradient={{ from: 'cyan', to: 'green', deg: 110 }}
@@ -162,6 +163,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
                       Cancel Booking
                     </Button>
                   )}
+                  {!own && <Switch label="Notify Booking Owner" checked={notify} onChange={(event) => setNotify(event.currentTarget.checked)} />}
                 </Flex>
               </Paper>
             </Grid.Col>

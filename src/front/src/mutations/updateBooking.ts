@@ -7,15 +7,19 @@ import { TUpdateBookingData } from '../../../lambda/endpoints/booking/updateBook
 import { TBookingForType } from '../../../shared/schemas/booking'
 import { TEvent } from '../../../shared/schemas/event'
 
+type TOk = {
+  ok: "ok"
+}
+
 export const updateBookingMuation = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ event, booking, min, max }: { event: TEvent; booking: TBookingForType; min: number; max: number }) => {
-      return await axios.post<TUpdateBookingData>(`/api/event/${event.eventId}/booking/update`, { booking, min, max })
+    mutationFn: async ({ event, booking, min, max, notify }: { event: TEvent; booking: TBookingForType; min: number; max: number; notify: boolean }) => {
+      return await axios.post<TOk, AxiosResponse<TOk>, TUpdateBookingData>(`/api/event/${event.eventId}/booking/update`, { booking, min, max, notify })
     },
-    onSuccess: (data: AxiosResponse, context) => {
+    onSuccess: (data: AxiosResponse<TOk>, context) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
       navigate({ to: '/' })
       notifications.show({
