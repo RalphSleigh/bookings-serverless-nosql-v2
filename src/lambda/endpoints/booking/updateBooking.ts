@@ -212,7 +212,7 @@ export const updateBooking = HandlerWrapper(
         type: 'emailBookingUpdated',
         data: {
           eventId: event.eventId,
-          userId: user.userId,
+          userId: updatedBooking.data.userId,
         },
       })
     }
