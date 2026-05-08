@@ -14,6 +14,7 @@ export type TUpdateBookingData = {
   booking: TBooking
   min: number
   max: number
+  notify: boolean
 }
 
 export const updateBooking = HandlerWrapper(
@@ -205,14 +206,16 @@ export const updateBooking = HandlerWrapper(
       console.log('No diff to post to discord')
     }
 
-    res.locals.logger.logToPath('Enqueuing async email task')
-    await enqueueAsyncTask({
-      type: 'emailBookingUpdated',
-      data: {
-        eventId: event.eventId,
-        userId: user.userId,
-      },
-    })
+    if (req.body.notify) {
+      res.locals.logger.logToPath('Enqueuing async email task')
+      await enqueueAsyncTask({
+        type: 'emailBookingUpdated',
+        data: {
+          eventId: event.eventId,
+          userId: user.userId,
+        },
+      })
+    }
 
     await enqueueAsyncTask({
       type: 'driveSync',
@@ -227,7 +230,7 @@ export const updateBooking = HandlerWrapper(
       const newApplication = ApplicationSchema.parse({ ...application.data, minPredicted: req.body.min, maxPredicted: req.body.max })
 
       if (application.data.minPredicted !== newApplication.minPredicted || application.data.maxPredicted !== newApplication.maxPredicted) {
-          await DBApplication.patch(application.data).set({minPredicted:newApplication.minPredicted, maxPredicted:newApplication.maxPredicted}).go()
+        await DBApplication.patch(application.data).set({ minPredicted: newApplication.minPredicted, maxPredicted: newApplication.maxPredicted }).go()
         if (own) {
           await enqueueAsyncTask({
             type: 'discordMessage',

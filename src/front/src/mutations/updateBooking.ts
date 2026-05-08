@@ -12,8 +12,8 @@ export const updateBookingMuation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ event, booking, min, max }: { event: TEvent; booking: TBookingForType; min: number; max: number }) => {
-      return await axios.post<TUpdateBookingData>(`/api/event/${event.eventId}/booking/update`, { booking, min, max })
+    mutationFn: async ({ event, booking, min, max, notify }: { event: TEvent; booking: TBookingForType; min: number; max: number; notify: boolean }) => {
+      return await axios.post<TUpdateBookingData>(`/api/event/${event.eventId}/booking/update`, { booking, min, max, notify })
     },
     onSuccess: (data: AxiosResponse, context) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
