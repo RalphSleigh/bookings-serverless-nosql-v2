@@ -8,9 +8,10 @@ import { CustomSelect } from '../../front/src/components/custom-inputs/customSel
 import { errorProps } from '../../front/src/utils'
 import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 import { getAttendanceType } from '../attendance/attendance'
+import { FreeChoiceAttendance } from '../attendance/freechoice'
 import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
-import { TEvent, TEventLargeKP } from '../schemas/event'
+import { TEvent, TEventFreeChoiceAttendance, TEventLargeKP } from '../schemas/event'
 import { TRole } from '../schemas/role'
 import { ageGroupFromPerson } from '../woodcraft'
 import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
@@ -124,9 +125,13 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
             <Table.Tr key={c.personId}>
               <Table.Td>{c.basic.name}</Table.Td>
               <Table.Td>
-                <Text span c="green">
-                  {attendance.circles && attendance.isWholeAttendance && c.attendance?.bitMask && !attendance.isWholeAttendance(event, c) ? attendance.circles(c.attendance.bitMask, event) : null}
-                </Text>
+                {attendance instanceof FreeChoiceAttendance && (
+                  <Text span c="green">
+                    {(c as TPersonResponse<TEvent<TEventLargeKP, any, TEventFreeChoiceAttendance>>).attendance?.bitMask && !attendance.isWholeAttendance(event, c)
+                      ? attendance.circles((c as TPersonResponse<TEvent<TEventLargeKP, any, TEventFreeChoiceAttendance>>).attendance.bitMask, event)
+                      : null}
+                  </Text>
+                )}
               </Table.Td>
               <Table.Td>{ageFn(c).toAgeGroupString()}</Table.Td>
               <Table.Td>{c.kp.details}</Table.Td>

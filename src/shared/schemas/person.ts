@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { z } from 'zod/v4'
 
 import { KPBasicOptions } from '../kp/kp'
-import { TEvent, TEventBasicKP, TEventFreeChoiceAttendance, TEventKPUnion, TEventLargeKP, TEventWholeAttendance } from './event'
+import { TEvent, TEventBasicKP, TEventFreeChoiceAttendance, TEventLargeKP, TEventOptionsAttendance, TEventWholeAttendance } from './event'
 
 const KPBasic = z.object({ diet: z.enum(KPBasicOptions), details: z.string().optional() })
 const KPLarge = z.object({
@@ -26,10 +26,12 @@ export type TPersonKPData = TPersonBasicKPData | TPersonLargeKPData
 
 const AttendanceWhole = z.object({})
 const AttendanceFreeChoice = z.object({ bitMask: z.number().min(1, { message: 'Please select at least one night' }) })
+const AttendanceOptions = z.object({ option: z.string().nonempty() })
 
 export type TPersonWholeAttendance = z.infer<typeof AttendanceWhole>
 export type TPersonFreeChoiceAttendance = z.infer<typeof AttendanceFreeChoice>
-export type TPersonAttendance = TPersonWholeAttendance | TPersonFreeChoiceAttendance
+export type TPersonOptionsAttendance = z.infer<typeof AttendanceOptions>
+export type TPersonAttendance = TPersonWholeAttendance | TPersonFreeChoiceAttendance | TPersonOptionsAttendance
 
 const HealthSmall = z.object({ medical: z.string().optional() })
 const HealthLarge = z.object({ medical: z.string().optional(), accessibility: z.string().optional(), contactMe: z.boolean().default(false) })
@@ -59,7 +61,7 @@ export const PersonSchema = (event: TEvent) => {
       eventId: z.uuidv7(),
       cancelled: z.boolean().default(false),
       basic: basic,
-      attendance: event.attendance.attendanceStructure === 'whole' ? AttendanceWhole : AttendanceFreeChoice,
+      attendance: event.attendance.attendanceStructure === 'whole' ? AttendanceWhole : event.attendance.attendanceStructure === 'freechoice' ? AttendanceFreeChoice : AttendanceOptions,
       kp: event.kp.kpStructure === 'basic' ? KPBasic : KPLarge,
       health: event.bigCampMode ? HealthLarge : HealthSmall,
       consents: event.consents.consentsStructure === 'none' ? ConsentNone : ConsentVCamp,
@@ -116,7 +118,7 @@ export const PersonSchemaForType = z.object({
     email: z.email().optional(),
     role: z.enum(['participant', 'volunteer']).optional(),
   }),
-  attendance: AttendanceWhole.or(AttendanceFreeChoice),
+  attendance: AttendanceWhole.or(AttendanceFreeChoice).or(AttendanceOptions),
   kp: KPBasic.or(KPLarge),
   health: HealthSmall.or(HealthLarge),
   consents: ConsentNone.or(ConsentVCamp),
@@ -131,7 +133,9 @@ type MapEventAttendanceToPersonAttendance<Event extends TEvent> = Event['attenda
   ? TPersonWholeAttendance
   : Event['attendance'] extends TEventFreeChoiceAttendance
     ? TPersonFreeChoiceAttendance
-    : TPersonAttendance
+    : Event['attendance'] extends TEventOptionsAttendance
+      ? TPersonOptionsAttendance
+      : TPersonAttendance
 
 export type TPerson<Event extends TEvent = TEvent> = Omit<z.infer<typeof PersonSchemaForType>, 'attendance' | 'kp'> & {
   kp: MapEventKPToPersonKP<Event>
