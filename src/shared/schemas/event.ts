@@ -18,11 +18,13 @@ export type TEventVCampConsents = z.infer<typeof vcampConsents>
 
 const wholeAttendance = z.object({ attendanceStructure: z.literal('whole') })
 const freeChoiceAttendance = z.object({ attendanceStructure: z.literal('freechoice') })
-const attendanceOptions = z.discriminatedUnion('attendanceStructure', [wholeAttendance, freeChoiceAttendance])
+const optionsAttendance = z.object({ attendanceStructure: z.literal('options'), attendanceOptions: z.array(z.object({ option: z.string().nonempty() })).min(1) })
+const attendanceOptions = z.discriminatedUnion('attendanceStructure', [wholeAttendance, freeChoiceAttendance, optionsAttendance])
 
 export type TEventAttendanceUnion = z.infer<typeof attendanceOptions>
 export type TEventWholeAttendance = z.infer<typeof wholeAttendance>
 export type TEventFreeChoiceAttendance = z.infer<typeof freeChoiceAttendance>
+export type TEventOptionsAttendance = z.infer<typeof optionsAttendance>
 
 const ealingFee = z.object({
   feeStructure: z.literal('ealing'),
@@ -46,17 +48,34 @@ const ealingFees2026 = z.object({
   }),
 })
 
+const ealing2026Options = z.object({
+  feeStructure: z.literal('ealing2026options'),
+  ealingData2026options: z.object({
+    options: z
+      .array(
+        z.object({
+          adult: z.number(),
+          child: z.number(),
+          adultDiscount: z.number(),
+          childDiscount: z.number(),
+        }),
+      )
+      .min(1),
+    paymentInstructions: z.string().nonempty(),
+  }),
+})
+
 const freeFee = z.object({ feeStructure: z.literal('free') })
 const vcampFee = z.object({ feeStructure: z.literal('vcamp'), participant: z.object({ a: z.number(), b: z.number() }), volunteer: z.object({ a: z.number(), b: z.number() }) })
 
-const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee, ealingFees2026, vcampFee])
+const feeOptions = z.discriminatedUnion('feeStructure', [freeFee, ealingFee, ealingFees2026, ealing2026Options, vcampFee])
 
 export type TEventFeesUnion = z.infer<typeof feeOptions>
 export type TEventEalingFees = z.infer<typeof ealingFee>
 export type TEventEalingFees2026 = z.infer<typeof ealingFees2026>
+export type TEventEalingFees2026Options = z.infer<typeof ealing2026Options>
 export type TEventFreeFees = z.infer<typeof freeFee>
 export type TEventVCampFees = z.infer<typeof vcampFee>
-
 
 const customQuestion = z.object({
   questionType: z.enum(['yesnochoice', 'text', 'longtext']),

@@ -10,7 +10,7 @@ import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBoo
 import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
 import { TEvent, TEventFreeChoiceAttendance } from '../schemas/event'
-import { AttendanceBookingFormDisplayElement, AttendanceIsWholeAttendanceFunction, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
+import { AttendanceBookingFormDisplayElement, AttendanceEventFormElement, AttendanceIsWholeAttendanceFunction, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
 
 dayjs.extend(AdvancedFormat)
 
@@ -72,6 +72,8 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
       </>
     )
   }
+
+  EventFormElement: AttendanceEventFormElement<TEventFreeChoiceAttendance> = ({}) => null
 
   getNightsFromEvent(event: TEvent<any, any, TEventFreeChoiceAttendance, any>): Nights {
     if (nightsFromEventCached[event.eventId]) return nightsFromEventCached[event.eventId]
