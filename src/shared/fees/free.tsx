@@ -1,19 +1,18 @@
-import { Grid, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { Text } from '@mantine/core'
 import { useFormContext } from 'react-hook-form'
-import { PartialDeep } from 'type-fest'
 
-import { AttendanceStructureValues } from '../attendance/attendance'
-import { PartialBookingType, TBooking } from '../schemas/booking'
-import { TEvent, TEventFeesUnion, TEventFreeFees } from '../schemas/event'
-import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
 import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
+import { AttendanceStructureValues } from '../attendance/attendance'
+import { PartialBookingType } from '../schemas/booking'
+import { TEvent, TEventFreeFees } from '../schemas/event'
+import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureConfigurationElement, GetFeeLineFunction } from './feeStructure'
 
 export class FreeFees implements FeeStructure<TEventFreeFees> {
   typeName: 'free' = 'free'
   name: string = 'Free Fees'
   supportedAttendance: AttendanceStructureValues[] = []
 
-  ConfigurationElement: FeeStructureCondfigurationElement<TEventFreeFees> = () => {
+  ConfigurationElement: FeeStructureConfigurationElement<TEventFreeFees> = () => {
     return (
       <div>
         <p>Free</p>
