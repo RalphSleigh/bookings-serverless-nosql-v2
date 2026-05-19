@@ -266,10 +266,6 @@ export const DBEvent = new Entity(
                       type: 'number',
                       required: true,
                     },
-                    option: {
-                      type: 'string',
-                      required: true,
-                    },
                   },
                 },
               },

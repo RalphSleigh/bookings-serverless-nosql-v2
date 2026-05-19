@@ -54,7 +54,6 @@ const ealing2026Options = z.object({
     options: z
       .array(
         z.object({
-          option: z.string().nonempty(),
           adult: z.number(),
           child: z.number(),
           adultDiscount: z.number(),

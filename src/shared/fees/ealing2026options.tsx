@@ -24,11 +24,13 @@ export class Ealing2026OptionsFees implements FeeStructure<TEventEalingFees2026O
 
     const event = watch()
 
-    useEffect(() => {
-      event.attendance.attendanceOptions.map((k, i) => {
-        setValue(`fee.ealingData2026options.options.${i}` as const, { option: k.option, child: 0, childDiscount: 0, adult: 0, adultDiscount: 0 }, { shouldDirty: true, shouldTouch: true })
+    /*     useEffect(() => {
+      const options =  event.attendance.attendanceOptions.map((k, i) => {
+        const existing = event.fee.ealingData2026options.options[i]
+        return existing || { child: 0, childDiscount: 0, adult: 0, adultDiscount: 0 }
       })
-    }, [event.attendance])
+      setValue('fee.ealingData2026options.options', options)
+    }, [event.attendance.attendanceOptions]) */
 
     const options = (event as TEvent<any, any, TEventOptionsAttendance, TEventEalingFees2026Options>).attendance.attendanceOptions.map((k, i) => {
       return (
