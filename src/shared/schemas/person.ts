@@ -78,6 +78,14 @@ export const PersonSchema = (event: TEvent) => {
         path: ['consents', 'rse'],
         error: `RSE Consent is required for those aged 12 - 17`,
       },
+    ).refine(
+      (data) => {
+        return event.attendance.attendanceStructure !== 'options' || event.attendance.attendanceOptions.some((option) => option.option === data.attendance.option)
+      },
+      {
+        path: ['attendance', 'option'],
+        error: 'Please select a valid attendance option',
+      },
     )
 }
 
@@ -103,6 +111,14 @@ export const PersonSchemaForClient = (event: TEvent) => {
       {
         path: ['basic', 'dob'],
         error: 'Please enter a valid date of birth',
+      },
+    ).refine(
+      (data) => {
+        return event.attendance.attendanceStructure !== 'options' || event.attendance.attendanceOptions.some((option) => option.option === data.attendance.option)
+      },
+      {
+        path: ['attendance', 'option'],
+        error: 'Please select a valid attendance option',
       },
     )
 }

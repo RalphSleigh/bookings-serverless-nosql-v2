@@ -78,7 +78,7 @@ export class OptionsAttendance implements AttendanceStructure<TEventOptionsAtten
   }
 
   isWholeAttendance: AttendanceIsWholeAttendanceFunction<TEventOptionsAttendance> = (event, person): boolean => {
-    return person.attendance.option == 'Whole event'
+    return person.attendance.option == event.attendance.attendanceOptions[0].option
   }
 
   getDefaultData = (event: TEvent<any, any, TEventOptionsAttendance, any>) => ({ option: event.attendance.attendanceOptions[0].option })
