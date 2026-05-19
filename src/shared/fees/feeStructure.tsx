@@ -9,7 +9,6 @@ import { TUser } from '../schemas/user'
 
 export type FeeStructureConfigData<T extends TEventFeesUnion> = Required<Pick<T, 'feeStructure'>> & PartialDeep<T>
 export type FeeStructureConfigurationElement<T extends TEventFeesUnion> = React.FC<{
-  event: TEvent<any, any, any, T>
   //data: FeeStructureConfigData<T>;
   //update: Dispatch<SetStateAction<PartialDeep<T>>>;
 }>
