@@ -1,57 +1,73 @@
 import { Grid, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { Markdown as EmailMarkdown } from '@react-email/markdown'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { WatchDebounce } from '../../front/src/utils'
 import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 import { AttendanceStructureValues } from '../attendance/attendance'
 import { PartialBookingType } from '../schemas/booking'
-import { TEvent, TEventEalingFees2026 } from '../schemas/event'
+import { TEvent, TEventEalingFees2026Options, TEventOptionsAttendance } from '../schemas/event'
 import { TFee } from '../schemas/fees'
 import { currency } from '../util'
 import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureConfigurationElement, GetFeeLineFunction } from './feeStructure'
 
-export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
-  typeName: 'ealing2026' = 'ealing2026'
-  name = 'Ealing Fees 2026'
-  supportedAttendance: AttendanceStructureValues[] = ['whole']
-  ConfigurationElement: FeeStructureConfigurationElement<TEventEalingFees2026> = () => {
-    const { register } = useFormContext<{ fee: TEventEalingFees2026 }>()
+export class Ealing2026OptionsFees implements FeeStructure<TEventEalingFees2026Options> {
+  typeName: 'ealing2026options' = 'ealing2026options'
+  name = 'Ealing Fees 2026 Options'
+  supportedAttendance: AttendanceStructureValues[] = ['options']
+  ConfigurationElement: FeeStructureConfigurationElement<TEventEalingFees2026Options> = ({}) => {
+    const { register, setValue, watch } = useFormContext<{ fee: TEventEalingFees2026Options; attendance: TEventOptionsAttendance }>()
     //const { updateNumber, updateField } = getMemoObjectUpdateFunctions(getSubUpdate(update, 'ealingData'))
     const pound = <Text>£</Text>
+
+    const event = watch()
+
+    useEffect(() => {
+      event.attendance.attendanceOptions.map((k, i) => {
+        setValue(`fee.ealingData2026options.options.${i}` as const, { option: k.option, child: 0, childDiscount: 0, adult: 0, adultDiscount: 0 }, { shouldDirty: true, shouldTouch: true })
+      })
+    }, [event.attendance])
+
+    const options = (event as TEvent<any, any, TEventOptionsAttendance, TEventEalingFees2026Options>).attendance.attendanceOptions.map((k, i) => {
+      return (
+        <Grid key={i}>
+          <Grid.Col span={12}>
+            <Text>
+              <b>{k.option}</b>
+            </Text>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Child" {...register(`fee.ealingData2026options.options.${i}.child`, { valueAsNumber: true })} />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Child Discount" {...register(`fee.ealingData2026options.options.${i}.childDiscount`, { valueAsNumber: true })} />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Adult" {...register(`fee.ealingData2026options.options.${i}.adult`, { valueAsNumber: true })} />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Adult Discount" {...register(`fee.ealingData2026options.options.${i}.adultDiscount`, { valueAsNumber: true })} />
+          </Grid.Col>
+        </Grid>
+      )
+    })
+
     return (
       <>
         <Title order={2} size="h5">
           Ealing fee options
         </Title>
-        <Grid>
-          <Grid.Col span={6}>
-            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Child" {...register('fee.ealingData2026.child', { valueAsNumber: true })} />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Child Discount" {...register('fee.ealingData2026.childDiscount', { valueAsNumber: true })} />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Adult" {...register('fee.ealingData2026.adult', { valueAsNumber: true })} />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput leftSection={pound} leftSectionPointerEvents="none" label="Adult Discount" {...register('fee.ealingData2026.adultDiscount', { valueAsNumber: true })} />
-          </Grid.Col>
-        </Grid>
-        <Textarea autosize={true} label="Payment instructions" {...register('fee.ealingData2026.paymentInstructions')} />
+        {options}
+        <Textarea autosize={true} label="Payment instructions" {...register('fee.ealingData2026options.paymentInstructions')} />
       </>
     )
   }
 
-  getFeeLines: GetFeeLineFunction<TEventEalingFees2026> = (event: TEvent<any, any, any, TEventEalingFees2026>, booking: PartialBookingType) => {
+  getFeeLines: GetFeeLineFunction<TEventEalingFees2026Options> = (event: TEvent<any, any, TEventOptionsAttendance, TEventEalingFees2026Options>, booking: PartialBookingType) => {
     const people = booking.people || []
     const under4 = people.filter((p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isAfter(dayjs(event.endDate).subtract(4, 'years'))).length
-    const child = people.filter(
-      (p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(4, 'years')) && dayjs(p.basic.dob).isAfter(dayjs(event.endDate).subtract(16, 'years')),
-    ).length
-    const adult = people.filter((p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(16, 'years'))).length
 
     const lines: FeeLine[] = []
 
@@ -62,58 +78,100 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
       })
     }
 
-    if (child) {
-      lines.push({
-        label: `${child} ${child == 1 ? 'Child' : 'Children'}`,
-        amount: child * event.fee.ealingData2026.child,
-      })
-    }
+    event.attendance.attendanceOptions.forEach((option, i) => {
+      const child = people.filter(
+        (p) =>
+          p &&
+          p.basic &&
+          p.basic.dob &&
+          p.attendance &&
+          'option' in p.attendance &&
+          p.attendance.option === option.option &&
+          dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(4, 'years')) &&
+          dayjs(p.basic.dob).isAfter(dayjs(event.endDate).subtract(16, 'years')),
+      ).length
+      const adult = people.filter(
+        (p) =>
+          p && p.basic && p.basic.dob && p.attendance && 'option' in p.attendance && p.attendance.option === option.option && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(16, 'years')),
+      ).length
 
-    if (adult) {
-      lines.push({
-        label: `${adult} ${adult == 1 ? 'Adult' : 'Adults'}`,
-        amount: adult * event.fee.ealingData2026.adult,
-      })
-    }
+      const childAmount = event.fee.ealingData2026options.options[i].child
+      const adultAmount = event.fee.ealingData2026options.options[i].adult
+
+      if (child) {
+        lines.push({
+          label: `${child} ${child == 1 ? 'Child for ' + option.option : 'Children for ' + option.option}`,
+          amount: child * childAmount,
+        })
+      }
+
+      if (adult) {
+        lines.push({
+          label: `${adult} ${adult == 1 ? 'Adult for ' + option.option : 'Adults for ' + option.option}`,
+          amount: adult * adultAmount,
+        })
+      }
+    })
 
     return lines
   }
 
-  getFeeLinesDiscounted: GetFeeLineFunction<TEventEalingFees2026> = (event: TEvent<any, any, any, TEventEalingFees2026>, booking: PartialBookingType) => {
+  getFeeLinesDiscounted: GetFeeLineFunction<TEventEalingFees2026Options> = (event: TEvent<any, any, TEventOptionsAttendance, TEventEalingFees2026Options>, booking: PartialBookingType) => {
     const people = booking.people || []
     const under4 = people.filter((p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isAfter(dayjs(event.endDate).subtract(4, 'years'))).length
-    const child = people.filter(
-      (p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(4, 'years')) && dayjs(p.basic.dob).isAfter(dayjs(event.endDate).subtract(16, 'years')),
-    ).length
-    const adult = people.filter((p) => p && p.basic && p.basic.dob && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(16, 'years'))).length
 
     const lines: FeeLine[] = []
 
     if (under4) {
       lines.push({
-        label: `${under4} ${under4 == 1 ? 'Under 4' : 'Under 4'}`,
+        label: `${under4} ${under4 == 1 ? 'Child under 4' : 'Children under 4'}`,
         amount: 0,
       })
     }
 
-    if (child) {
-      lines.push({
-        label: `${child} ${child == 1 ? 'Child' : 'Children'}`,
-        amount: child * event.fee.ealingData2026.childDiscount,
-      })
-    }
+    event.attendance.attendanceOptions.forEach((option, i) => {
+      const child = people.filter(
+        (p) =>
+          p &&
+          p.basic &&
+          p.basic.dob &&
+          p.attendance &&
+          'option' in p.attendance &&
+          p.attendance.option === option.option &&
+          dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(4, 'years')) &&
+          dayjs(p.basic.dob).isAfter(dayjs(event.endDate).subtract(16, 'years')),
+      ).length
+      const adult = people.filter(
+        (p) =>
+          p && p.basic && p.basic.dob && p.attendance && 'option' in p.attendance && p.attendance.option === option.option && dayjs(p.basic.dob).isBefore(dayjs(event.endDate).subtract(16, 'years')),
+      ).length
 
-    if (adult) {
-      lines.push({
-        label: `${adult} ${adult == 1 ? 'Adult' : 'Adults'}`,
-        amount: adult * event.fee.ealingData2026.adultDiscount,
-      })
-    }
+      const childAmount = event.fee.ealingData2026options.options[i].childDiscount
+      const adultAmount = event.fee.ealingData2026options.options[i].adultDiscount
+
+      if (child) {
+        lines.push({
+          label: `${child} ${child == 1 ? 'Child for ' + option.option : 'Children for ' + option.option} (discounted)`,
+          amount: child * childAmount,
+        })
+      }
+
+      if (adult) {
+        lines.push({
+          label: `${adult} ${adult == 1 ? 'Adult for ' + option.option : 'Adults for ' + option.option} (discounted)`,
+          amount: adult * adultAmount,
+        })
+      }
+    })
 
     return lines
   }
 
-  BookingFormDisplayElementContents: React.FC<{ people: PartialBookingType['people']; event: TEvent<any, any, any, TEventEalingFees2026>; fees: TFee[] }> = ({ people, event, fees }) => {
+  BookingFormDisplayElementContents: React.FC<{ people: PartialBookingType['people']; event: TEvent<any, any, TEventOptionsAttendance, TEventEalingFees2026Options>; fees: TFee[] }> = ({
+    people,
+    event,
+    fees,
+  }) => {
     const lines = this.getFeeLines(event, { people })
     const discountedLines = this.getFeeLinesDiscounted(event, { people })
 
@@ -167,20 +225,26 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            <Table.Tr>
-              <Table.Td>
-                <Text>Children</Text>
-              </Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.child)}</Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.childDiscount)}</Table.Td>
-            </Table.Tr>
-            <Table.Tr>
-              <Table.Td>
-                <Text>DFs and Adults</Text>
-              </Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.adult)}</Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.adultDiscount)}</Table.Td>
-            </Table.Tr>
+            {event.attendance.attendanceOptions.map((o, i) => {
+              return (
+                <>
+                  <Table.Tr key={i}>
+                    <Table.Td>
+                      <Text>Children {o.option}</Text>
+                    </Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].child)}</Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].childDiscount)}</Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>
+                      <Text>DFs and Adults {o.option}</Text>
+                    </Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].adult)}</Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].adultDiscount)}</Table.Td>
+                  </Table.Tr>
+                </>
+              )
+            })}
             <Table.Tr>
               <Table.Td colSpan={3}>
                 <Text fw={700} ta="center">
@@ -207,7 +271,7 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
     )
   }
 
-  BookingFormDisplayElement: BookingFormDisplayElement<TEventEalingFees2026> = ({ event, fees }) => {
+  BookingFormDisplayElement: BookingFormDisplayElement<TEventEalingFees2026Options> = ({ event, fees }) => {
     const [people, setPeople] = useState<PartialBookingType['people']>([])
     return (
       <>
@@ -217,7 +281,7 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
     )
   }
 
-  EventListDisplayElement: EventListDisplayElement<TEventEalingFees2026> = ({ event, booking, fees }) => {
+  EventListDisplayElement: EventListDisplayElement<TEventEalingFees2026Options> = ({ event, booking, fees }) => {
     const lines = this.getFeeLines(event, booking)
     const discountedLines = this.getFeeLinesDiscounted(event, booking)
 
@@ -273,20 +337,26 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            <Table.Tr>
-              <Table.Td>
-                <Text>Children</Text>
-              </Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.child)}</Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.childDiscount)}</Table.Td>
-            </Table.Tr>
-            <Table.Tr>
-              <Table.Td>
-                <Text>DFs and Adults</Text>
-              </Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.adult)}</Table.Td>
-              <Table.Td>{currency(event.fee.ealingData2026.adultDiscount)}</Table.Td>
-            </Table.Tr>
+            {(event as TEvent<any, any, TEventOptionsAttendance, TEventEalingFees2026Options>).attendance.attendanceOptions.map((o, i) => {
+              return (
+                <>
+                  <Table.Tr key={i}>
+                    <Table.Td>
+                      <Text>Children {o.option}</Text>
+                    </Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].child)}</Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].childDiscount)}</Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>
+                      <Text>DFs and Adults {o.option}</Text>
+                    </Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].adult)}</Table.Td>
+                    <Table.Td>{currency(event.fee.ealingData2026options.options[i].adultDiscount)}</Table.Td>
+                  </Table.Tr>
+                </>
+              )
+            })}
             <Table.Tr>
               <Table.Td colSpan={3}>
                 <Text fw={700} ta="center">
@@ -313,7 +383,7 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
     )
   }
 
-  EmailElement: EmailElement<TEventEalingFees2026> = ({ event, booking, fees }) => {
+  EmailElement: EmailElement<TEventEalingFees2026Options> = ({ event, booking, fees }) => {
     const lines = this.getFeeLines(event, booking)
     const discountedLines = this.getFeeLinesDiscounted(event, booking)
 
@@ -350,7 +420,7 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
     return (
       <>
         <EmailMarkdown
-          children={event.fee.ealingData2026.paymentInstructions}
+          children={event.fee.ealingData2026options.paymentInstructions}
           markdownCustomStyles={{
             p: { fontSize: '14px' },
           }}
@@ -383,7 +453,7 @@ export class Ealing2026Fees implements FeeStructure<TEventEalingFees2026> {
     )
   }
 
-  getPaymentReference(booking: TBookingResponse<TEvent<any, any, any, TEventEalingFees2026>>): string {
+  getPaymentReference(booking: TBookingResponse<TEvent<any, any, TEventOptionsAttendance, TEventEalingFees2026Options>>): string {
     return `EALING${booking.userId.split('-')[0].toUpperCase()}`
   }
 }

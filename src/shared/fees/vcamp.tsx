@@ -1,26 +1,24 @@
-import { Button, Grid, Group, Paper, Skeleton, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { Button, Grid, Group, Table, Text, TextInput, Title } from '@mantine/core'
 import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-import { envQueryOptions } from '../../front/src/queries/env'
 import { WatchDebounce } from '../../front/src/utils'
+import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 import { AttendanceStructureValues, getAttendanceType } from '../attendance/attendance'
 import { bitCount32, FreeChoiceAttendance } from '../attendance/freechoice'
 import { PartialBookingType, TBooking } from '../schemas/booking'
-import { TEvent, TEventEalingFees, TEventFeesUnion, TEventFreeFees, TEventVCampFees } from '../schemas/event'
+import { TEvent, TEventFreeChoiceAttendance, TEventVCampFees } from '../schemas/event'
 import { TFee } from '../schemas/fees'
 import { TUser } from '../schemas/user'
 import { currency } from '../util'
-import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, GetFeeLineFunction } from './feeStructure'
-import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
+import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureConfigurationElement, GetFeeLineFunction } from './feeStructure'
 
 export class VCampFees implements FeeStructure<TEventVCampFees> {
   typeName: 'vcamp' = 'vcamp'
   name: string = 'VCamp Fees'
   supportedAttendance: AttendanceStructureValues[] = ['freechoice']
 
-  ConfigurationElement: FeeStructureCondfigurationElement<TEventVCampFees> = () => {
+  ConfigurationElement: FeeStructureConfigurationElement<TEventVCampFees> = () => {
     const { register } = useFormContext<{ fee: TEventVCampFees }>()
     const pound = <Text>£</Text>
     return (
@@ -40,13 +38,13 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
     )
   }
 
-  getFeeLines: GetFeeLineFunction<TEventVCampFees> = (event: TEvent<any, any, any, TEventVCampFees>, booking: PartialBookingType) => {
+  getFeeLines: GetFeeLineFunction<TEventVCampFees> = (event: TEvent<any, any, TEventFreeChoiceAttendance, TEventVCampFees>, booking: PartialBookingType) => {
     const attendance = getAttendanceType(event) as FreeChoiceAttendance
     const nights = attendance.getNightsFromEvent(event)
     const peopleTotals = nights.map(() => ({ participant: 0, volunteer: 0 }))
 
     booking.people?.forEach((p) => {
-      if (!p || !p.attendance?.bitMask || !p.basic?.role) return
+      if (!p || !(p.attendance && 'bitMask' in p.attendance) || !p.basic?.role) return
       const nightCount = bitCount32(p.attendance.bitMask || 0)
       if (nightCount > 0 && nightCount <= peopleTotals.length) {
         peopleTotals[nightCount - 1][p?.basic?.role] += 1
