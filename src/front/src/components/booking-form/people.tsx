@@ -1,26 +1,24 @@
-import { ActionIcon, Alert, Anchor, Button, Divider, Flex, Grid, Group, Input, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Alert, Button, Divider, Flex, Grid, Group, Input, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { IconChevronDown, IconChevronUp, IconInfoCircle, IconPlus, IconX } from '@tabler/icons-react'
 import { useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import React, { useEffect, useMemo, useState } from 'react'
-import { Control, Controller, DefaultValues, useFieldArray, UseFieldArrayRemove, useFormContext, useFormState, useWatch } from 'react-hook-form'
-import { v7 as uuidv7 } from 'uuid'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { Control, Controller, useFieldArray, UseFieldArrayRemove, useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod/v4'
 
-import { app } from '../../../../lambda/app.js'
 import { getAttendanceType } from '../../../../shared/attendance/attendance.js'
 import { getConsentsType } from '../../../../shared/consents/consents.js'
-import { getKPType, KPBasicOptions } from '../../../../shared/kp/kp.js'
-import { BookingSchema, BookingSchemaForType, PartialBookingType, TBooking } from '../../../../shared/schemas/booking.js'
+import { getKPType } from '../../../../shared/kp/kp.js'
+import { BookingSchemaForType, PartialBookingType, TBooking } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
-import { PersonSchema, PersonSchemaForType, TPerson } from '../../../../shared/schemas/person.js'
+import { PersonSchema, TPerson } from '../../../../shared/schemas/person.js'
 import { errorProps, useEvent } from '../../utils.js'
 import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
-import { CustomDatePicker } from '../custom-inputs/customDatePicker.js'
 import { CustomRadioGroup } from '../custom-inputs/customRadioGroup.js'
 import { CustomSelect } from '../custom-inputs/customSelect.js'
-import { SmallSuspenseWrapper, SuspenseWrapper } from '../suspense.js'
+import { SmallSuspenseWrapper } from '../suspense.js'
 import { defaultPersonData } from './defaults.js'
+import { ReadOnlyContext } from './readOnlyContext.js'
 import { SheetsInput } from './sheetsInput.js'
 
 type PeopleFormProps = {
@@ -29,6 +27,7 @@ type PeopleFormProps = {
 }
 
 export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
+  const readOnly = useContext(ReadOnlyContext)
   const { user } = useRouteContext({ from: '/_user' })
   const { fields, append, remove, replace } = useFieldArray<z.infer<typeof BookingSchemaForType>>({
     name: 'people', // unique name for your Field Array
@@ -56,7 +55,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
         <SheetsInput event={event} userId={userId} replace={replace} />
       </SmallSuspenseWrapper>
       {people}
-      <Button onClick={appendFn} mt={16} variant="gradient" gradient={{ from: 'blue', to: 'violet', deg: 110 }} leftSection={<IconPlus size={18} />}>
+      <Button onClick={appendFn} disabled={readOnly} mt={16} variant="gradient" gradient={{ from: 'blue', to: 'violet', deg: 110 }} leftSection={<IconPlus size={18} />}>
         Add person
       </Button>
     </>
@@ -117,6 +116,7 @@ const CollapsedPersonForm = ({ index, setCollapsed, peopleSchema, event }: { ind
 
 const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEvent; index: number; remove: UseFieldArrayRemove; setCollapsed: (collapsed: boolean) => void }) => {
   const { register, formState, control } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const readOnly = useContext(ReadOnlyContext)
 
   const { errors } = formState
   const e = errorProps(errors)
@@ -134,6 +134,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
     <>
       <Grid.Col span={12}>
         <TextInput
+          disabled={readOnly}
           required
           autoComplete={`section-person-${index} email`}
           id={`person-email-${index}`}
@@ -158,6 +159,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
       <Grid p={6} gutter={8}>
         <Grid.Col span={8}>
           <TextInput
+            disabled={readOnly}
             required
             autoComplete={`section-person-${index} name`}
             id={`person-name-${index}`}
@@ -182,7 +184,7 @@ const ExpandedPersonForm = ({ event, index, remove, setCollapsed }: { event: TEv
           <consent.FormSection index={index} />
           {event.bigCampMode ? <FirstAid index={index} /> : null}
           <Flex justify="flex-end">
-            <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)}>
+            <ActionIcon variant="default" size="input-sm" onClick={() => removeFn(index)} disabled={readOnly}>
               <IconX size={16} stroke={3} color="red" />
             </ActionIcon>
             <ActionIcon variant="default" size="input-sm" onClick={() => setCollapsed(true)} ml={8}>
@@ -217,6 +219,7 @@ const HealthSmallElement: React.FC<{ index: number }> = ({ index }) => {
 }
 
 const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
+  const readOnly = useContext(ReadOnlyContext)
   const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
   const { errors } = formState
   const e = errorProps(errors)
@@ -225,6 +228,7 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
     <Grid.Col span={12}>
       <Divider my="xs" label="Medical & Accessbility" labelPosition="center" />
       <Textarea
+        disabled={readOnly}
         autoComplete={`section-person-${index} health-medical`}
         id={`person-health-medical-${index}`}
         data-form-type="other"
@@ -238,6 +242,7 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
         Please provide us with details of any accessibility requirements, this may include mobility issues, a requirement for power or other access requirements.
       </Text>
       <Textarea
+        disabled={readOnly}
         mt={16}
         autoComplete={`section-person-${index} health-accessibility`}
         id={`person-health-accessibility-${index}`}
@@ -249,6 +254,7 @@ const HealthLargeElement: React.FC<{ index: number }> = ({ index }) => {
         minRows={2}
       />
       <CustomCheckbox
+        disabled={readOnly}
         mt={16}
         label="I would like to talk to the accessibility team about my accessibility requirements"
         id={`person-health-contactme-${index}`}
@@ -277,6 +283,7 @@ const FirstAid: React.FC<{ index: number }> = ({ index }) => {
 }
 
 const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
+  const readOnly = useContext(ReadOnlyContext)
   const dob = useWatch<z.infer<typeof BookingSchemaForType>>({
     name: `people.${index}.basic.dob`,
   })
@@ -304,8 +311,8 @@ const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
           <Input.Label required>
             <b>Role on camp:</b> Is this person attending as a participant or volunteer?
           </Input.Label>
-          <Radio value={'participant'} label="Participant" />
-          <Radio value={'volunteer'} label="Volunteer" />
+          <Radio disabled={readOnly} value={'participant'} label="Participant" />
+          <Radio disabled={readOnly} value={'volunteer'} label="Volunteer" />
         </Group>
       </CustomRadioGroup>
       {displayWarning && (
@@ -317,6 +324,7 @@ const PersonRoleForm: React.FC<{ index: number }> = ({ index }) => {
 
 const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infer<typeof BookingSchemaForType>>; e: ReturnType<typeof errorProps> }> = ({ event, index, control, e }) => {
   const { setValue } = useFormContext<z.infer<typeof BookingSchemaForType>>()
+  const readOnly = useContext(ReadOnlyContext)
 
   if (event.dobInput === 'date')
     return (
@@ -329,6 +337,7 @@ const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infe
             //console.log('formatted', formatted)
             return (
               <TextInput
+                disabled={readOnly}
                 required
                 autoComplete={`section-person-${index} dob`}
                 id={`person-dob-${index}`}
@@ -377,7 +386,7 @@ const DoBInput: React.FC<{ event: TEvent; index: number; control: Control<z.infe
         return { value: year.toISOString(), label: dayjs(event.startDate).diff(year, 'year').toString() }
       })
     dates[18].label = '18+'
-    return <CustomSelect required label="Age" name={`people.${index}.basic.dob`} control={control} data={dates} {...e(`people.${index}.basic.dob`)} />
+    return <CustomSelect required label="Age" name={`people.${index}.basic.dob`} control={control} data={dates} {...e(`people.${index}.basic.dob`)} disabled={readOnly} />
   }
 }
 

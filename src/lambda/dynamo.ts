@@ -1,7 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { Attributes, Entity, Service, type EntityItem } from 'electrodb'
-import { application } from 'express'
-import { first } from 'lodash'
+import { Entity, Service } from 'electrodb'
 import { v7 as uuidv7 } from 'uuid'
 
 import { KPBasicOptions } from '../shared/kp/kp'
@@ -112,7 +110,7 @@ export const DBRole = new Entity(
         required: true,
       },
       role: {
-        type: ['admin', 'owner', 'manager', 'viewer', 'comms', 'finance'] as const,
+        type: ['admin', 'owner', 'manager', 'viewer', 'comms', 'finance', 'amend'] as const,
         required: true,
       },
       eventId: {
@@ -191,7 +189,7 @@ export const DBEvent = new Entity(
         required: true,
         properties: {
           feeStructure: {
-            type: ['free', 'ealing', 'ealing2026', 'vcamp'] as const,
+            type: ['free', 'ealing', 'ealing2026', 'vcamp', 'ealing2026options'] as const,
             required: true,
           },
           ealingData: {
@@ -237,6 +235,39 @@ export const DBEvent = new Entity(
               childDiscount: {
                 type: 'number',
                 required: true,
+              },
+              paymentInstructions: {
+                type: 'string',
+                required: true,
+              },
+            },
+          },
+          ealingData2026options: {
+            type: 'map',
+            properties: {
+              options: {
+                type: 'list',
+                items: {
+                  type: 'map',
+                  properties: {
+                    adult: {
+                      type: 'number',
+                      required: true,
+                    },
+                    child: {
+                      type: 'number',
+                      required: true,
+                    },
+                    adultDiscount: {
+                      type: 'number',
+                      required: true,
+                    },
+                    childDiscount: {
+                      type: 'number',
+                      required: true,
+                    },
+                  },
+                },
               },
               paymentInstructions: {
                 type: 'string',
@@ -294,8 +325,21 @@ export const DBEvent = new Entity(
         type: 'map',
         properties: {
           attendanceStructure: {
-            type: ['whole', 'freechoice'] as const,
+            type: ['whole', 'freechoice', 'options'] as const,
             required: true,
+          },
+          attendanceOptions: {
+            type: 'list',
+            items: {
+              type: 'map',
+              properties: {
+                option: {
+                  type: 'string',
+                  required: true,
+                },
+              },
+            },
+            required: false,
           },
         },
       },
@@ -606,6 +650,7 @@ const PersonAttributes = {
     type: 'map',
     properties: {
       bitMask: { type: 'number' },
+      option: { type: 'string' },
       // No properties for whole attendance
     },
   },

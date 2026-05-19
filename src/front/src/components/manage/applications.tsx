@@ -1,6 +1,6 @@
 import { ActionIcon, Avatar, Container, Flex, Loader, Table, Text, Title } from '@mantine/core'
 import pdf from '@stdlib/stats-base-dists-normal-pdf'
-import { IconCheck, IconX } from '@tabler/icons-react'
+import { IconCheck, IconLock, IconLockOpen, IconX } from '@tabler/icons-react'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import dayjs from 'dayjs'
@@ -9,11 +9,16 @@ import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Too
 
 import { TApplication } from '../../../../shared/schemas/application'
 import { TEvent } from '../../../../shared/schemas/event'
+import { RoleForFormSchema, TRole } from '../../../../shared/schemas/role'
 import { approveApplicationMutation } from '../../mutations/approveApplication'
+import { createRoleMuation } from '../../mutations/createRole'
 import { declineApplicationMutation } from '../../mutations/declineApplication'
+import { deleteApplicationMutation } from '../../mutations/deleteApplication'
+import { deleteRoleMuation } from '../../mutations/deleteRole'
 import { getEventApplicationsQueryOptions } from '../../queries/getEventApplications'
 import { getEventApplicationSheetNumbersQueryOptions } from '../../queries/getEventApplicationSheetNumbers'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
+import { getEventRolesQueryOptions } from '../../queries/getEventRoles'
 import { useEvent } from '../../utils'
 
 export const ManageApplications = () => {
@@ -22,11 +27,14 @@ export const ManageApplications = () => {
   const { eventId } = event
   const applicationsQuery = useSuspenseQuery(getEventApplicationsQueryOptions(eventId))
   const bookingsQuery = useSuspenseQuery(getEventBookingsQueryOptions(eventId))
+  const rolesQuery = useSuspenseQuery(getEventRolesQueryOptions(eventId))
   const sheetNumbersQuery = useQuery(getEventApplicationSheetNumbersQueryOptions(eventId))
 
   const bookings = useMemo(() => bookingsQuery.data.bookings, [bookingsQuery.data])
 
   const pending = useMemo(() => applicationsQuery.data.applications.filter((a) => a.status === 'pending').sort((a, b) => b.createdAt - a.createdAt), [applicationsQuery.data])
+
+  const deadlinePassed = dayjs().isAfter(dayjs(event.bookingDeadline))
 
   const pendingRows = pending.map((app) => (
     <Table.Tr key={app.userId}>
@@ -54,6 +62,7 @@ export const ManageApplications = () => {
 
   const approvedRows = approved.map((app) => {
     const booking = bookings.find((b) => b.userId === app.userId)
+    const role = rolesQuery.data.roles.find((r) => r.userId === app.userId && r.eventId === eventId && r.role === 'amend')
     return (
       <Table.Tr key={app.userId}>
         <Table.Td>{Avatars(app.type)}</Table.Td>
@@ -67,6 +76,7 @@ export const ManageApplications = () => {
         <Table.Td>{sheetNumbersQuery.isSuccess ? (sheetNumbersQuery.data.numbers[app.userId] ?? '') : <Loader size={16} />}</Table.Td>
         <Table.Td>
           <Flex gap={8}>
+            {deadlinePassed ? role ? <LockButton event={event} application={app} role={role} /> : <UnlockButton event={event} application={app} /> : <DisabledUnlockButton />}
             <DeclineButton event={event} application={app} />
           </Flex>
         </Table.Td>
@@ -126,6 +136,7 @@ export const ManageApplications = () => {
       <Table.Td>
         <Flex gap={8}>
           <ApproveButton event={event} application={app} />
+          <DeleteButton event={event} application={app} />
         </Flex>
       </Table.Td>
     </Table.Tr>
@@ -222,8 +233,59 @@ const ApproveButton = ({ event, application }: { event: TEvent; application: TAp
 const DeclineButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
   const mutation = declineApplicationMutation(event.eventId)
   return (
-    <ActionIcon loading={mutation.isPending} gradient={{ from: 'red', to: 'orange', deg: 110 }} variant="gradient" onClick={() => mutation.mutate(application.userId)}>
+    <ActionIcon loading={mutation.isPending} gradient={{ from: 'yellow', to: 'orange', deg: 110 }} variant="gradient" onClick={() => mutation.mutate(application.userId)}>
       <IconX />
+    </ActionIcon>
+  )
+}
+
+const DeleteButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
+  const mutation = deleteApplicationMutation(event.eventId)
+  return (
+    <ActionIcon
+      loading={mutation.isPending}
+      gradient={{ from: 'red', to: 'orange', deg: 110 }}
+      variant="gradient"
+      onClick={() => {
+        if (confirm('Are you sure you want to delete this application? This action cannot be undone.')) mutation.mutate(application.userId)
+      }}
+    >
+      <IconX />
+    </ActionIcon>
+  )
+}
+
+const UnlockButton = ({ event, application }: { event: TEvent; application: TApplication }) => {
+  const createMutation = createRoleMuation(event.eventId)
+  const onClick: () => void = () => {
+    const valid = RoleForFormSchema.parse({ userId: application.userId, role: 'amend', eventId: event.eventId })
+    createMutation.mutate(valid)
+  }
+
+  return (
+    <ActionIcon loading={createMutation.isPending} gradient={{ from: 'teal', to: 'lime', deg: 110 }} variant="gradient" onClick={onClick}>
+      <IconLockOpen />
+    </ActionIcon>
+  )
+}
+
+const DisabledUnlockButton = () => {
+  return (
+    <ActionIcon disabled variant="outline">
+      <IconLockOpen />
+    </ActionIcon>
+  )
+}
+
+const LockButton = ({ event, application, role }: { event: TEvent; application: TApplication; role: TRole }) => {
+  const deleteMutation = deleteRoleMuation(event.eventId)
+  const onClick: () => void = () => {
+    deleteMutation.mutate(role.roleId)
+  }
+
+  return (
+    <ActionIcon loading={deleteMutation.isPending} gradient={{ from: 'orange', to: 'red', deg: 110 }} variant="gradient" onClick={onClick}>
+      <IconLock />
     </ActionIcon>
   )
 }

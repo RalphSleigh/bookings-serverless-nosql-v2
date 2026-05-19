@@ -38,7 +38,7 @@ export abstract class PersonField<T extends TEvent = TEvent> {
         case 'boolean':
           return v.toString()
         case 'object':
-          return v.toLocaleString("en-GB")
+          return v.toISOString()
         case 'number':
           return v.toString()
       }

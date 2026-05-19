@@ -1,24 +1,22 @@
 import { Grid, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { Markdown as EmailMarkdown } from '@react-email/markdown'
-import { useDebounce } from '@react-hook/debounce'
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 
 import { WatchDebounce } from '../../front/src/utils'
-import { AttendanceStructureValues } from '../attendance/attendance'
-import { PartialBookingType, TBooking } from '../schemas/booking'
-import { TEvent, TEventEalingFees } from '../schemas/event'
-import { TPerson } from '../schemas/person'
-import { currency } from '../util'
-import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeLine, FeeStructure, FeeStructureCondfigurationElement, FeeStructureConfigData, GetFeeLineFunction } from './feeStructure'
 import type { TBookingResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
+import { AttendanceStructureValues } from '../attendance/attendance'
+import { PartialBookingType } from '../schemas/booking'
+import { TEvent, TEventEalingFees } from '../schemas/event'
+import { currency } from '../util'
+import { BookingFormDisplayElement, EmailElement, EventListDisplayElement, FeeStructure, FeeStructureConfigurationElement, GetFeeLineFunction } from './feeStructure'
 
 export class EalingFees implements FeeStructure<TEventEalingFees> {
   typeName: 'ealing' = 'ealing'
   name = 'Ealing Fees'
   supportedAttendance: AttendanceStructureValues[] = ['whole']
-  ConfigurationElement: FeeStructureCondfigurationElement<TEventEalingFees> = () => {
+  ConfigurationElement: FeeStructureConfigurationElement<TEventEalingFees> = () => {
     const { register } = useFormContext<{ fee: TEventEalingFees }>()
     //const { updateNumber, updateField } = getMemoObjectUpdateFunctions(getSubUpdate(update, 'ealingData'))
     const pound = <Text>£</Text>

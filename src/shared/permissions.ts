@@ -1,18 +1,18 @@
 import { AbilityBuilder, ConditionsMatcher, createMongoAbility, ForcedSubject, MatchConditions, PureAbility } from '@casl/ability'
 import dayjs from 'dayjs'
 
+import type { TBookingResponse } from '../lambda/endpoints/event/manage/getEventBookings'
 import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
 import { TRole, TRoleForForm } from './schemas/role'
 import { ContextUser } from './schemas/user'
-import type { TBookingResponse } from '../lambda/endpoints/event/manage/getEventBookings'
 
 export type EventID = Pick<TEvent, 'eventId'>
 
 export type Abilities =
   | ['manage', 'all']
   | ['get', 'events' | 'event' | 'currentUser' | 'env' | 'ownBookings' | 'users' | 'errors']
-  | ['update', 'userPreferences' | 'eventBooking' | ({ event: TEvent; booking: TBookingResponse } & ForcedSubject<'eventBooking'>)]
+  | ['update' | 'pay', 'userPreferences' | 'eventBooking' | ({ event: TEvent; booking: TBookingResponse } & ForcedSubject<'eventBooking'>)]
   | ['book' | 'apply', 'event' | (TEvent & ForcedSubject<'event'>)]
   | ['create', 'booking' | 'event']
   | ['edit', 'booking' | 'event']
@@ -45,7 +45,8 @@ export const getPermissionsFromUser = (user: ContextUser) => {
   can('update', 'userPreferences')
 
   //edit own bookings
-  can('update', 'eventBooking', ({ booking: b }) => b.userId === user.userId)
+  can('update', 'eventBooking', ({ booking: b, event: e }) => b.userId === user.userId && dayjs(e.bookingDeadline).isAfter(new Date()))
+  can('pay', 'eventBooking', ({ booking: b }) => b.userId === user.userId)
   can('cancelBooking', 'eventBookingIds', (ids) => ids.userId === user.userId)
 
   //get the sheet for own bookings
@@ -133,5 +134,9 @@ const permissionsFunctions: Record<TRole['role'], (can: AbilityBuilder<PureAbili
     can('getBackend', 'eventId', (e) => e.eventId === role.eventId)
     can('getFees', 'eventId', (e) => e.eventId === role.eventId)
     can('createFee', 'eventId', (e) => e.eventId === role.eventId)
+  },
+  amend: (can, role) => {
+    can('book', 'event', (e) => e.eventId === role.eventId)
+    can('update', 'eventBooking', ({ booking: b }) => b.userId === role.userId && b.eventId === role.eventId)
   },
 }

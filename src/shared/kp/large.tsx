@@ -1,15 +1,17 @@
 import { Divider, Grid, Table, Text, Textarea } from '@mantine/core'
+import { useContext } from 'react'
 import { useFormContext } from 'react-hook-form'
 
+import { ReadOnlyContext } from '../../front/src/components/booking-form/readOnlyContext'
 import { CustomCheckbox } from '../../front/src/components/custom-inputs/customCheckbox'
 import { CustomSelect } from '../../front/src/components/custom-inputs/customSelect'
 import { errorProps } from '../../front/src/utils'
 import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 import { getAttendanceType } from '../attendance/attendance'
+import { FreeChoiceAttendance } from '../attendance/freechoice'
 import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
-import { TEvent, TEventBasicKP, TEventLargeKP } from '../schemas/event'
-import { TPerson } from '../schemas/person'
+import { TEvent, TEventFreeChoiceAttendance, TEventLargeKP } from '../schemas/event'
 import { TRole } from '../schemas/role'
 import { ageGroupFromPerson } from '../woodcraft'
 import { KPBasicOptions, KPPersonCardSection, KPStructure, ManageKPPageList } from './kp'
@@ -18,6 +20,7 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
   typeName: 'large' = 'large'
 
   PersonFormSection: React.FC<{ index: number }> = ({ index }) => {
+    const readOnly = useContext(ReadOnlyContext)
     const { register, formState } = useFormContext<TBooking<TEvent<TEventLargeKP>>>()
     const errors = formState.errors
     const e = errorProps(errors)
@@ -33,7 +36,7 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
           <Text size="sm">Choose the diet you want on camp. Only choose omnivore if you want to eat meat on camp. Camp is a great time to try out a vegetarian diet.</Text>
         </Grid.Col>
         <Grid.Col span={4}>
-          <CustomSelect required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
+          <CustomSelect disabled={readOnly} required label="Diet" id={`person-diet-${index}`} name={`people.${index}.kp.diet`} data={KPBasicOptions.map((d) => ({ value: d, label: d }))} />
         </Grid.Col>
         <Grid.Col span={12}>
           <Text mt={16} size="sm">
@@ -41,31 +44,32 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
           </Text>
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Nut Free" id={`person-nut-${index}`} name={`people.${index}.kp.nut`} m={4} />
+          <TypedBox label="Nut Free" id={`person-nut-${index}`} name={`people.${index}.kp.nut`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Gluten Free" id={`person-gluten-${index}`} name={`people.${index}.kp.gluten`} m={4} />
+          <TypedBox label="Gluten Free" id={`person-gluten-${index}`} name={`people.${index}.kp.gluten`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Soya Free" id={`person-soya-${index}`} name={`people.${index}.kp.soya`} m={4} />
+          <TypedBox label="Soya Free" id={`person-soya-${index}`} name={`people.${index}.kp.soya`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Dairy/Lactose Free" id={`person-dairy-${index}`} name={`people.${index}.kp.dairy`} m={4} />
+          <TypedBox label="Dairy/Lactose Free" id={`person-dairy-${index}`} name={`people.${index}.kp.dairy`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Egg Free" id={`person-egg-${index}`} name={`people.${index}.kp.egg`} m={4} />
+          <TypedBox label="Egg Free" id={`person-egg-${index}`} name={`people.${index}.kp.egg`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Pork Free" id={`person-pork-${index}`} name={`people.${index}.kp.pork`} m={4} />
+          <TypedBox label="Pork Free" id={`person-pork-${index}`} name={`people.${index}.kp.pork`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Chickpea Free" id={`person-chickpea-${index}`} name={`people.${index}.kp.chickpea`} m={4} />
+          <TypedBox label="Chickpea Free" id={`person-chickpea-${index}`} name={`people.${index}.kp.chickpea`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={{ base: 6, xs: 4, sm: 3 }}>
-          <TypedBox label="Diabetic" id={`person-diabetic-${index}`} name={`people.${index}.kp.diabetic`} m={4} />
+          <TypedBox label="Diabetic" id={`person-diabetic-${index}`} name={`people.${index}.kp.diabetic`} m={4} disabled={readOnly} />
         </Grid.Col>
         <Grid.Col span={12}>
           <Textarea
+            disabled={readOnly}
             autoComplete={`section-person-${index} diet-details`}
             id={`person-details-${index}`}
             data-form-type="other"
@@ -77,14 +81,16 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
             mt={16}
           />
           <TypedBox
+            disabled={readOnly}
             mt={16}
             label="My allergies or dietary needs are complicated and I would like to be contacted by the camp team"
             id={`person-contact-${index}`}
             name={`people.${index}.kp.contactMe`}
           />
           <Textarea
+            disabled={readOnly}
             autoComplete={`section-person-${index} diet-preferences`}
-            id={`person-details-${index}`}
+            id={`person-preferences-${index}`}
             data-form-type="other"
             label="Food dislikes or preferences (not allergies)"
             {...register(`people.${index}.kp.preferences` as const)}
@@ -119,9 +125,13 @@ export class LargeKP implements KPStructure<TEventLargeKP> {
             <Table.Tr key={c.personId}>
               <Table.Td>{c.basic.name}</Table.Td>
               <Table.Td>
-                <Text span c="green">
-                  {attendance.circles && attendance.isWholeAttendance && c.attendance?.bitMask && !attendance.isWholeAttendance(event, c) ? attendance.circles(c.attendance.bitMask, event) : null}
-                </Text>
+                {attendance instanceof FreeChoiceAttendance && (
+                  <Text span c="green">
+                    {(c as TPersonResponse<TEvent<TEventLargeKP, any, TEventFreeChoiceAttendance>>).attendance?.bitMask && !attendance.isWholeAttendance(event, c)
+                      ? attendance.circles((c as TPersonResponse<TEvent<TEventLargeKP, any, TEventFreeChoiceAttendance>>).attendance.bitMask, event)
+                      : null}
+                  </Text>
+                )}
               </Table.Td>
               <Table.Td>{ageFn(c).toAgeGroupString()}</Table.Td>
               <Table.Td>{c.kp.details}</Table.Td>

@@ -1,17 +1,16 @@
 import { Button, Divider, Input, Text } from '@mantine/core'
 import dayjs, { Dayjs } from 'dayjs'
 import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
-import e from 'express'
-import { get } from 'lodash'
+import { useContext } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 
+import { ReadOnlyContext } from '../../front/src/components/booking-form/readOnlyContext'
 import styles from '../../front/src/css/attendenceButtons.module.css'
 import { TPersonResponse } from '../../lambda/endpoints/event/manage/getEventBookings'
 import { PersonField } from '../personFields'
 import { TBooking } from '../schemas/booking'
 import { TEvent, TEventFreeChoiceAttendance } from '../schemas/event'
-import { TPerson } from '../schemas/person'
-import { AttendanceBookingFormDisplayElement, AttendanceIsWholeAttendanceFunction, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
+import { AttendanceBookingFormDisplayElement, AttendanceEventFormElement, AttendanceIsWholeAttendanceFunction, AttendancePersonCardElement, AttendanceStructure } from './attendanceStructure'
 
 dayjs.extend(AdvancedFormat)
 
@@ -23,6 +22,7 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
   typeName: 'freechoice' = 'freechoice'
   name = 'Free choice event'
   BookingFormDisplayElement: AttendanceBookingFormDisplayElement<TEventFreeChoiceAttendance> = ({ index, event }) => {
+    const readOnly = useContext(ReadOnlyContext)
     const { control } = useFormContext<TBooking<TEvent<any, any, TEventFreeChoiceAttendance>>>()
     const value = useWatch({ name: `people.${index}.attendance.bitMask`, control })
 
@@ -43,6 +43,7 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
 
     const buttons = nights.map((night, nightIndex) => (
       <Button
+        disabled={readOnly}
         size="sm"
         className={styles.root}
         variant={currentBitMask & (1 << nightIndex) ? 'attendanceSelected' : 'attendanceUnselected'}
@@ -63,10 +64,16 @@ export class FreeChoiceAttendance implements AttendanceStructure<TEventFreeChoic
         <Input.Label required>Nights attending:</Input.Label>
         <Button.Group style={{ flexWrap: 'wrap' }}>{buttons}</Button.Group>
         {invalid && <Input.Error>{error?.message}</Input.Error>}
-        {currentBitMask !== 0 && (<Text size="sm" mt={2}>{bitCount32(currentBitMask)} night{bitCount32(currentBitMask) > 1 ? 's' : ''} selected</Text>)}
+        {currentBitMask !== 0 && (
+          <Text size="sm" mt={2}>
+            {bitCount32(currentBitMask)} night{bitCount32(currentBitMask) > 1 ? 's' : ''} selected
+          </Text>
+        )}
       </>
     )
   }
+
+  EventFormElement: AttendanceEventFormElement<TEventFreeChoiceAttendance> = ({}) => null
 
   getNightsFromEvent(event: TEvent<any, any, TEventFreeChoiceAttendance, any>): Nights {
     if (nightsFromEventCached[event.eventId]) return nightsFromEventCached[event.eventId]

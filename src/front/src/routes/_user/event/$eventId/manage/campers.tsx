@@ -4,7 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, redirect, useRouteContext } from '@tanstack/react-router'
 
 import { useEvent } from '../../../../../utils'
-import { getUserBookingsQueryOptions } from '../../../../../queries/geUserBookings'
+import { getUserBookingsQueryOptions } from '../../../../../queries/getUserBookings'
 import { ManageCampers } from '../../../../../components/manage/campers'
 import { subject } from '@casl/ability'
 

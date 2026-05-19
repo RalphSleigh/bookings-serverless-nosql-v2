@@ -5,15 +5,18 @@ import { getMemoUpdateFunctions } from "../../../shared/util.js"
 import { PartialDeep } from "type-fest"
  */
 
-import { ActionIcon, Box, Button, Flex, Grid, Group, LoadingOverlay, Overlay, Paper, Radio, Text, Textarea, TextInput, Title } from '@mantine/core'
-import { useFieldArray, UseFieldArrayAppend, UseFieldArrayRemove, useFormContext } from 'react-hook-form'
+import { Grid, Group, Radio, Textarea, Title } from '@mantine/core'
+import { useContext } from 'react'
+import { useFormContext } from 'react-hook-form'
 import { z } from 'zod/v4'
 
 import { BookingSchemaForType } from '../../../../shared/schemas/booking'
 import { errorProps, useEvent } from '../../utils'
 import { CustomRadioGroup } from '../custom-inputs/customRadioGroup'
+import { ReadOnlyContext } from './readOnlyContext'
 
 export function OtherQuestionsForm() {
+  const readOnly = useContext(ReadOnlyContext)
   const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
 
   const { errors } = formState
@@ -30,12 +33,13 @@ export function OtherQuestionsForm() {
           </Title>
           <CustomRadioGroup name="other.shuttle" label="Will you need the shuttle bus to/from the station to camp?">
             <Group mt={8}>
-              <Radio value={'yes'} label="Yes " />
-              <Radio value={'maybe'} label="Not sure - but might" />
-              <Radio value={'no'} label="No" />
+              <Radio disabled={readOnly} value={'yes'} label="Yes " />
+              <Radio disabled={readOnly} value={'maybe'} label="Not sure - but might" />
+              <Radio disabled={readOnly} value={'no'} label="No" />
             </Group>
           </CustomRadioGroup>
           <Textarea
+            disabled={readOnly}
             mt={8}
             label="Anything else:"
             {...register('other.anythingElse')}
