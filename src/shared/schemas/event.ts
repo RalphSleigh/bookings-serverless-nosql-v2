@@ -18,11 +18,13 @@ export type TEventVCampConsents = z.infer<typeof vcampConsents>
 
 const wholeAttendance = z.object({ attendanceStructure: z.literal('whole') })
 const freeChoiceAttendance = z.object({ attendanceStructure: z.literal('freechoice') })
-const attendanceOptions = z.discriminatedUnion('attendanceStructure', [wholeAttendance, freeChoiceAttendance])
+const optionsAttendance = z.object({ attendanceStructure: z.literal('options'), attendanceOptions: z.array(z.object({ option: z.string().nonempty() })).min(1) })
+const attendanceOptions = z.discriminatedUnion('attendanceStructure', [wholeAttendance, freeChoiceAttendance, optionsAttendance])
 
 export type TEventAttendanceUnion = z.infer<typeof attendanceOptions>
 export type TEventWholeAttendance = z.infer<typeof wholeAttendance>
 export type TEventFreeChoiceAttendance = z.infer<typeof freeChoiceAttendance>
+export type TEventOptionsAttendance = z.infer<typeof optionsAttendance>
 
 const ealingFee = z.object({
   feeStructure: z.literal('ealing'),
@@ -56,7 +58,6 @@ export type TEventEalingFees = z.infer<typeof ealingFee>
 export type TEventEalingFees2026 = z.infer<typeof ealingFees2026>
 export type TEventFreeFees = z.infer<typeof freeFee>
 export type TEventVCampFees = z.infer<typeof vcampFee>
-
 
 const customQuestion = z.object({
   questionType: z.enum(['yesnochoice', 'text', 'longtext']),
