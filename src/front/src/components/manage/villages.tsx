@@ -11,8 +11,8 @@ import { manageVillageMutation } from '../../mutations/manageVillages'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 import { useEvent } from '../../utils'
 
-const VILLAGE_OK = 50
-const VILLAGE_FULL = 80
+const VILLAGE_OK = 70
+const VILLAGE_FULL = 90
 
 export const ManageVillages: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
