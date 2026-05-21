@@ -7,7 +7,6 @@ import dayjs from 'dayjs'
 import AdvancedFormat from 'dayjs/plugin/advancedFormat.js'
 import Markdown from 'react-markdown'
 
-import { app } from '../../../lambda/app.js'
 import { getFeeType } from '../../../shared/fees/fees.js'
 import { TApplication } from '../../../shared/schemas/application.js'
 import { TBooking } from '../../../shared/schemas/booking.js'
