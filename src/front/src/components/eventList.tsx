@@ -89,7 +89,6 @@ function EventCard({ event, booking, fees, application, user }: { event: TEvent;
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} p="md">
-      {!!application ? 'yes' : 'no'} {!permission.can('book', subject('event', event)) ? 'yes' : 'no'}
       <BookingButton event={event} booking={booking} application={application} />
       <Title order={1} size="h2">
         {event.name}
