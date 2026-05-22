@@ -85,7 +85,7 @@ function EventCard({ event, booking, fees, application, user }: { event: TEvent;
 
   const startDataFormat = dayjs(startDate).isSame(dayjs(endDate), 'month') ? 'Do' : 'Do MMMM'
 
-  const displayWarning = application && application.status === 'approved' && !permission.can('book', subject('event', event))
+  const displayWarning = user && application && application.status === 'approved' && !permission.can('book', subject('event', event))
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} p="md">
