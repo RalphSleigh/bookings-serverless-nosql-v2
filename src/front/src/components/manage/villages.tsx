@@ -88,7 +88,9 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
     mutation.mutate({ action: 'unassign', villageId, userId })
   }
 
-  const bookingsElements = bookings.map((booking) => (
+  const bookingsElements = bookings
+  .sort((a, b) => b.people.length - a.people.length)
+  .map((booking) => (
     <Table.Tr key={booking.userId}>
       <Table.Td>{'district' in booking.basic && booking.basic.district ? `${booking.basic.district} (${booking.basic.name})` : booking.basic.name}</Table.Td>
       <Table.Td>
