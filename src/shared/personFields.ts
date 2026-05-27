@@ -189,25 +189,31 @@ class Village extends PersonField {
   accessor = ({ p, b }: { p: TPersonResponse; b: TBooking }) => this.villageByUserId.get(b.userId) || ''
 }
 
+const consentMap = (value: string | undefined): string => {
+  if(value === 'yes') return '✅'
+  if(value === 'no') return '❌'
+  return ''
+}
+
 class PhotoConsent extends PersonField {
   enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
   roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   name = 'Photo Consent'
-  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.photo ? '✅' : '') : '')
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? consentMap(p.consents?.photo) : '')
 }
 
 class ActivityConsent extends PersonField {
   enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
   roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   name = 'Activity Consent'
-  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.activities ? '✅' : '') : '')
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? consentMap(p.consents?.activities) : '')
 }
 
 class RSEConsent extends PersonField {
   enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
   roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   name = 'RSE Consent'
-  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.rse ? '✅' : '') : '')
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? consentMap(p.consents?.rse) : '')
 }
 
 export class Current extends PersonField {
