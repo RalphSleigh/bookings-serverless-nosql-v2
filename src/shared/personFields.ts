@@ -191,23 +191,24 @@ class Village extends PersonField {
 
 class PhotoConsent extends PersonField {
   enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   name = 'Photo Consent'
   accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.photo ? '✅' : '') : '')
 }
 
 class ActivityConsent extends PersonField {
   enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   name = 'Activity Consent'
   accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.activities ? '✅' : '') : '')
 }
 
 class RSEConsent extends PersonField {
   enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   name = 'RSE Consent'
   accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.rse ? '✅' : '') : '')
 }
-
-
 
 export class Current extends PersonField {
   name = 'Current'
