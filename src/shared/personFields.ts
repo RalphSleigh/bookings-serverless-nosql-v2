@@ -189,6 +189,26 @@ class Village extends PersonField {
   accessor = ({ p, b }: { p: TPersonResponse; b: TBooking }) => this.villageByUserId.get(b.userId) || ''
 }
 
+class PhotoConsent extends PersonField {
+  enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  name = 'Photo Consent'
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.photo ? '✅' : '') : '')
+}
+
+class ActivityConsent extends PersonField {
+  enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  name = 'Activity Consent'
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.activities ? '✅' : '') : '')
+}
+
+class RSEConsent extends PersonField {
+  enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  name = 'RSE Consent'
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? (p.consents?.rse ? '✅' : '') : '')
+}
+
+
+
 export class Current extends PersonField {
   name = 'Current'
   accessor = ({ p }: { p: TPersonResponse }) => !p.cancelled
@@ -212,6 +232,9 @@ export const personFields = <E extends TEvent>(event: E, villages?: TVillages): 
     new Accessibility(event),
     new AccessibilityContactMe(event),
     ...attendance.PersonFields(event),
+    new PhotoConsent(event),
+    new ActivityConsent(event),
+    new RSEConsent(event),
     new Created(event),
     new Updated(event),
   ]
