@@ -190,8 +190,8 @@ class Village extends PersonField {
 }
 
 const consentMap = (value: string | undefined): string => {
-  if(value === 'yes') return '✅'
-  if(value === 'no') return '❌'
+  if(value === 'Yes') return '✅'
+  if(value === 'No') return '❌'
   return ''
 }
 
