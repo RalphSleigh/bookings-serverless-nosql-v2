@@ -1,5 +1,6 @@
 import { subject } from '@casl/ability'
-import { Button, Container, Paper, Table, Text, Title } from '@mantine/core'
+import { Alert, Button, Container, Paper, Table, Text, Title } from '@mantine/core'
+import { IconInfoCircle } from '@tabler/icons-react'
 import { useSuspenseQueries } from '@tanstack/react-query'
 import { LinkProps, useRouteContext } from '@tanstack/react-router'
 import dayjs from 'dayjs'
@@ -78,10 +79,13 @@ export function EventList() {
 }
 
 function EventCard({ event, booking, fees, application, user }: { event: TEvent; booking?: TBooking; fees: TFee[]; application: TApplication | undefined; user?: TUser }) {
+  const { permission } = useRouteContext({ from: '__root__' })
   const startDate = toLocalDate(event.startDate)!
   const endDate = toLocalDate(event.endDate)!
 
   const startDataFormat = dayjs(startDate).isSame(dayjs(endDate), 'month') ? 'Do' : 'Do MMMM'
+
+  const displayWarning = user && application && application.status === 'approved' && !permission.can('book', subject('event', event))
 
   return (
     <Paper shadow="md" radius="md" withBorder mt={16} p="md">
@@ -92,6 +96,17 @@ function EventCard({ event, booking, fees, application, user }: { event: TEvent;
       <Title order={2} size="h4">
         {dayjs(startDate).format(startDataFormat)} - {dayjs(endDate).format('Do MMMM YYYY')}
       </Title>
+      {displayWarning && (
+        <Alert mt={16} variant="light" color="yellow" title="Deadline Passed" icon={<IconInfoCircle />}>
+          <Text c="yellow.9">
+            As the deadline has passed you can no longer update your booking. If you need to make changes please contact the camp team at{' '}
+            <a style={{ color: 'inherit' }} href="mailto:info@venturercamp.org.uk">
+              info@venturercamp.org.uk
+            </a>{' '}
+            and they can make the changes or allow you to edit it yourself.
+          </Text>
+        </Alert>
+      )}
       {event.description ? <Markdown>{event.description}</Markdown> : null}
       {user && booking ? <YourBooking event={event} booking={booking} fees={fees} /> : null}
       <Text ta="right" mt={8}>

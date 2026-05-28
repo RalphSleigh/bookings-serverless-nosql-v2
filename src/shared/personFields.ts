@@ -8,7 +8,6 @@ import { getAttendanceType } from './attendance/attendance'
 import { getKPType } from './kp/kp'
 import { TBooking } from './schemas/booking'
 import { TEvent } from './schemas/event'
-import { TPerson } from './schemas/person'
 import { TRole } from './schemas/role'
 import { TVillages } from './schemas/villages'
 import { ageGroupFromPerson } from './woodcraft'
@@ -127,11 +126,22 @@ class Role extends PersonField {
   enabled = (event: TEvent) => event.fee.feeStructure === 'vcamp'
 }
 
-
 class Medical extends PersonField {
   name = 'Medical'
   roles: TRole['role'][] = ['owner', 'manager', 'viewer']
   accessor = ({ p }: { p: TPersonResponse }) => ('health' in p ? p.health?.medical || '' : '')
+}
+
+class Accessibility extends PersonField {
+  name = 'Accessibility'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
+  accessor = ({ p }: { p: TPersonResponse }) => ('health' in p && 'accessibility' in p.health ? (p.health?.accessibility ?? '') : '')
+}
+
+class AccessibilityContactMe extends PersonField {
+  name = 'Accessibility Contact Me'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
+  accessor = ({ p }: { p: TPersonResponse }) => ('health' in p && 'contactMe' in p.health ? (p.health?.contactMe ? '✅' : '') : '')
 }
 
 class Created extends PersonField {
@@ -179,6 +189,33 @@ class Village extends PersonField {
   accessor = ({ p, b }: { p: TPersonResponse; b: TBooking }) => this.villageByUserId.get(b.userId) || ''
 }
 
+const consentMap = (value: string | undefined): string => {
+  if(value === 'Yes') return '✅'
+  if(value === 'No') return '❌'
+  return ''
+}
+
+class PhotoConsent extends PersonField {
+  enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
+  name = 'Photo Consent'
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? consentMap(p.consents?.photo) : '')
+}
+
+class ActivityConsent extends PersonField {
+  enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
+  name = 'Activity Consent'
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? consentMap(p.consents?.activities) : '')
+}
+
+class RSEConsent extends PersonField {
+  enabled: (event: TEvent) => boolean = (event) => event.consents.consentsStructure === 'vcamp'
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
+  name = 'RSE Consent'
+  accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? consentMap(p.consents?.rse) : '')
+}
+
 export class Current extends PersonField {
   name = 'Current'
   accessor = ({ p }: { p: TPersonResponse }) => !p.cancelled
@@ -199,7 +236,12 @@ export const personFields = <E extends TEvent>(event: E, villages?: TVillages): 
     new Role(event),
     ...kp.PersonFields(event),
     new Medical(event),
+    new Accessibility(event),
+    new AccessibilityContactMe(event),
     ...attendance.PersonFields(event),
+    new PhotoConsent(event),
+    new ActivityConsent(event),
+    new RSEConsent(event),
     new Created(event),
     new Updated(event),
   ]
