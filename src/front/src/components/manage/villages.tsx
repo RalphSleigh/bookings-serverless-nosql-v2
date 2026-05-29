@@ -88,9 +88,16 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
     mutation.mutate({ action: 'unassign', villageId, userId })
   }
 
+
+
   const bookingsElements = bookings
   .sort((a, b) => b.people.length - a.people.length)
-  .map((booking) => (
+  .map((booking) => {
+    
+  const particioants = booking.people.filter(p => p.basic.role === 'participant').length
+  const volunteers = booking.people.filter(p => p.basic.role === 'volunteer').length
+
+    return (
     <Table.Tr key={booking.userId}>
       <Table.Td>{'district' in booking.basic && booking.basic.district ? `${booking.basic.district} (${booking.basic.name})` : booking.basic.name}</Table.Td>
       <Table.Td>
@@ -98,15 +105,20 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
         <br />
         {booking.camping?.equipment}
       </Table.Td>
-      <Table.Td>{booking.people.length}</Table.Td>
+      <Table.Td>{particioants}</Table.Td>
+      <Table.Td>{volunteers}</Table.Td>
+      <Table.Td>{particioants + volunteers}</Table.Td>
       <Table.Td>
         <ActionIcon onClick={() => unassignFn(id, booking.userId)} color="red" variant="outline">
           <IconX size={16} />
         </ActionIcon>
       </Table.Td>
     </Table.Tr>
-  ))
+  )})
 
+
+  const totalParticipants = bookings.reduce((acc, booking) => acc + booking.people.filter(p => p.basic.role === 'participant').length, 0)
+  const totalVolunteers = bookings.reduce((acc, booking) => acc + booking.people.filter(p => p.basic.role === 'volunteer').length, 0)
   const total = bookings.reduce((acc, booking) => acc + booking.people.length, 0)
 
   return (
@@ -128,6 +140,8 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
           <Table.Tr>
             <Table.Th>Name</Table.Th>
             <Table.Th>Details</Table.Th>
+            <Table.Th>Participants</Table.Th>
+            <Table.Th>Volunteers</Table.Th>
             <Table.Th>Campers</Table.Th>
             <Table.Th></Table.Th>
           </Table.Tr>
@@ -139,6 +153,8 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
               <b>Total</b>
             </Table.Td>
             <Table.Td></Table.Td>
+            <Table.Td>{totalParticipants}</Table.Td>
+            <Table.Td>{totalVolunteers}</Table.Td>
             <Table.Td>
               <Text c={totalColour(total)}><b>{total}</b></Text>
             </Table.Td>
