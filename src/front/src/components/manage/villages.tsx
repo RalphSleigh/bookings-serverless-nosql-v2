@@ -1,8 +1,9 @@
-import { ActionIcon, Box, Button, Container, Grid, Group, Paper, Select, Table, Text, TextInput, Title } from '@mantine/core'
-import { IconCross, IconEdit, IconX } from '@tabler/icons-react'
+import { ActionIcon, AspectRatio, Box, Button, Container, Grid, Group, Paper, Select, Table, Text, TextInput, Title } from '@mantine/core'
+import { IconEdit, IconX } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { useState } from 'react'
+import { Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { TBookingResponse } from '../../../../lambda/endpoints/event/manage/getEventBookings'
 import { TEvent } from '../../../../shared/schemas/event'
@@ -13,6 +14,64 @@ import { useEvent } from '../../utils'
 
 const VILLAGE_OK = 70
 const VILLAGE_FULL = 90
+
+const VillagesGraph: React.FC<{ villages: TVillages; bookings: TBookingResponse[] }> = ({ villages, bookings }) => {
+  const data = villages.villages.map((village) => {
+    return {
+      name: village.name,
+      Participants: village.bookings.reduce((acc, bookingId) => {
+        const booking = bookings.find((b) => b.userId === bookingId)
+        if (!booking) return acc
+        return acc + booking.people.filter((p) => p.basic.role === 'participant').length
+      }, 0),
+      Volunteers: village.bookings.reduce((acc, bookingId) => {
+        const booking = bookings.find((b) => b.userId === bookingId)
+        if (!booking) return acc
+        return acc + booking.people.filter((p) => p.basic.role === 'volunteer').length
+      }, 0),
+    }
+  })
+
+  return (
+    <ResponsiveContainer width="100%" aspect={3}>
+      <BarChart
+        width={100}
+        height={100}
+        data={data}
+        margin={{
+          top: 0,
+          right: 0,
+          left: -20,
+          bottom: 0,
+        }}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          horizontalCoordinatesGenerator={({ yAxis, width, height, offset }) => {
+            let niceTicks = yAxis.niceTicks ? yAxis.niceTicks[1] : 1
+            niceTicks = typeof niceTicks === 'string' ? parseInt(niceTicks) : niceTicks
+            const heightPerTen = (offset.height! / niceTicks) * 100
+            const lines: number[] = []
+            let i = offset.height!
+            while (i > 0) {
+              lines.push(i)
+              i -= heightPerTen
+            }
+            return lines
+          }}
+        />
+        <XAxis dataKey="name" tick={{ dy: 7 }} />
+        <YAxis tickCount={2} domain={[0, 120]} />
+        <Tooltip />
+        <Bar type="monotone" dataKey="Participants" stackId="1" stroke="#999999" fill="rgb(250, 156, 156)" />
+        <Bar type="monotone" dataKey="Volunteers" stackId="1" stroke="#999999" fill="rgb(167, 215, 255)">
+          <LabelList position="center" valueAccessor={(entry) => ((entry.payload as any).Participants as number) + ((entry.payload as any).Volunteers as number)} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  )
+}
 
 export const ManageVillages: React.FC = () => {
   const route = getRouteApi('/_user/event/$eventId/manage')
@@ -45,6 +104,9 @@ export const ManageVillages: React.FC = () => {
         <Grid mt={16}>
           <Grid.Col span={{ base: 12, md: 3 }}>{noVillageElements}</Grid.Col>
           <Grid.Col span={{ base: 12, md: 9 }}>
+            <AspectRatio ratio={3} mt={16}>
+              <VillagesGraph villages={villages} bookings={bookingsQuery.data.bookings} />
+            </AspectRatio>
             <AddVillage eventId={event.eventId} />
             {villageElements}
           </Grid.Col>
@@ -89,24 +151,33 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
   }
 
   const bookingsElements = bookings
-  .sort((a, b) => b.people.length - a.people.length)
-  .map((booking) => (
-    <Table.Tr key={booking.userId}>
-      <Table.Td>{'district' in booking.basic && booking.basic.district ? `${booking.basic.district} (${booking.basic.name})` : booking.basic.name}</Table.Td>
-      <Table.Td>
-        {booking.camping?.who}
-        <br />
-        {booking.camping?.equipment}
-      </Table.Td>
-      <Table.Td>{booking.people.length}</Table.Td>
-      <Table.Td>
-        <ActionIcon onClick={() => unassignFn(id, booking.userId)} color="red" variant="outline">
-          <IconX size={16} />
-        </ActionIcon>
-      </Table.Td>
-    </Table.Tr>
-  ))
+    .sort((a, b) => b.people.length - a.people.length)
+    .map((booking) => {
+      const particioants = booking.people.filter((p) => p.basic.role === 'participant').length
+      const volunteers = booking.people.filter((p) => p.basic.role === 'volunteer').length
 
+      return (
+        <Table.Tr key={booking.userId}>
+          <Table.Td>{'district' in booking.basic && booking.basic.district ? `${booking.basic.district} (${booking.basic.name})` : booking.basic.name}</Table.Td>
+          <Table.Td>
+            {booking.camping?.who}
+            <br />
+            {booking.camping?.equipment}
+          </Table.Td>
+          <Table.Td>{particioants}</Table.Td>
+          <Table.Td>{volunteers}</Table.Td>
+          <Table.Td>{particioants + volunteers}</Table.Td>
+          <Table.Td>
+            <ActionIcon onClick={() => unassignFn(id, booking.userId)} color="red" variant="outline">
+              <IconX size={16} />
+            </ActionIcon>
+          </Table.Td>
+        </Table.Tr>
+      )
+    })
+
+  const totalParticipants = bookings.reduce((acc, booking) => acc + booking.people.filter((p) => p.basic.role === 'participant').length, 0)
+  const totalVolunteers = bookings.reduce((acc, booking) => acc + booking.people.filter((p) => p.basic.role === 'volunteer').length, 0)
   const total = bookings.reduce((acc, booking) => acc + booking.people.length, 0)
 
   return (
@@ -128,6 +199,8 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
           <Table.Tr>
             <Table.Th>Name</Table.Th>
             <Table.Th>Details</Table.Th>
+            <Table.Th>Participants</Table.Th>
+            <Table.Th>Volunteers</Table.Th>
             <Table.Th>Campers</Table.Th>
             <Table.Th></Table.Th>
           </Table.Tr>
@@ -139,8 +212,12 @@ const Village: React.FC<{ name: string; id: string; eventId: string; bookings: T
               <b>Total</b>
             </Table.Td>
             <Table.Td></Table.Td>
+            <Table.Td>{totalParticipants}</Table.Td>
+            <Table.Td>{totalVolunteers}</Table.Td>
             <Table.Td>
-              <Text c={totalColour(total)}><b>{total}</b></Text>
+              <Text c={totalColour(total)}>
+                <b>{total}</b>
+              </Text>
             </Table.Td>
             <Table.Td></Table.Td>
           </Table.Tr>
