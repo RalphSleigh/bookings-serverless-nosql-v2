@@ -33,7 +33,7 @@ const VillagesGraph: React.FC<{ villages: TVillages; bookings: TBookingResponse[
   })
 
   return (
-    <ResponsiveContainer width="100%" aspect={3}>
+    <ResponsiveContainer width="100%" aspect={5}>
       <BarChart
         width={100}
         height={100}
@@ -51,7 +51,7 @@ const VillagesGraph: React.FC<{ villages: TVillages; bookings: TBookingResponse[
           horizontalCoordinatesGenerator={({ yAxis, width, height, offset }) => {
             let niceTicks = yAxis.niceTicks ? yAxis.niceTicks[1] : 1
             niceTicks = typeof niceTicks === 'string' ? parseInt(niceTicks) : niceTicks
-            const heightPerTen = (offset.height! / niceTicks) * 100
+            const heightPerTen = (offset.height! / niceTicks) * 20
             const lines: number[] = []
             let i = offset.height!
             while (i > 0) {
@@ -104,7 +104,7 @@ export const ManageVillages: React.FC = () => {
         <Grid mt={16}>
           <Grid.Col span={{ base: 12, md: 3 }}>{noVillageElements}</Grid.Col>
           <Grid.Col span={{ base: 12, md: 9 }}>
-            <AspectRatio ratio={3} mt={16}>
+            <AspectRatio ratio={5} mb={16}>
               <VillagesGraph villages={villages} bookings={bookingsQuery.data.bookings} />
             </AspectRatio>
             <AddVillage eventId={event.eventId} />
