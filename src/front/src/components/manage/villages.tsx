@@ -1,5 +1,5 @@
 import { ActionIcon, AspectRatio, Box, Button, Container, Grid, Group, Paper, Select, Table, Text, TextInput, Title } from '@mantine/core'
-import { IconCross, IconEdit, IconX } from '@tabler/icons-react'
+import { IconEdit, IconX } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { useState } from 'react'
