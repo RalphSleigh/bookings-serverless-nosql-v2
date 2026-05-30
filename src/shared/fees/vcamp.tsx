@@ -1,4 +1,5 @@
 import { Button, Grid, Group, Table, Text, TextInput, Title } from '@mantine/core'
+import dayjs from 'dayjs'
 import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
@@ -41,13 +42,16 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
   getFeeLines: GetFeeLineFunction<TEventVCampFees> = (event: TEvent<any, any, TEventFreeChoiceAttendance, TEventVCampFees>, booking: PartialBookingType) => {
     const attendance = getAttendanceType(event) as FreeChoiceAttendance
     const nights = attendance.getNightsFromEvent(event)
-    const peopleTotals = nights.map(() => ({ participant: 0, volunteer: 0 }))
+    const peopleTotals = nights.map(() => ({ participant: 0, volunteer: 0, lateVolunteer: 0 }))
 
     booking.people?.forEach((p) => {
       if (!p || !(p.attendance && 'bitMask' in p.attendance) || !p.basic?.role) return
       const nightCount = bitCount32(p.attendance.bitMask || 0)
       if (nightCount > 0 && nightCount <= peopleTotals.length) {
-        peopleTotals[nightCount - 1][p?.basic?.role] += 1
+        const created = p.createdAt ? dayjs(p.createdAt) : dayjs()
+        const late = created.isAfter(dayjs(event.bookingDeadline))
+        const role = p.basic?.role === 'participant' ? 'participant' : late ? 'lateVolunteer' : 'volunteer'
+        peopleTotals[nightCount - 1][role] += 1
       }
     })
 
@@ -62,6 +66,12 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
         lines.push({
           label: `${tp.volunteer} ${tp.volunteer > 1 ? 'volunteers' : 'volunteer'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.volunteer.a + event.fee.volunteer.b * (index + 1))} ${tp.volunteer > 1 ? 'each' : ''}`,
           amount: (event.fee.volunteer.a + event.fee.volunteer.b * (index + 1)) * tp.volunteer,
+        })
+      }
+      if (tp.lateVolunteer > 0) {
+        lines.push({
+          label: `${tp.lateVolunteer} ${tp.lateVolunteer > 1 ? 'late volunteers' : 'late volunteer'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.participant.a + event.fee.participant.b * (index + 1))} ${tp.lateVolunteer > 1 ? 'each' : ''}`,
+          amount: (event.fee.participant.a + event.fee.participant.b * (index + 1)) * tp.lateVolunteer,
         })
       }
       return lines
@@ -87,7 +97,7 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
             <b>Camp fees:</b>
           </Text>
           <Text mt={4}>
-            Participants: {currency(event.fee.participant.a)} + {currency(event.fee.participant.b)} per night
+            Participants and Volunteers after the booking deadline: {currency(event.fee.participant.a)} + {currency(event.fee.participant.b)} per night
           </Text>
           <Text mt={4}>
             Volunteers: {currency(event.fee.volunteer.a)} + {currency(event.fee.volunteer.b)} per night
