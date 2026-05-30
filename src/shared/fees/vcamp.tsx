@@ -70,7 +70,7 @@ export class VCampFees implements FeeStructure<TEventVCampFees> {
       }
       if (tp.lateVolunteer > 0) {
         lines.push({
-          label: `${tp.lateVolunteer} ${tp.lateVolunteer > 1 ? 'late volunteers' : 'late volunteer'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.participant.a + event.fee.participant.b * (index + 1))} ${tp.participant > 1 ? 'each' : ''}`,
+          label: `${tp.lateVolunteer} ${tp.lateVolunteer > 1 ? 'late volunteers' : 'late volunteer'} for ${index + 1} ${index + 1 === 1 ? 'night' : 'nights'} at ${currency(event.fee.participant.a + event.fee.participant.b * (index + 1))} ${tp.lateVolunteer > 1 ? 'each' : ''}`,
           amount: (event.fee.participant.a + event.fee.participant.b * (index + 1)) * tp.lateVolunteer,
         })
       }
