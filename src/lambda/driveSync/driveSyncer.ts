@@ -59,7 +59,10 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
 
       const filteredBookingFields = bookingFields(event, villages).filter((f) => f.enabledForDrive(event) && f.available(roles))
 
-      const parsedPeople = bookingsQuery.data?.person.map((p) => PersonSchema(event).parse(p))
+      const parsedPeople = bookingsQuery.data?.person
+      .map((p) => PersonSchema(event).parse(p))
+      .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
+
       const parsedBookings = bookingsQuery.data?.booking.map((b) => BookingSchema(event).parse({ ...b, people: parsedPeople?.filter((p) => p.userId === b.userId && p.eventId === b.eventId) }))
 
       /* const people = bookingsQuery.data.person
