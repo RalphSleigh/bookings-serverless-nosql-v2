@@ -1,13 +1,16 @@
-import { Grid, Textarea, TextInput, Title, Text } from '@mantine/core'
+import { Grid, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { useContext } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import z from 'zod/v4'
 
 import { BookingSchemaForType, PartialBookingType } from '../../../../shared/schemas/booking'
 import { errorProps } from '../../utils'
+import { ReadOnlyContext } from './readOnlyContext'
 
 export const EmergencyContactSection: React.FC = () => {
   const { register, formState } = useFormContext<z.infer<typeof BookingSchemaForType>>()
   const bookingType = useWatch<PartialBookingType, 'basic.type'>({ name: 'basic.type' })
+  const readOnly = useContext(ReadOnlyContext)
 
   const { errors } = formState
   const e = errorProps(errors)
@@ -22,8 +25,9 @@ export const EmergencyContactSection: React.FC = () => {
         Emergency Contact
       </Title>
       <Text>Please supply the name and phone number of an emergency contact.</Text>
-      <TextInput autoComplete="emergency name" id="emergencyname" data-form-type="name" required label="Name" {...register('basic.emergencyName')} {...e('basic.emergencyName')} />
+      <TextInput disabled={readOnly} autoComplete="emergency name" id="emergencyname" data-form-type="name" required label="Name" {...register('basic.emergencyName')} {...e('basic.emergencyName')} />
       <TextInput
+        disabled={readOnly}
         autoComplete="emergency tel"
         id="emergencytelephone"
         data-form-type="phone"

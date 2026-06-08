@@ -1,6 +1,6 @@
 //import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox, Alert, AlertTitle } from "@mui/material"
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, Flex, Grid, NumberInput, Paper, Switch, Text, Title } from '@mantine/core'
+import { Alert, Box, Button, Flex, Grid, NumberInput, Paper, Switch, Text, Title } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useDebounce } from '@react-hook/debounce'
 import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react'
@@ -135,6 +135,17 @@ export const BookingForm: React.FC<BookingFormProps> = ({ mode, event, inputData
             )}
             <Grid.Col span={{ base: 12, md: 9, lg: 6 }}>
               <Paper shadow="md" radius="md" withBorder m={8} p="md">
+                {readOnly && (
+                  <Alert variant="light" color="yellow" title="Deadline Passed" icon={<IconInfoCircle />} mb={16}>
+                    <Text c="yellow.9">
+                      As the deadline has passed you can no longer update your booking. If you need to make changes please contact the camp team at{' '}
+                      <a style={{ color: 'inherit' }} href="mailto:info@venturercamp.org.uk">
+                        info@venturercamp.org.uk
+                      </a>{' '}
+                      and they can make the changes or allow you to edit it yourself.
+                    </Text>
+                  </Alert>
+                )}
                 <BasicFields event={event} />
                 <EmergencyContactSection />
                 {event.bigCampMode && <ExtraContactsForm />}
