@@ -38,6 +38,15 @@ export function CustomNumberInput<T extends FieldValues>({
       defaultValue={value}
       value={value}
       onChange={(e) => {
+        //this gives a string back if you type a decimal with a 0 at the end so let's try to parse it as a float and if that works use the parsed value instead
+        if(typeof e === "string" && e.includes(".") && e.slice(-1) === "0") {
+          const parsedValue = parseFloat(e);
+          if (!isNaN(parsedValue)) {
+            fieldOnChange(parsedValue);
+            onChange?.(parsedValue);
+            return;
+          }
+        }
         fieldOnChange(e);
         onChange?.(e);
       }}
