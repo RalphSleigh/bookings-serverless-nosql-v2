@@ -74,6 +74,7 @@ export const ManageApplications = () => {
         <Table.Td>{app.minPredicted === app.maxPredicted ? app.minPredicted : `${app.minPredicted} - ${app.maxPredicted}`}</Table.Td>
         <Table.Td>{booking ? booking.people.filter((p) => !p.cancelled).length : ''}</Table.Td>
         <Table.Td>{sheetNumbersQuery.isSuccess ? (sheetNumbersQuery.data.numbers[app.userId] ?? '') : <Loader size={16} />}</Table.Td>
+        <Table.Td><Flex gap={8}>{role ? <IconLockOpen size={26} color='green'/> : <IconLock size={26} color='red' />}</Flex></Table.Td>
         <Table.Td>
           <Flex gap={8}>
             {deadlinePassed ? role ? <LockButton event={event} application={app} role={role} /> : <UnlockButton event={event} application={app} /> : <DisabledUnlockButton />}
@@ -195,6 +196,7 @@ export const ManageApplications = () => {
             <Table.Th>Predicted</Table.Th>
             <Table.Th>Booked</Table.Th>
             <Table.Th>In Sheet</Table.Th>
+            <Table.Th>State</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
