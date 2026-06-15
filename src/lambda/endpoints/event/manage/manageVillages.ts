@@ -2,6 +2,7 @@ import { subject } from '@casl/ability'
 import { v7 } from 'uuid'
 
 import { TVillages, VillagesSchema } from '../../../../shared/schemas/villages'
+import { enqueueAsyncTask } from '../../../asyncTasks/asyncTaskQueuer'
 import { DBVillage } from '../../../dynamo'
 import { HandlerWrapperLoggedIn } from '../../../utils'
 
@@ -73,6 +74,14 @@ export const manageVillages = HandlerWrapperLoggedIn<{}, ManageVillageItemData>(
 
       const parsed = VillagesSchema.parse(villageData)
       await DBVillage.put(parsed).go()
+
+      await enqueueAsyncTask({
+        type: 'driveSync',
+        data: {
+          eventId: res.locals.event.eventId,
+        },
+      })
+
       res.json({ parsed })
     } catch (e: any) {
       res.status(400).json({ message: e.message })
