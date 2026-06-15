@@ -11,7 +11,7 @@ import { getConsentsType } from '../../../../shared/consents/consents.js'
 import { getKPType } from '../../../../shared/kp/kp.js'
 import { BookingSchemaForType, PartialBookingType, TBooking } from '../../../../shared/schemas/booking.js'
 import { TEvent } from '../../../../shared/schemas/event.js'
-import { PersonSchema, TPerson } from '../../../../shared/schemas/person.js'
+import { PersonSchemaForClient, TPerson } from '../../../../shared/schemas/person.js'
 import { errorProps, useEvent } from '../../utils.js'
 import { CustomCheckbox } from '../custom-inputs/customCheckbox.js'
 import { CustomRadioGroup } from '../custom-inputs/customRadioGroup.js'
@@ -35,7 +35,7 @@ export const PeopleForm: React.FC<PeopleFormProps> = ({ event, userId }) => {
 
   const defaultCollapsed = fields.length > 6
 
-  const peopleSchema = useMemo(() => PersonSchema(event), [event])
+  const peopleSchema = useMemo(() => PersonSchemaForClient(event), [event])
 
   const people = fields.map((f, i) => {
     return <PersonForm event={event} index={i} key={f.id} remove={remove} defaultCollapsed={defaultCollapsed} peopleSchema={peopleSchema} />
