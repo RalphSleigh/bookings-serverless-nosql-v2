@@ -216,6 +216,13 @@ class RSEConsent extends PersonField {
   accessor = ({ p }: { p: TPersonResponse }) => ('consents' in p ? consentMap(p.consents?.rse) : '')
 }
 
+class FirstAid extends PersonField {
+  name = 'First Aid'
+  enabled: (event: TEvent) => boolean = (event) => event.bigCampMode
+  roles: TRole['role'][] = ['owner', 'manager', 'viewer']
+  accessor = ({ p }: { p: TPersonResponse }) => p.firstAid ? '✅' : ''
+}
+
 export class Current extends PersonField {
   name = 'Current'
   accessor = ({ p }: { p: TPersonResponse }) => !p.cancelled
@@ -242,6 +249,7 @@ export const personFields = <E extends TEvent>(event: E, villages?: TVillages): 
     new PhotoConsent(event),
     new ActivityConsent(event),
     new RSEConsent(event),
+    new FirstAid(event),
     new Created(event),
     new Updated(event),
   ]
