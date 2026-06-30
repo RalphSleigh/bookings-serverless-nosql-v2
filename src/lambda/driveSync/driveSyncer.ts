@@ -61,7 +61,7 @@ export const syncDriveForEvent = async (eventId: string, config: ConfigType) => 
 
       const parsedPeople = bookingsQuery.data?.person
       .map((p) => PersonSchema(event).parse(p))
-      .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
+      .sort((a, b) => a.personId.localeCompare(b.personId))
 
       const parsedBookings = bookingsQuery.data?.booking.map((b) => BookingSchema(event).parse({ ...b, people: parsedPeople?.filter((p) => p.userId === b.userId && p.eventId === b.eventId) }))
 
