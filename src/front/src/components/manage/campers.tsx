@@ -3,12 +3,11 @@ import { getRouteApi, useRouteContext } from '@tanstack/react-router'
 import { MantineReactTable, MRT_ColumnDef, MRT_Row, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, useMantineReactTable } from 'mantine-react-table'
 import { useMemo, useState } from 'react'
 
-import { TPerson } from '../../../../shared/schemas/person'
 import { getEventBookingsQueryOptions } from '../../queries/getEventBookings'
 
 import 'mantine-react-table/styles.css'
 
-import { ActionIcon, Box, Button, Container, Flex, Modal, Paper, Text, Title } from '@mantine/core'
+import { ActionIcon, Box, Container, Flex, Modal, Text, Title } from '@mantine/core'
 import { IconDownload } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
@@ -170,6 +169,7 @@ const PersonDetails = ({ event, person, booking }: { event: TEvent; person: TPer
       </Text>
       {'kp' in person && <kp.PersonCardSection person={person} />}
       <attendance.PersonCardElement event={event} person={person} />
+      {'health' in person && 'accessibility' in person.health && <Text>{person.health.accessibility}</Text>}
       {'health' in person && <Text>{person.health.medical}</Text>}
     </>
   )
