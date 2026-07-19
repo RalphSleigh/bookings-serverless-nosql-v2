@@ -126,7 +126,9 @@ const UserSelect = ({}) => {
 
   const userCombobox = useCombobox()
 
-  const items = usersQuery.data.users.map((user) => (
+  const items = usersQuery.data.users
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .map((user) => (
     <Combobox.Option key={user.userId} value={user.userId}>
       <UserItem user={user} />
     </Combobox.Option>
