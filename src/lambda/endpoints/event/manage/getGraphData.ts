@@ -26,6 +26,8 @@ export const getGraphData = HandlerWrapperLoggedIn<{ eventId: string }>(
           return person.createdAt < earliest ? person.createdAt : earliest
         }, people.data[0].createdAt)
 
+        console.log('Earliest date:', earliestDate)
+
         const results: Array<{ date: string, count: number }> = []
 
         for(let day = dayjs(earliestDate).endOf('day'); dayjs().endOf('day').diff(day, 'day') >= 0; day = day.add(1, 'day')) {
@@ -35,6 +37,8 @@ export const getGraphData = HandlerWrapperLoggedIn<{ eventId: string }>(
             }).length
             results.push({ date: day.format('YYYY-MM-DD'), count: peopleOnDay })
         }
+
+        console.log('Graph data results:', results)
 
         const users = await DBUser.scan.go({pages: "all"})
         const bookings = await DB.collections.booking({ eventId: event.eventId }).go()
