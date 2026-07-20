@@ -146,7 +146,7 @@ export const updateBooking = HandlerWrapper(
           .go({ response: 'all_new' })
         const personHistoryItem: EntityIdentifiers<typeof DBPersonHistory> = {
           eventId: event.eventId,
-          userId: user.userId,
+          userId: userId,
           personId: newPerson.data.personId,
         }
         await DBPersonHistory.update(personHistoryItem)
