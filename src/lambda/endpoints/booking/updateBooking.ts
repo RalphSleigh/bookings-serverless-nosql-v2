@@ -89,7 +89,7 @@ export const updateBooking = HandlerWrapper(
       userId,
     }
 
-    await DBBookingHistory.update(bookingHistoryItem)
+    await DBBookingHistory.patch(bookingHistoryItem)
       .append({ versions: [updatedBooking.data] })
       .go()
 
@@ -118,7 +118,7 @@ export const updateBooking = HandlerWrapper(
           personId: newPerson.data.personId,
         }
 
-        await DBPersonHistory.update(personHistoryItem)
+        await DBPersonHistory.patch(personHistoryItem)
           .append({ versions: [newPerson.data] })
           .go()
       } else {
@@ -149,7 +149,7 @@ export const updateBooking = HandlerWrapper(
           userId: userId,
           personId: newPerson.data.personId,
         }
-        await DBPersonHistory.update(personHistoryItem)
+        await DBPersonHistory.patch(personHistoryItem)
           .append({ versions: [newPerson.data] })
           .go()
       }
